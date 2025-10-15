@@ -182,10 +182,29 @@ npm run build:ssr
 ./vendor/bin/sail artisan inertia:start-ssr
 ```
 
-## Implementation Plan
+## Core Features
 
-Refer to `docs/StructLogr_Implementation_Plan.md` for the detailed development plan including:
-- Log formatting service architecture
-- Prism package integration
-- Database schema for formatted logs
-- Frontend form implementation
+**Log Formatting:**
+- Main route: `/` (FormatterPage)
+- POST `/format` endpoint processes raw logs
+- LogFormatterService with Prism SDK v2
+- DeepSeek LLM provider (configurable)
+- Structured output: timestamp, level, message, source, metadata
+- Database persistence in `formatted_logs` table
+
+**Authentication:**
+- Laravel Fortify with 2FA support
+- Email verification required
+- Recovery codes for 2FA
+- Settings pages for profile, password, 2FA, appearance
+
+## Documentation
+
+**Project Documentation:**
+- `README.md` - Project overview, installation, usage guide
+- `docs/architecture-overview.md` - Comprehensive system architecture
+- `docs/StructLogr_Implementation_Plan.md` - Development phases (COMPLETED)
+- `docs/UI_UX_Improvements.md` - Design system and component guide
+- `docs/CHANGELOG.md` - Version history and updates
+- `CLAUDE.md` - This file (AI assistant instructions)
+- `AGENTS.md` - Multi-agent system coordination
