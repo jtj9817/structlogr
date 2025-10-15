@@ -20,7 +20,7 @@ Homestead.yaml
 .env.production
 .env.local
 .env.*.local
-
+.env.example
 # Node.js dependencies and build artifacts
 /node_modules
 npm-debug.log*
@@ -129,4 +129,5 @@ docker-bkup.zip
 # DRT Alert Fix Records
 *_FixRecords_DRT_Alerts.md
 
+.editorconfig
 
