@@ -119,6 +119,7 @@ composer.lock
 
 # System documentation
 docs/system-summary.md
+docs/Phase_Dependencies_and_Prompts.md
 drivers/geckodriver
 drivers/chromedriver
 
