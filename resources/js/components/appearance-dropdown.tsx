@@ -7,13 +7,28 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useAppearance } from '@/hooks/use-appearance';
 import { Monitor, Moon, Sun } from 'lucide-react';
-import { HTMLAttributes } from 'react';
+import { HTMLAttributes, useEffect, useState } from 'react';
 
 export default function AppearanceToggleDropdown({
     className = '',
     ...props
 }: HTMLAttributes<HTMLDivElement>) {
     const { appearance, updateAppearance } = useAppearance();
+    const [systemPreference, setSystemPreference] = useState<'light' | 'dark'>(
+        'light',
+    );
+
+    useEffect(() => {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        setSystemPreference(mediaQuery.matches ? 'dark' : 'light');
+
+        const handleChange = (e: MediaQueryListEvent) => {
+            setSystemPreference(e.matches ? 'dark' : 'light');
+        };
+
+        mediaQuery.addEventListener('change', handleChange);
+        return () => mediaQuery.removeEventListener('change', handleChange);
+    }, []);
 
     const getCurrentIcon = () => {
         switch (appearance) {
@@ -57,7 +72,7 @@ export default function AppearanceToggleDropdown({
                     >
                         <span className="flex items-center gap-2">
                             <Monitor className="h-5 w-5" />
-                            System
+                            System ({systemPreference})
                         </span>
                     </DropdownMenuItem>
                 </DropdownMenuContent>

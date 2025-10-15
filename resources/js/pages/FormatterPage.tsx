@@ -1,3 +1,4 @@
+import { FormattingPreferences } from '@/components/formatter/formatting-preferences';
 import { HistorySidebar } from '@/components/formatter/history-sidebar';
 import HeroSection from '@/components/hero-section';
 import InputError from '@/components/input-error';
@@ -6,9 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 import { useHistory } from '@/hooks/use-history';
+import { usePreferences } from '@/hooks/use-preferences';
 import { login, register } from '@/routes';
 import { type SharedData } from '@/types';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Settings } from 'lucide-react';
 import { FormEventHandler, useRef, useState } from 'react';
 
 interface FormatterPageProps {
@@ -26,8 +29,10 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
     const { auth } = usePage<SharedData>().props;
     const formRef = useRef<HTMLElement>(null);
     const [historyOpen, setHistoryOpen] = useState(false);
+    const [preferencesOpen, setPreferencesOpen] = useState(false);
     const { addEntry } = useHistory();
-    const { data, setData, post, processing, errors } = useForm({
+    const { applyPreferences } = usePreferences();
+    const { data, setData, post, processing, errors, reset } = useForm({
         raw_log: '',
     });
 
@@ -159,14 +164,26 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
                             {formattedLog && (
                                 <Card className="shadow-sm transition-shadow hover:shadow-md">
                                     <CardHeader>
-                                        <CardTitle>
-                                            Formatted JSON Output
-                                        </CardTitle>
+                                        <div className="flex items-center justify-between">
+                                            <CardTitle>
+                                                Formatted JSON Output
+                                            </CardTitle>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() =>
+                                                    setPreferencesOpen(true)
+                                                }
+                                                className="h-8 w-8 p-0"
+                                            >
+                                                <Settings className="h-4 w-4" />
+                                            </Button>
+                                        </div>
                                     </CardHeader>
                                     <CardContent>
                                         <pre className="overflow-x-auto rounded-lg bg-muted p-6 text-sm">
                                             {JSON.stringify(
-                                                formattedLog,
+                                                applyPreferences(formattedLog),
                                                 null,
                                                 2,
                                             )}
@@ -189,6 +206,11 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
                 open={historyOpen}
                 onOpenChange={setHistoryOpen}
                 onLoadEntry={handleLoadHistoryEntry}
+            />
+
+            <FormattingPreferences
+                open={preferencesOpen}
+                onOpenChange={setPreferencesOpen}
             />
         </>
     );

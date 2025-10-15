@@ -23,8 +23,16 @@ const applyTheme = (appearance: Appearance) => {
     const isDark =
         appearance === 'dark' || (appearance === 'system' && prefersDark());
 
+    // Add transition class for smooth theme change
+    document.documentElement.classList.add('theme-transition');
+
     document.documentElement.classList.toggle('dark', isDark);
     document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+
+    // Remove transition class after animation completes
+    setTimeout(() => {
+        document.documentElement.classList.remove('theme-transition');
+    }, 300);
 };
 
 const mediaQuery = () => {
