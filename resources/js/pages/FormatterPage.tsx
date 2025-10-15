@@ -32,7 +32,7 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
     const [preferencesOpen, setPreferencesOpen] = useState(false);
     const { addEntry } = useHistory();
     const { applyPreferences } = usePreferences();
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const { data, setData, post, processing, errors } = useForm({
         raw_log: '',
     });
 
@@ -56,10 +56,7 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
         setHistoryOpen(true);
     };
 
-    const handleLoadHistoryEntry = (
-        rawLog: string,
-        _formattedLogData: Record<string, unknown>,
-    ) => {
+    const handleLoadHistoryEntry = (rawLog: string) => {
         setData('raw_log', rawLog);
         // The formatted log will be displayed through the props
     };
