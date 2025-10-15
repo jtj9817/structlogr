@@ -14,6 +14,47 @@ import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { Settings } from 'lucide-react';
 import { FormEventHandler, useRef, useState } from 'react';
 
+// Sample logs data
+const sampleLogs = [
+    {
+        id: 'apache-access',
+        name: 'Apache Access Log',
+        description: 'Standard Apache web server access log entry',
+        difficulty: 'easy',
+        content: `127.0.0.1 - - [15/Oct/2025:14:32:01 +0000] "GET /api/users HTTP/1.1" 200 1234 "https://example.com" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"`,
+    },
+    {
+        id: 'nginx-error',
+        name: 'Nginx Error Log',
+        description: 'Nginx web server error log entry',
+        difficulty: 'easy',
+        content: `2025/10/15 14:32:01 [error] 12345#12345: *67890 connect() failed (111: Connection refused) while connecting to upstream, client: 192.168.1.100, server: example.com, request: "GET /api/data HTTP/1.1", upstream: "http://127.0.0.1:8080/api/data", host: "example.com"`,
+    },
+    {
+        id: 'application-error',
+        name: 'Application Error Log',
+        description: 'Generic application error with stack trace',
+        difficulty: 'medium',
+        content: `2025-10-15 14:32:01 ERROR [main] com.example.app.UserService - Failed to connect to database
+java.sql.SQLException: Connection refused: connect
+\tat com.example.app.Database.connect(Database.java:123)
+\tat com.example.app.UserService.getUser(UserService.java:45)
+\tat com.example.app.Main.main(Main.java:12)
+Caused by: java.net.ConnectException: Connection refused: connect
+\t... 3 more`,
+    },
+    {
+        id: 'docker-logs',
+        name: 'Docker Container Log',
+        description: 'Docker container application log',
+        difficulty: 'medium',
+        content: `2025-10-15T14:32:01.123Z INFO  [web-server] Server started on port 8080
+2025-10-15T14:32:02.456Z DEBUG [web-server] Processing request from 192.168.1.100
+2025-10-15T14:32:03.789Z WARN  [web-server] Slow query detected: 2.5s
+2025-10-15T14:32:04.012Z ERROR [web-server] Database connection failed: timeout after 30s`,
+    },
+];
+
 interface FormatterPageProps {
     formattedLog?: {
         timestamp?: string;
@@ -59,6 +100,25 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
     const handleLoadHistoryEntry = (rawLog: string) => {
         setData('raw_log', rawLog);
         // The formatted log will be displayed through the props
+    };
+
+    const handleLoadSampleLog = (sampleId: string) => {
+        const sample = sampleLogs.find((log) => log.id === sampleId);
+        if (sample) {
+            setData('raw_log', sample.content);
+        }
+    };
+
+    const handleClearInput = () => {
+        setData('raw_log', '');
+    };
+
+    const getCharacterCount = () => {
+        return data.raw_log.length;
+    };
+
+    const getLineCount = () => {
+        return data.raw_log.split('\n').length;
     };
 
     return (
@@ -124,28 +184,93 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
                                         onSubmit={submit}
                                         className="space-y-6"
                                     >
+                                        {/* Sample Logs Dropdown */}
                                         <div className="space-y-2">
-                                            <Textarea
-                                                name="raw_log"
-                                                placeholder="Paste your raw log text here..."
-                                                className="min-h-[200px] rounded-md"
-                                                value={data.raw_log}
+                                            <label
+                                                htmlFor="sample-logs"
+                                                className="text-sm font-medium"
+                                            >
+                                                Try an example
+                                            </label>
+                                            <select
+                                                id="sample-logs"
                                                 onChange={(e) =>
-                                                    setData(
-                                                        'raw_log',
+                                                    handleLoadSampleLog(
                                                         e.target.value,
                                                     )
                                                 }
-                                            />
+                                                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+                                                defaultValue=""
+                                            >
+                                                <option value="">
+                                                    Select a sample log type...
+                                                </option>
+                                                {sampleLogs.map((log) => (
+                                                    <option
+                                                        key={log.id}
+                                                        value={log.id}
+                                                    >
+                                                        {log.name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        {/* Textarea with Clear Button */}
+                                        <div className="space-y-2">
+                                            <div className="relative">
+                                                <Textarea
+                                                    name="raw_log"
+                                                    placeholder="Paste your raw log text here..."
+                                                    className="min-h-[200px] rounded-md pr-10"
+                                                    value={data.raw_log}
+                                                    onChange={(e) =>
+                                                        setData(
+                                                            'raw_log',
+                                                            e.target.value,
+                                                        )
+                                                    }
+                                                />
+                                                {data.raw_log && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={
+                                                            handleClearInput
+                                                        }
+                                                        className="absolute top-3 right-3 rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                                                    >
+                                                        ×
+                                                    </button>
+                                                )}
+                                            </div>
+
+                                            {/* Character and Line Counter */}
+                                            <div className="flex justify-between text-xs text-muted-foreground">
+                                                <span>
+                                                    {getCharacterCount()}{' '}
+                                                    characters •{' '}
+                                                    {getLineCount()} lines
+                                                </span>
+                                                <span>
+                                                    {getCharacterCount() > 0
+                                                        ? '✓ Ready to format'
+                                                        : 'Enter log text to format'}
+                                                </span>
+                                            </div>
+
                                             <InputError
                                                 message={errors.raw_log}
                                                 className="mt-2"
                                             />
                                         </div>
+
                                         <div className="flex items-center">
                                             <Button
                                                 type="submit"
-                                                disabled={processing}
+                                                disabled={
+                                                    processing ||
+                                                    !data.raw_log.trim()
+                                                }
                                                 className="rounded-md"
                                             >
                                                 {processing && (
