@@ -32,7 +32,15 @@ import { cn } from '@/lib/utils';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react';
+import {
+    BookOpen,
+    Folder,
+    HelpCircle,
+    History as HistoryIcon,
+    LayoutGrid,
+    Menu,
+    Search,
+} from 'lucide-react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
 
@@ -62,16 +70,22 @@ const activeItemStyles =
 
 interface AppHeaderProps {
     breadcrumbs?: BreadcrumbItem[];
+    onHistoryOpen?: () => void;
+    onHelpOpen?: () => void;
 }
 
-export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
+export function AppHeader({
+    breadcrumbs = [],
+    onHistoryOpen,
+    onHelpOpen,
+}: AppHeaderProps) {
     const page = usePage<SharedData>();
     const { auth } = page.props;
     const getInitials = useInitials();
     return (
         <>
             <div className="border-b border-sidebar-border/80">
-                <div className="mx-auto flex h-16 items-center px-4 md:max-w-7xl">
+                <div className="mx-auto flex h-16 items-center px-4 sm:px-6 md:max-w-7xl lg:px-8">
                     {/* Mobile Menu */}
                     <div className="lg:hidden">
                         <Sheet>
@@ -193,6 +207,44 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
 
                     <div className="ml-auto flex items-center space-x-2">
                         <div className="relative flex items-center space-x-1">
+                            {onHistoryOpen && (
+                                <TooltipProvider delayDuration={0}>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="group h-9 w-9 cursor-pointer"
+                                                onClick={onHistoryOpen}
+                                            >
+                                                <HistoryIcon className="!size-5 opacity-80 group-hover:opacity-100" />
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>History</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            )}
+                            {onHelpOpen && (
+                                <TooltipProvider delayDuration={0}>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="group h-9 w-9 cursor-pointer"
+                                                onClick={onHelpOpen}
+                                            >
+                                                <HelpCircle className="!size-5 opacity-80 group-hover:opacity-100" />
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>Help</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            )}
                             <Button
                                 variant="ghost"
                                 size="icon"
@@ -264,7 +316,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
             </div>
             {breadcrumbs.length > 1 && (
                 <div className="flex w-full border-b border-sidebar-border/70">
-                    <div className="mx-auto flex h-12 w-full items-center justify-start px-4 text-neutral-500 md:max-w-7xl">
+                    <div className="mx-auto flex h-12 w-full items-center justify-start px-4 text-neutral-500 sm:px-6 md:max-w-7xl lg:px-8">
                         <Breadcrumbs breadcrumbs={breadcrumbs} />
                     </div>
                 </div>

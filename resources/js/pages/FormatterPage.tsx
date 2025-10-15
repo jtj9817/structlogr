@@ -1,13 +1,15 @@
+import { HistorySidebar } from '@/components/formatter/history-sidebar';
 import HeroSection from '@/components/hero-section';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
+import { useHistory } from '@/hooks/use-history';
 import { login, register } from '@/routes';
 import { type SharedData } from '@/types';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { FormEventHandler, useRef } from 'react';
+import { FormEventHandler, useRef, useState } from 'react';
 
 interface FormatterPageProps {
     formattedLog?: {
@@ -23,17 +25,38 @@ interface FormatterPageProps {
 export default function FormatterPage({ formattedLog }: FormatterPageProps) {
     const { auth } = usePage<SharedData>().props;
     const formRef = useRef<HTMLElement>(null);
+    const [historyOpen, setHistoryOpen] = useState(false);
+    const { addEntry } = useHistory();
     const { data, setData, post, processing, errors } = useForm({
         raw_log: '',
     });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        post('/format');
+        post('/format', {
+            onSuccess: () => {
+                // Add to history on successful formatting
+                if (formattedLog) {
+                    addEntry(data.raw_log, formattedLog);
+                }
+            },
+        });
     };
 
     const handleGetStarted = () => {
         formRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    const handleHistoryOpen = () => {
+        setHistoryOpen(true);
+    };
+
+    const handleLoadHistoryEntry = (
+        rawLog: string,
+        _formattedLogData: Record<string, unknown>,
+    ) => {
+        setData('raw_log', rawLog);
+        // The formatted log will be displayed through the props
     };
 
     return (
@@ -44,6 +67,14 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
                     <div className="container mx-auto flex h-16 items-center justify-between px-4">
                         <h1 className="text-xl font-semibold">StructLogr</h1>
                         <nav className="flex items-center gap-4">
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={handleHistoryOpen}
+                                className="text-sm"
+                            >
+                                History
+                            </Button>
                             {!auth.user && (
                                 <>
                                     <Link
@@ -70,32 +101,32 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
                     <section
                         id="formatter"
                         ref={formRef}
-                        className="container mx-auto px-4 py-16"
+                        className="container mx-auto px-4 py-16 sm:px-6 lg:px-8 lg:py-24"
                     >
-                        <div className="mx-auto max-w-4xl space-y-6">
-                            <div className="text-center">
-                                <h2 className="text-3xl font-bold">
+                        <div className="mx-auto max-w-4xl space-y-8">
+                            <div className="space-y-4 text-center">
+                                <h2 className="text-3xl leading-tight font-bold lg:text-4xl">
                                     Log Formatter
                                 </h2>
-                                <p className="mt-2 text-muted-foreground">
+                                <p className="text-lg leading-relaxed text-muted-foreground">
                                     Transform raw log text into structured JSON
                                 </p>
                             </div>
 
-                            <Card>
+                            <Card className="shadow-sm transition-shadow hover:shadow-md">
                                 <CardHeader>
                                     <CardTitle>Raw Log Input</CardTitle>
                                 </CardHeader>
-                                <CardContent>
+                                <CardContent className="space-y-6">
                                     <form
                                         onSubmit={submit}
-                                        className="space-y-4"
+                                        className="space-y-6"
                                     >
-                                        <div>
+                                        <div className="space-y-2">
                                             <Textarea
                                                 name="raw_log"
                                                 placeholder="Paste your raw log text here..."
-                                                className="min-h-[200px]"
+                                                className="min-h-[200px] rounded-md"
                                                 value={data.raw_log}
                                                 onChange={(e) =>
                                                     setData(
@@ -113,6 +144,7 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
                                             <Button
                                                 type="submit"
                                                 disabled={processing}
+                                                className="rounded-md"
                                             >
                                                 {processing && (
                                                     <Spinner className="mr-2" />
@@ -125,14 +157,14 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
                             </Card>
 
                             {formattedLog && (
-                                <Card>
+                                <Card className="shadow-sm transition-shadow hover:shadow-md">
                                     <CardHeader>
                                         <CardTitle>
                                             Formatted JSON Output
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <pre className="overflow-x-auto rounded-md bg-muted p-4 text-sm">
+                                        <pre className="overflow-x-auto rounded-lg bg-muted p-6 text-sm">
                                             {JSON.stringify(
                                                 formattedLog,
                                                 null,
@@ -152,6 +184,12 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
                     </div>
                 </footer>
             </div>
+
+            <HistorySidebar
+                open={historyOpen}
+                onOpenChange={setHistoryOpen}
+                onLoadEntry={handleLoadHistoryEntry}
+            />
         </>
     );
 }
