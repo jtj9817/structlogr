@@ -23,11 +23,30 @@ export interface NavItem {
     external?: boolean;
 }
 
+export type ApiStatusState =
+    | 'operational'
+    | 'degraded'
+    | 'outage'
+    | 'unknown';
+
+export interface FooterSharedConfig {
+    version?: string;
+    status?: {
+        state?: ApiStatusState;
+        message?: string;
+        href?: string;
+    };
+    newsletter?: {
+        subscribeUrl?: string;
+    };
+}
+
 export interface SharedData {
     name: string;
     quote: { message: string; author: string };
     auth: Auth;
     sidebarOpen: boolean;
+    footer?: FooterSharedConfig;
     [key: string]: unknown;
 }
 
