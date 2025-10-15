@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Services\LogFormatterService;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 
 class LogFormatterController extends Controller
 {
