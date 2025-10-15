@@ -2,17 +2,23 @@ import { FormattingPreferences } from '@/components/formatter/formatting-prefere
 import { HistorySidebar } from '@/components/formatter/history-sidebar';
 import HeroSection from '@/components/hero-section';
 import InputError from '@/components/input-error';
+import KeyboardShortcutsModal from '@/components/keyboard-shortcuts-modal';
+import SkipNavigation from '@/components/skip-navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 import { useHistory } from '@/hooks/use-history';
+import {
+    commonShortcuts,
+    useKeyboardShortcuts,
+} from '@/hooks/use-keyboard-shortcuts';
 import { usePreferences } from '@/hooks/use-preferences';
 import { login, register } from '@/routes';
 import { type SharedData } from '@/types';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { Settings } from 'lucide-react';
-import { FormEventHandler, useRef, useState } from 'react';
+import { HelpCircle, Settings } from 'lucide-react';
+import { FormEventHandler, useEffect, useRef, useState } from 'react';
 
 // Sample logs data
 const sampleLogs = [
@@ -69,8 +75,12 @@ interface FormatterPageProps {
 export default function FormatterPage({ formattedLog }: FormatterPageProps) {
     const { auth } = usePage<SharedData>().props;
     const formRef = useRef<HTMLElement>(null);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const outputRef = useRef<HTMLPreElement>(null);
     const [historyOpen, setHistoryOpen] = useState(false);
     const [preferencesOpen, setPreferencesOpen] = useState(false);
+    const [shortcutsOpen, setShortcutsOpen] = useState(false);
+    const [statusMessage, setStatusMessage] = useState('');
     const { addEntry } = useHistory();
     const { applyPreferences } = usePreferences();
     const { data, setData, post, processing, errors } = useForm({
@@ -79,12 +89,20 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
+        setStatusMessage('Processing your log...');
         post('/format', {
             onSuccess: () => {
+                setStatusMessage('Log formatting complete');
                 // Add to history on successful formatting
                 if (formattedLog) {
                     addEntry(data.raw_log, formattedLog);
                 }
+                // Clear status message after 3 seconds
+                setTimeout(() => setStatusMessage(''), 3000);
+            },
+            onError: () => {
+                setStatusMessage('Error formatting log');
+                setTimeout(() => setStatusMessage(''), 3000);
             },
         });
     };
@@ -97,7 +115,10 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
         setHistoryOpen(true);
     };
 
-    const handleLoadHistoryEntry = (rawLog: string) => {
+    const handleLoadHistoryEntry = (
+        rawLog: string,
+        formattedLog: Record<string, unknown>,
+    ) => {
         setData('raw_log', rawLog);
         // The formatted log will be displayed through the props
     };
@@ -121,14 +142,77 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
         return data.raw_log.split('\n').length;
     };
 
+    // Keyboard shortcuts
+    useKeyboardShortcuts([
+        {
+            ...commonShortcuts.submit,
+            action: () => {
+                if (data.raw_log.trim() && !processing) {
+                    const formEvent = new Event('submit', {
+                        cancelable: true,
+                    }) as any;
+                    formEvent.preventDefault = () => {};
+                    submit(formEvent);
+                }
+            },
+        },
+        {
+            ...commonShortcuts.clear,
+            action: handleClearInput,
+        },
+        {
+            ...commonShortcuts.escape,
+            action: () => {
+                if (historyOpen) setHistoryOpen(false);
+                if (preferencesOpen) setPreferencesOpen(false);
+                if (shortcutsOpen) setShortcutsOpen(false);
+            },
+        },
+        {
+            ...commonShortcuts.help,
+            action: () => setShortcutsOpen(true),
+        },
+        {
+            ...commonShortcuts.focusInput,
+            action: () => textareaRef.current?.focus(),
+        },
+        {
+            ...commonShortcuts.focusOutput,
+            action: () => outputRef.current?.focus(),
+        },
+    ]);
+
+    // Auto-focus input on desktop (not mobile)
+    useEffect(() => {
+        const isMobile = window.innerWidth < 768;
+        if (!isMobile && textareaRef.current) {
+            textareaRef.current.focus();
+        }
+    }, []);
+
     return (
         <>
             <Head title="StructLogr - Log Formatter" />
             <div className="flex min-h-screen flex-col bg-background">
-                <header className="border-b">
+                <SkipNavigation />
+                <header className="border-b" role="banner">
                     <div className="container mx-auto flex h-16 items-center justify-between px-4">
                         <h1 className="text-xl font-semibold">StructLogr</h1>
-                        <nav className="flex items-center gap-4">
+                        <nav
+                            className="flex items-center gap-4"
+                            role="navigation"
+                            aria-label="Main navigation"
+                        >
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setShortcutsOpen(true)}
+                                className="text-sm"
+                                aria-label="Show keyboard shortcuts (Ctrl+/)"
+                            >
+                                <HelpCircle className="mr-2 h-4 w-4" />
+                                Shortcuts
+                            </Button>
                             <Button
                                 variant="ghost"
                                 size="sm"
@@ -157,17 +241,31 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
                     </div>
                 </header>
 
-                <main>
+                <main role="main" id="main-content">
+                    {/* Screen reader live region for status updates */}
+                    <div
+                        role="status"
+                        aria-live="polite"
+                        aria-atomic="true"
+                        className="sr-only"
+                    >
+                        {statusMessage}
+                    </div>
+
                     <HeroSection onGetStarted={handleGetStarted} />
 
                     <section
                         id="formatter"
                         ref={formRef}
                         className="container mx-auto px-4 py-16 sm:px-6 lg:px-8 lg:py-24"
+                        aria-labelledby="formatter-heading"
                     >
                         <div className="mx-auto max-w-4xl space-y-8">
                             <div className="space-y-4 text-center">
-                                <h2 className="text-3xl leading-tight font-bold lg:text-4xl">
+                                <h2
+                                    id="formatter-heading"
+                                    className="text-3xl leading-tight font-bold lg:text-4xl"
+                                >
                                     Log Formatter
                                 </h2>
                                 <p className="text-lg leading-relaxed text-muted-foreground">
@@ -183,6 +281,7 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
                                     <form
                                         onSubmit={submit}
                                         className="space-y-6"
+                                        aria-label="Log formatting form"
                                     >
                                         {/* Sample Logs Dropdown */}
                                         <div className="space-y-2">
@@ -199,8 +298,9 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
                                                         e.target.value,
                                                     )
                                                 }
-                                                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+                                                className="focus-ring w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
                                                 defaultValue=""
+                                                aria-label="Select a sample log to load"
                                             >
                                                 <option value="">
                                                     Select a sample log type...
@@ -220,6 +320,7 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
                                         <div className="space-y-2">
                                             <div className="relative">
                                                 <Textarea
+                                                    ref={textareaRef}
                                                     name="raw_log"
                                                     placeholder="Paste your raw log text here..."
                                                     className="min-h-[200px] rounded-md pr-10"
@@ -230,6 +331,7 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
                                                             e.target.value,
                                                         )
                                                     }
+                                                    aria-label="Raw log input"
                                                 />
                                                 {data.raw_log && (
                                                     <button
@@ -237,7 +339,9 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
                                                         onClick={
                                                             handleClearInput
                                                         }
-                                                        className="absolute top-3 right-3 rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                                                        className="focus-ring absolute top-3 right-3 rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                                                        aria-label="Clear input"
+                                                        tabIndex={0}
                                                     >
                                                         ×
                                                     </button>
@@ -258,10 +362,17 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
                                                 </span>
                                             </div>
 
-                                            <InputError
-                                                message={errors.raw_log}
-                                                className="mt-2"
-                                            />
+                                            {errors.raw_log && (
+                                                <div
+                                                    role="alert"
+                                                    aria-live="assertive"
+                                                    className="mt-2"
+                                                >
+                                                    <InputError
+                                                        message={errors.raw_log}
+                                                    />
+                                                </div>
+                                            )}
                                         </div>
 
                                         <div className="flex items-center">
@@ -272,6 +383,11 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
                                                     !data.raw_log.trim()
                                                 }
                                                 className="rounded-md"
+                                                aria-label={
+                                                    processing
+                                                        ? 'Processing log format request'
+                                                        : 'Format log with AI'
+                                                }
                                             >
                                                 {processing && (
                                                     <Spinner className="mr-2" />
@@ -303,7 +419,12 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
                                         </div>
                                     </CardHeader>
                                     <CardContent>
-                                        <pre className="overflow-x-auto rounded-lg bg-muted p-6 text-sm">
+                                        <pre
+                                            ref={outputRef}
+                                            className="overflow-x-auto rounded-lg bg-muted p-6 text-sm"
+                                            tabIndex={0}
+                                            aria-label="Formatted JSON output"
+                                        >
                                             {JSON.stringify(
                                                 applyPreferences(formattedLog),
                                                 null,
@@ -333,6 +454,11 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
             <FormattingPreferences
                 open={preferencesOpen}
                 onOpenChange={setPreferencesOpen}
+            />
+
+            <KeyboardShortcutsModal
+                open={shortcutsOpen}
+                onOpenChange={setShortcutsOpen}
             />
         </>
     );
