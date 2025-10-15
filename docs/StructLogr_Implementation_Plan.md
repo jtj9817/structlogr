@@ -57,13 +57,14 @@ This service will encapsulate all logic related to the `Prism` package, ensuring
 - **Implementation Details**:
     - **Prism SDK Version**: Using Prism SDK v2
     - **LLM Provider**: DeepSeek (deepseek-chat model)
-    - **System Prompt**: "You are an expert log analysis assistant. Your task is to reformat the given raw log text into a structured JSON object. Extract key information such as timestamp, log level, message, source, and any relevant metadata. Ensure the output is clean, well-structured, and follows standard log formatting conventions."
+    - **System Prompt**: Instructs the model (StructLogr) to classify the log, summarise status, extract entities and metrics, generate structured sections tailored to the log type (tests, errors, HTTP traffic, build steps, security events, etc.), and to output strictly valid JSON without inventing data.
     - **Output Schema**: Defined using `ObjectSchema` with the following fields:
-        - `timestamp`: StringSchema - The timestamp of the log entry
-        - `level`: StringSchema - The log level (e.g., INFO, ERROR, DEBUG)
-        - `message`: StringSchema - The main log message
-        - `source`: StringSchema - The source or origin of the log
-        - `metadata`: StringSchema - Any additional metadata as JSON string
+        - `detected_log_type`: StringSchema - High-level classification such as `test_runner`, `application_error`, or `general`
+        - `summary`: ObjectSchema - Contains `status`, `headline`, optional `primary_subject`, `key_points`, `duration`, and `timestamp`
+        - `entities`: ArraySchema of ObjectSchema - Each entity has `type`, `identifier`, optional `details`
+        - `metrics`: ArraySchema of ObjectSchema - Each metric includes `name`, optional `value`, `unit`, `description`
+        - `sections`: ArraySchema of ObjectSchema - Each section has `section_type`, optional `title`/`description`, optional `items`, and a flexible `data` object for type-specific payloads (e.g., failed tests, exceptions, HTTP requests)
+        - Additional context can be stored within section `data` objects to support domain-specific structures
     - **Format Method**: `format(string $rawLog): array`
         - Uses `Prism::structured()->using()->withSystemPrompt()->withSchema()->withPrompt()->generate()`
         - Returns structured array from LLM response
@@ -283,4 +284,3 @@ All planned phases are complete. Future enhancements may include:
    - Log formatting statistics
    - Usage metrics
    - Error tracking
-

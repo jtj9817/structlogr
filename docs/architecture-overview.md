@@ -157,11 +157,12 @@ public function format(string $rawLog): array
 - Uses Prism structured generation with schema
 - Configured provider: DeepSeek (deepseek-chat model)
 - Returns structured array with fields:
-  - `timestamp`: ISO 8601 or log timestamp
-  - `level`: Log level (INFO, ERROR, DEBUG, etc.)
-  - `message`: Main log message
-  - `source`: Origin/service name
-  - `metadata`: Additional context as JSON string
+  - `detected_log_type`: High-level classification such as `test_runner`, `application_error`, or `http_access`
+  - `summary`: Object containing `status`, `headline`, optional `primary_subject`, `key_points`, `duration`, and `timestamp`
+  - `entities`: Array of `{ type, identifier, details? }` extracted from the log
+  - `metrics`: Array of numeric metrics `{ name, value?, unit?, description? }`
+  - `sections`: Array of structured sections with `section_type`, optional `title`/`description`, optional `items`, and a flexible `data` object for type-specific payloads
+  - Optional additional data may be included inside section `data` objects to capture domain-specific structures
 
 ```php
 public function saveLog(string $rawLog, array $formattedLog): FormattedLog

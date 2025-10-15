@@ -137,11 +137,47 @@ Example input:
 Example output:
 ```json
 {
-  "timestamp": "2024-10-15 14:23:45",
-  "level": "ERROR",
-  "message": "Database connection failed - timeout after 30s",
-  "source": "Database",
-  "metadata": "{\"timeout\":\"30s\"}"
+  "detected_log_type": "application_error",
+  "summary": {
+    "status": "ERROR",
+    "headline": "Database connection failed after timing out at 30s",
+    "primary_subject": "Database",
+    "key_points": [
+      "Connection attempt exceeded 30s timeout",
+      "Severity recorded as ERROR level"
+    ],
+    "duration": "30s",
+    "timestamp": "2024-10-15 14:23:45"
+  },
+  "entities": [
+    {
+      "type": "service",
+      "identifier": "Database"
+    }
+  ],
+  "metrics": [
+    {
+      "name": "timeout_seconds",
+      "value": 30,
+      "unit": "seconds",
+      "description": "Declared timeout before the connection aborted"
+    }
+  ],
+  "sections": [
+    {
+      "section_type": "errors",
+      "title": "Error Events",
+      "items": [
+        {
+          "name": "Database connection failed",
+          "status": "ERROR",
+          "details": {
+            "message": "Database connection failed - timeout after 30s"
+          }
+        }
+      ]
+    }
+  ]
 }
 ```
 
