@@ -86,7 +86,7 @@ export function OnboardingTour({
             element.scrollIntoView({ behavior: 'smooth', block: 'center' });
             setHighlightedElement(element);
         }
-    }, [isOpen, currentStep]);
+    }, [isOpen, currentStep, highlightedElement]);
 
     const handleNext = () => {
         if (currentStep < tourSteps.length - 1) {

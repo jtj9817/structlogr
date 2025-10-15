@@ -53,6 +53,7 @@ export function usePreferences() {
 
         // Apply metadata filtering
         if (!preferences.includeMetadata && result.metadata) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { metadata, ...rest } = result;
             result = rest;
         }
