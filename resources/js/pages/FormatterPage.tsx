@@ -1,3 +1,4 @@
+import HeroSection from '@/components/hero-section';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { login, register } from '@/routes';
 import { type SharedData } from '@/types';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
+import { FormEventHandler, useRef } from 'react';
 
 interface FormatterPageProps {
     formattedLog?: {
@@ -21,6 +22,7 @@ interface FormatterPageProps {
 
 export default function FormatterPage({ formattedLog }: FormatterPageProps) {
     const { auth } = usePage<SharedData>().props;
+    const formRef = useRef<HTMLElement>(null);
     const { data, setData, post, processing, errors } = useForm({
         raw_log: '',
     });
@@ -28,6 +30,10 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
         post('/format');
+    };
+
+    const handleGetStarted = () => {
+        formRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
     return (
@@ -58,70 +64,91 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
                     </div>
                 </header>
 
-                <main className="container mx-auto flex-1 px-4 py-8">
-                    <div className="mx-auto max-w-4xl space-y-6">
-                        <div className="text-center">
-                            <h2 className="text-3xl font-bold">
-                                Log Formatter
-                            </h2>
-                            <p className="mt-2 text-muted-foreground">
-                                Transform raw log text into structured JSON
-                            </p>
-                        </div>
+                <main>
+                    <HeroSection onGetStarted={handleGetStarted} />
 
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Raw Log Input</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <form onSubmit={submit} className="space-y-4">
-                                    <div>
-                                        <Textarea
-                                            name="raw_log"
-                                            placeholder="Paste your raw log text here..."
-                                            className="min-h-[200px]"
-                                            value={data.raw_log}
-                                            onChange={(e) =>
-                                                setData('raw_log', e.target.value)
-                                            }
-                                        />
-                                        <InputError
-                                            message={errors.raw_log}
-                                            className="mt-2"
-                                        />
-                                    </div>
-                                    <div className="flex items-center">
-                                        <Button type="submit" disabled={processing}>
-                                            {processing && (
-                                                <Spinner className="mr-2" />
-                                            )}
-                                            Format Log
-                                        </Button>
-                                    </div>
-                                </form>
-                            </CardContent>
-                        </Card>
+                    <section
+                        id="formatter"
+                        ref={formRef}
+                        className="container mx-auto px-4 py-16"
+                    >
+                        <div className="mx-auto max-w-4xl space-y-6">
+                            <div className="text-center">
+                                <h2 className="text-3xl font-bold">
+                                    Log Formatter
+                                </h2>
+                                <p className="mt-2 text-muted-foreground">
+                                    Transform raw log text into structured JSON
+                                </p>
+                            </div>
 
-                        {formattedLog && (
                             <Card>
                                 <CardHeader>
-                                    <CardTitle>Formatted JSON Output</CardTitle>
+                                    <CardTitle>Raw Log Input</CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    <pre className="overflow-x-auto rounded-md bg-muted p-4 text-sm">
-                                        {JSON.stringify(formattedLog, null, 2)}
-                                    </pre>
+                                    <form
+                                        onSubmit={submit}
+                                        className="space-y-4"
+                                    >
+                                        <div>
+                                            <Textarea
+                                                name="raw_log"
+                                                placeholder="Paste your raw log text here..."
+                                                className="min-h-[200px]"
+                                                value={data.raw_log}
+                                                onChange={(e) =>
+                                                    setData(
+                                                        'raw_log',
+                                                        e.target.value,
+                                                    )
+                                                }
+                                            />
+                                            <InputError
+                                                message={errors.raw_log}
+                                                className="mt-2"
+                                            />
+                                        </div>
+                                        <div className="flex items-center">
+                                            <Button
+                                                type="submit"
+                                                disabled={processing}
+                                            >
+                                                {processing && (
+                                                    <Spinner className="mr-2" />
+                                                )}
+                                                Format Log
+                                            </Button>
+                                        </div>
+                                    </form>
                                 </CardContent>
                             </Card>
-                        )}
-                    </div>
+
+                            {formattedLog && (
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>
+                                            Formatted JSON Output
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <pre className="overflow-x-auto rounded-md bg-muted p-4 text-sm">
+                                            {JSON.stringify(
+                                                formattedLog,
+                                                null,
+                                                2,
+                                            )}
+                                        </pre>
+                                    </CardContent>
+                                </Card>
+                            )}
+                        </div>
+                    </section>
                 </main>
 
                 <footer className="border-t py-6">
                     <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-                        <p>
-                            Powered by Laravel + React + Prism
-                        </p>
+                        <p>Powered by Laravel + React + Prism</p>
                     </div>
                 </footer>
             </div>
