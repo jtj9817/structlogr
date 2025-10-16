@@ -227,7 +227,6 @@ html {
     .card,
     [role="region"],
     section {
-        @apply page-break-inside-avoid;
         page-break-inside: avoid;
         border: 1px solid #ccc;
         padding: 1rem;
@@ -268,7 +267,6 @@ html {
     h4,
     h5,
     h6 {
-        @apply page-break-after-avoid;
         page-break-after: avoid;
     }
 
