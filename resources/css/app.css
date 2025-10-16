@@ -187,3 +187,122 @@
         @apply sr-only z-50 rounded-md bg-primary px-4 py-2 text-primary-foreground focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none;
     }
 }
+
+/* Smooth scrolling for the entire page */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Print styles for better output formatting */
+@media print {
+    /* Hide non-content elements */
+    header,
+    footer,
+    nav,
+    aside,
+    .sidebar,
+    .app-header,
+    .app-footer,
+    button:not(.print-visible),
+    [role="button"]:not(.print-visible),
+    .no-print {
+        @apply hidden;
+    }
+
+    /* Show main content */
+    main,
+    .main-content,
+    #root {
+        @apply block;
+    }
+
+    /* Optimize body for print */
+    body {
+        @apply bg-white text-black;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Style cards and sections */
+    .card,
+    [role="region"],
+    section {
+        @apply page-break-inside-avoid;
+        page-break-inside: avoid;
+        border: 1px solid #ccc;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    /* Code blocks */
+    pre,
+    code {
+        @apply bg-gray-100 text-black;
+        border: 1px solid #ddd;
+        padding: 0.5rem;
+        overflow-x: auto;
+        page-break-inside: avoid;
+    }
+
+    /* Images */
+    img {
+        @apply max-w-full;
+        page-break-inside: avoid;
+    }
+
+    /* Links - show URL */
+    a {
+        @apply text-black underline;
+    }
+
+    a[href]:after {
+        content: " (" attr(href) ")";
+        font-size: 0.8em;
+        color: #666;
+    }
+
+    /* Headings */
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        @apply page-break-after-avoid;
+        page-break-after: avoid;
+    }
+
+    /* Tables */
+    table {
+        @apply w-full border-collapse;
+        border: 1px solid #ccc;
+    }
+
+    thead {
+        @apply bg-gray-200;
+    }
+
+    th,
+    td {
+        @apply border border-gray-300 px-2 py-1;
+    }
+
+    /* No background colors in print */
+    * {
+        background-color: transparent !important;
+    }
+
+    /* Remove shadows */
+    * {
+        box-shadow: none !important;
+    }
+
+    /* Adjust text colors for print */
+    body {
+        color: black;
+    }
+
+    a {
+        color: black;
+    }
+}
