@@ -3,6 +3,7 @@ import { HistorySidebar } from '@/components/formatter/history-sidebar';
 import HeroSection from '@/components/hero-section';
 import InputError from '@/components/input-error';
 import KeyboardShortcutsModal from '@/components/keyboard-shortcuts-modal';
+import { SettingsPanel } from '@/components/settings-panel';
 import SkipNavigation from '@/components/skip-navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -79,6 +80,7 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
     const outputRef = useRef<HTMLPreElement>(null);
     const [historyOpen, setHistoryOpen] = useState(false);
     const [preferencesOpen, setPreferencesOpen] = useState(false);
+    const [settingsOpen, setSettingsOpen] = useState(false);
     const [shortcutsOpen, setShortcutsOpen] = useState(false);
     const [statusMessage, setStatusMessage] = useState('');
     const { addEntry } = useHistory();
@@ -165,6 +167,7 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
             action: () => {
                 if (historyOpen) setHistoryOpen(false);
                 if (preferencesOpen) setPreferencesOpen(false);
+                if (settingsOpen) setSettingsOpen(false);
                 if (shortcutsOpen) setShortcutsOpen(false);
             },
         },
@@ -220,6 +223,15 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
                                 className="text-sm"
                             >
                                 History
+                            </Button>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setSettingsOpen(true)}
+                                className="text-sm"
+                            >
+                                <Settings className="mr-2 h-4 w-4" />
+                                Settings
                             </Button>
                             {!auth.user && (
                                 <>
@@ -455,6 +467,8 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
                 open={preferencesOpen}
                 onOpenChange={setPreferencesOpen}
             />
+
+            <SettingsPanel open={settingsOpen} onOpenChange={setSettingsOpen} />
 
             <KeyboardShortcutsModal
                 open={shortcutsOpen}

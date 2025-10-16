@@ -1,6 +1,6 @@
-import { Breadcrumbs } from '@/components/breadcrumbs';
-import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 import AppLogo from '@/components/app-logo';
+import AppearanceToggleDropdown from '@/components/appearance-dropdown';
+import { Breadcrumbs } from '@/components/breadcrumbs';
 import { MobileNavigation } from '@/components/mobile-navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -19,23 +19,24 @@ import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
 import { useScrollShadow } from '@/hooks/use-scroll-shadow';
 import { cn } from '@/lib/utils';
-import { show as formatterHome } from '@/routes/formatter';
 import { login, register } from '@/routes';
+import { show as formatterHome } from '@/routes/formatter';
 import { edit as profileSettingsRoute } from '@/routes/profile';
+import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
 import {
     BookOpen,
+    Github,
     HelpCircle,
     History as HistoryIcon,
     Home,
     Info,
     Search,
     Server,
+    Settings,
     Sparkles,
 } from 'lucide-react';
-import { Link, usePage } from '@inertiajs/react';
 import { type ReactNode, useMemo } from 'react';
-import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
-import { Github } from 'lucide-react';
 
 const primaryNavItems: NavItem[] = [
     {
@@ -84,12 +85,14 @@ interface AppHeaderProps {
     breadcrumbs?: BreadcrumbItem[];
     onHistoryOpen?: () => void;
     onHelpOpen?: () => void;
+    onSettingsOpen?: () => void;
 }
 
 export function AppHeader({
     breadcrumbs = [],
     onHistoryOpen,
     onHelpOpen,
+    onSettingsOpen,
 }: AppHeaderProps) {
     const page = usePage<SharedData>();
     const { auth } = page.props;
@@ -103,8 +106,7 @@ export function AppHeader({
     }, [page.url]);
 
     const isItemActive = (item: NavItem) => {
-        const href =
-            typeof item.href === 'string' ? item.href : item.href.url;
+        const href = typeof item.href === 'string' ? item.href : item.href.url;
         if (href.startsWith('http')) {
             return false;
         }
@@ -169,7 +171,9 @@ export function AppHeader({
     const isProUser =
         booleanUserProp('is_pro') ??
         booleanUserProp('isPro') ??
-        (planName ? ['pro', 'team', 'enterprise'].includes(planName.toLowerCase()) : false) ??
+        (planName
+            ? ['pro', 'team', 'enterprise'].includes(planName.toLowerCase())
+            : false) ??
         false;
 
     const showUpgrade = Boolean(user) && !isProUser;
@@ -180,14 +184,14 @@ export function AppHeader({
         <div className="hidden min-w-[210px] flex-col items-stretch gap-1 md:flex">
             <div className="flex items-center gap-2">
                 <Button variant="ghost" size="sm" asChild>
-                    <Link href={login()}>
-                        Log in
-                    </Link>
+                    <Link href={login()}>Log in</Link>
                 </Button>
-                <Button size="sm" className="bg-blue-600 text-white hover:bg-blue-700" asChild>
-                    <Link href={register()}>
-                        Register
-                    </Link>
+                <Button
+                    size="sm"
+                    className="bg-blue-600 text-white hover:bg-blue-700"
+                    asChild
+                >
+                    <Link href={register()}>Register</Link>
                 </Button>
             </div>
             <span className="text-center text-xs text-muted-foreground">
@@ -277,11 +281,7 @@ export function AppHeader({
         </div>
     ) : (
         <div className="space-y-2">
-            <Button
-                variant="ghost"
-                className="w-full justify-center"
-                asChild
-            >
+            <Button variant="ghost" className="w-full justify-center" asChild>
                 <Link href={login()}>Log in</Link>
             </Button>
             <Button
@@ -393,6 +393,25 @@ export function AppHeader({
                                     </TooltipTrigger>
                                     <TooltipContent>
                                         <p>Help</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        )}
+                        {onSettingsOpen && (
+                            <TooltipProvider delayDuration={0}>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="hidden h-9 w-9 md:inline-flex"
+                                            onClick={onSettingsOpen}
+                                        >
+                                            <Settings className="size-5 opacity-80" />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>Settings</p>
                                     </TooltipContent>
                                 </Tooltip>
                             </TooltipProvider>
