@@ -152,7 +152,12 @@ PROMPT;
             ->withSystemPrompt($systemPrompt)
             ->withSchema($schema)
             ->withPrompt($rawLog)
-            ->generate();
+            ->withClientOptions([
+                'timeout' => config('services.http.timeout', 600),
+                'connect_timeout' => config('services.http.connect_timeout', 60),
+            ])
+            ->asStructured();
+        // ->generate();
 
         return $response->structured;
     }
