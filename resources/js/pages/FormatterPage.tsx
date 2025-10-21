@@ -62,6 +62,53 @@ Caused by: java.net.ConnectException: Connection refused: connect
     },
 ];
 
+const dummyFormattedPreview = `{
+  "summary": {
+    "headline": "Database connection failed after timing out at 30s",
+    "level": "ERROR",
+    "timestamp": "2024-10-15T14:23:45Z"
+  },
+  "entities": [
+    {
+      "type": "service",
+      "identifier": "database"
+    }
+  ],
+  "metrics": [
+    {
+      "name": "timeout_seconds",
+      "value": 30
+    }
+  ]
+}`;
+
+const clockworkFrames = [
+    `   [===]   [===]
+  <  o  > <  *  >
+   [===]   [===]
+     \\\\     //
+      \\\\   //
+   -- clockwork syncing --`,
+    `   [===]   [===]
+  <  *  > <  o  >
+   [===]   [===]
+      ||   ||
+      ||   ||
+   -- clockwork syncing --`,
+    `   [===]   [===]
+  <  o  > <  *  >
+   [===]   [===]
+      //   \\\\
+     //     \\\\
+   -- clockwork syncing --`,
+    `   [===]   [===]
+  <  *  > <  o  >
+   [===]   [===]
+      ==   ==
+     ==     ==
+   -- clockwork syncing --`,
+];
+
 interface FormatterPageProps {
     formattedLog?: {
         timestamp?: string;
@@ -83,6 +130,8 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
     const [settingsOpen, setSettingsOpen] = useState(false);
     const [shortcutsOpen, setShortcutsOpen] = useState(false);
     const [statusMessage, setStatusMessage] = useState('');
+    const [hasSubmitted, setHasSubmitted] = useState(false);
+    const [animationFrame, setAnimationFrame] = useState(0);
     const { addEntry } = useHistory();
     const { applyPreferences } = usePreferences();
     const { data, setData, post, processing, errors } = useForm({
@@ -91,6 +140,8 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
+        setHasSubmitted(true);
+        setAnimationFrame(0);
         setStatusMessage('Processing your log...');
         post('/format', {
             onSuccess: () => {
@@ -189,6 +240,64 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
         }
     }, []);
 
+    useEffect(() => {
+        if (!processing) {
+            setAnimationFrame(0);
+            return;
+        }
+
+        const interval = window.setInterval(() => {
+            setAnimationFrame(
+                (frame) => (frame + 1) % clockworkFrames.length,
+            );
+        }, 220);
+
+        return () => window.clearInterval(interval);
+    }, [processing]);
+
+    const renderOutputContent = () => {
+        if (processing) {
+            return (
+                <pre className="whitespace-pre-line text-sm font-mono leading-6 text-accent-foreground/90">
+                    {clockworkFrames[animationFrame]}
+                </pre>
+            );
+        }
+
+        if (formattedLog) {
+            return (
+                <pre
+                    ref={outputRef}
+                    className="text-sm"
+                    tabIndex={0}
+                    aria-label="Formatted JSON output"
+                >
+                    {JSON.stringify(applyPreferences(formattedLog), null, 2)}
+                </pre>
+            );
+        }
+
+        if (hasSubmitted) {
+            return (
+                <div role="alert" className="space-y-2 text-left text-sm">
+                    <p className="font-medium text-destructive">
+                        Unable to display formatted output.
+                    </p>
+                    <p className="text-muted-foreground">
+                        {statusMessage ||
+                            'Something went wrong while fetching results. Please try again.'}
+                    </p>
+                </div>
+            );
+        }
+
+        return (
+            <pre className="whitespace-pre-wrap text-left text-sm text-muted-foreground">
+                {dummyFormattedPreview}
+            </pre>
+        );
+    };
+
     return (
         <>
             <Head title="StructLogr - Log Formatter" />
@@ -268,180 +377,189 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
                         className="container mx-auto px-4 py-16 sm:px-6 lg:px-8 lg:py-24"
                         aria-labelledby="formatter-heading"
                     >
-                        <div className="mx-auto max-w-4xl space-y-8">
+                        <div className="mx-auto flex max-w-6xl flex-col gap-10">
                             <div className="space-y-4 text-center">
                                 <h2
                                     id="formatter-heading"
-                                    className="text-3xl leading-tight font-bold lg:text-4xl"
+                                    className="text-3xl font-bold leading-tight lg:text-4xl"
                                 >
                                     Log Formatter
                                 </h2>
                                 <p className="text-lg leading-relaxed text-muted-foreground">
                                     Transform raw log text into structured JSON
+                                    with a single request.
                                 </p>
                             </div>
 
-                            <Card className="shadow-sm transition-shadow hover:shadow-md">
-                                <CardHeader>
-                                    <CardTitle>Raw Log Input</CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-6">
-                                    <form
-                                        onSubmit={submit}
-                                        className="space-y-6"
-                                        aria-label="Log formatting form"
-                                    >
-                                        {/* Sample Logs Dropdown */}
-                                        <div className="space-y-2">
-                                            <label
-                                                htmlFor="sample-logs"
-                                                className="text-sm font-medium"
-                                            >
-                                                Try an example
-                                            </label>
-                                            <select
-                                                id="sample-logs"
-                                                onChange={(e) =>
-                                                    handleLoadSampleLog(
-                                                        e.target.value,
-                                                    )
-                                                }
-                                                className="focus-ring w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
-                                                defaultValue=""
-                                                aria-label="Select a sample log to load"
-                                            >
-                                                <option value="">
-                                                    Select a sample log type...
-                                                </option>
-                                                {sampleLogs.map((log) => (
-                                                    <option
-                                                        key={log.id}
-                                                        value={log.id}
-                                                    >
-                                                        {log.name}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
-
-                                        {/* Textarea with Clear Button */}
-                                        <div className="space-y-2">
-                                            <div className="relative">
-                                                <Textarea
-                                                    ref={textareaRef}
-                                                    name="raw_log"
-                                                    placeholder="Paste your raw log text here..."
-                                                    className="min-h-[200px] rounded-md pr-10"
-                                                    value={data.raw_log}
+                            <div className="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+                                <Card className="shadow-sm transition-shadow hover:shadow-md">
+                                    <CardHeader>
+                                        <CardTitle>Raw Log Input</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-6">
+                                        <form
+                                            onSubmit={submit}
+                                            className="space-y-6"
+                                            aria-label="Log formatting form"
+                                        >
+                                            {/* Sample Logs Dropdown */}
+                                            <div className="space-y-2">
+                                                <label
+                                                    htmlFor="sample-logs"
+                                                    className="text-sm font-medium"
+                                                >
+                                                    Try an example
+                                                </label>
+                                                <select
+                                                    id="sample-logs"
                                                     onChange={(e) =>
-                                                        setData(
-                                                            'raw_log',
+                                                        handleLoadSampleLog(
                                                             e.target.value,
                                                         )
                                                     }
-                                                    aria-label="Raw log input"
-                                                />
-                                                {data.raw_log && (
-                                                    <button
-                                                        type="button"
-                                                        onClick={
-                                                            handleClearInput
-                                                        }
-                                                        className="focus-ring absolute top-3 right-3 rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
-                                                        aria-label="Clear input"
-                                                        tabIndex={0}
-                                                    >
-                                                        ×
-                                                    </button>
-                                                )}
-                                            </div>
-
-                                            {/* Character and Line Counter */}
-                                            <div className="flex justify-between text-xs text-muted-foreground">
-                                                <span>
-                                                    {getCharacterCount()}{' '}
-                                                    characters •{' '}
-                                                    {getLineCount()} lines
-                                                </span>
-                                                <span>
-                                                    {getCharacterCount() > 0
-                                                        ? '✓ Ready to format'
-                                                        : 'Enter log text to format'}
-                                                </span>
-                                            </div>
-
-                                            {errors.raw_log && (
-                                                <div
-                                                    role="alert"
-                                                    aria-live="assertive"
-                                                    className="mt-2"
+                                                    className="focus-ring w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                                    defaultValue=""
+                                                    aria-label="Select a sample log to load"
                                                 >
-                                                    <InputError
-                                                        message={errors.raw_log}
+                                                    <option value="">
+                                                        Select a sample log
+                                                        type...
+                                                    </option>
+                                                    {sampleLogs.map((log) => (
+                                                        <option
+                                                            key={log.id}
+                                                            value={log.id}
+                                                        >
+                                                            {log.name}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+
+                                            {/* Textarea with Clear Button */}
+                                            <div className="space-y-2">
+                                                <div className="relative">
+                                                    <Textarea
+                                                        ref={textareaRef}
+                                                        name="raw_log"
+                                                        placeholder="Paste your raw log text here..."
+                                                        className="min-h-[200px] rounded-md pr-10"
+                                                        value={data.raw_log}
+                                                        onChange={(e) =>
+                                                            setData(
+                                                                'raw_log',
+                                                                e.target.value,
+                                                            )
+                                                        }
+                                                        aria-label="Raw log input"
                                                     />
+                                                    {data.raw_log && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={
+                                                                handleClearInput
+                                                            }
+                                                            className="focus-ring absolute right-3 top-3 rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                                                            aria-label="Clear input"
+                                                            tabIndex={0}
+                                                        >
+                                                            ×
+                                                        </button>
+                                                    )}
                                                 </div>
-                                            )}
-                                        </div>
 
-                                        <div className="flex items-center">
-                                            <Button
-                                                type="submit"
-                                                disabled={
-                                                    processing ||
-                                                    !data.raw_log.trim()
-                                                }
-                                                className="rounded-md"
-                                                aria-label={
-                                                    processing
-                                                        ? 'Processing log format request'
-                                                        : 'Format log with AI'
-                                                }
-                                            >
-                                                {processing && (
-                                                    <Spinner className="mr-2" />
+                                                {/* Character and Line Counter */}
+                                                <div className="flex justify-between text-xs text-muted-foreground">
+                                                    <span>
+                                                        {getCharacterCount()}{' '}
+                                                        characters •{' '}
+                                                        {getLineCount()} lines
+                                                    </span>
+                                                    <span>
+                                                        {getCharacterCount() > 0
+                                                            ? '✓ Ready to format'
+                                                            : 'Enter log text to format'}
+                                                    </span>
+                                                </div>
+
+                                                {errors.raw_log && (
+                                                    <div
+                                                        role="alert"
+                                                        aria-live="assertive"
+                                                        className="mt-2"
+                                                    >
+                                                        <InputError
+                                                            message={
+                                                                errors.raw_log
+                                                            }
+                                                        />
+                                                    </div>
                                                 )}
-                                                Format Log
-                                            </Button>
-                                        </div>
-                                    </form>
-                                </CardContent>
-                            </Card>
+                                            </div>
 
-                            {formattedLog && (
-                                <Card className="shadow-sm transition-shadow hover:shadow-md">
-                                    <CardHeader>
-                                        <div className="flex items-center justify-between">
-                                            <CardTitle>
-                                                Formatted JSON Output
-                                            </CardTitle>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() =>
-                                                    setPreferencesOpen(true)
-                                                }
-                                                className="h-8 w-8 p-0"
-                                            >
-                                                <Settings className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <pre
-                                            ref={outputRef}
-                                            className="overflow-x-auto rounded-lg bg-muted p-6 text-sm"
-                                            tabIndex={0}
-                                            aria-label="Formatted JSON output"
-                                        >
-                                            {JSON.stringify(
-                                                applyPreferences(formattedLog),
-                                                null,
-                                                2,
-                                            )}
-                                        </pre>
+                                            <div className="flex items-center">
+                                                <Button
+                                                    type="submit"
+                                                    disabled={
+                                                        processing ||
+                                                        !data.raw_log.trim()
+                                                    }
+                                                    className="rounded-md"
+                                                    aria-label={
+                                                        processing
+                                                            ? 'Processing log format request'
+                                                            : 'Format log with AI'
+                                                    }
+                                                >
+                                                    {processing && (
+                                                        <Spinner className="mr-2" />
+                                                    )}
+                                                    Format Log
+                                                </Button>
+                                            </div>
+                                        </form>
                                     </CardContent>
                                 </Card>
-                            )}
+
+                                <Card className="shadow-sm transition-shadow hover:shadow-md">
+                                    <CardHeader className="flex flex-col gap-2 text-left sm:flex-row sm:items-center sm:justify-between">
+                                        <div>
+                                            <CardTitle>Converted Log</CardTitle>
+                                            <p className="text-sm text-muted-foreground">
+                                                Structured output preview
+                                            </p>
+                                        </div>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() =>
+                                                setPreferencesOpen(true)
+                                            }
+                                            className="h-9 gap-2 px-3"
+                                            disabled={!formattedLog}
+                                            aria-label="Open formatting preferences"
+                                        >
+                                            <Settings className="h-4 w-4" />
+                                            <span className="hidden sm:inline">
+                                                Preferences
+                                            </span>
+                                        </Button>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        {statusMessage && (
+                                            <p
+                                                className="text-sm text-muted-foreground"
+                                                aria-live="polite"
+                                            >
+                                                {statusMessage}
+                                            </p>
+                                        )}
+                                        <div className="min-h-[320px] max-h-[520px] overflow-auto rounded-lg border border-border/40 bg-background/80 p-4 font-mono text-sm leading-6">
+                                            {renderOutputContent()}
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </div>
                         </div>
                     </section>
                 </main>
