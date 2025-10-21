@@ -20,20 +20,39 @@ class LogFormatterController extends Controller
 
     public function format(Request $request, LogFormatterService $logFormatterService)
     {
-        $request->validate([
+        $validated = $request->validate([
             'raw_log' => 'required|string',
+            'llm_model' => 'nullable|string|in:deepseek-chat,kimi-k2-turbo-preview,GLM-4.5-Air,GLM-4.6',
         ]);
 
-        $rawLog = $request->input('raw_log');
-        $formattedLog = $logFormatterService->format($rawLog);
-        $logFormatterService->saveLog($rawLog, $formattedLog, $request->user());
+        $rawLog = $validated['raw_log'];
+        $llmModel = $validated['llm_model'] ?? 'deepseek-chat';
 
-        return inertia('FormatterPage', [
-            'formattedLog' => $formattedLog,
-            'success' => 'Log formatted successfully!',
-            'history' => $this->historyPayload($request),
-            'historyRoutes' => $this->historyRoutes(),
-        ]);
+        try {
+            $formattedLog = $logFormatterService->format($rawLog, $llmModel);
+            $logFormatterService->saveLog($rawLog, $formattedLog, $request->user());
+
+            return inertia('FormatterPage', [
+                'formattedLog' => $formattedLog,
+                'success' => 'Log formatted successfully!',
+                'history' => $this->historyPayload($request),
+                'historyRoutes' => $this->historyRoutes(),
+            ]);
+        } catch (\InvalidArgumentException $e) {
+            return inertia('FormatterPage', [
+                'history' => $this->historyPayload($request),
+                'historyRoutes' => $this->historyRoutes(),
+            ])->withErrors([
+                'llm_model' => 'Invalid LLM model selected. Please choose a supported model.',
+            ]);
+        } catch (\Exception $e) {
+            return inertia('FormatterPage', [
+                'history' => $this->historyPayload($request),
+                'historyRoutes' => $this->historyRoutes(),
+            ])->withErrors([
+                'raw_log' => 'Failed to format log. Please try again or select a different model.',
+            ]);
+        }
     }
 
     protected function historyPayload(Request $request): ?array

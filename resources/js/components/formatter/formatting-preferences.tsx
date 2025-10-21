@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/select';
 import { Toggle } from '@/components/ui/toggle';
 import { usePreferences } from '@/hooks/use-preferences';
+import type { LLMModel } from '@/types/preferences';
 import { Settings } from 'lucide-react';
 
 interface FormattingPreferencesProps {
@@ -157,6 +158,38 @@ export function FormattingPreferences({
                         </Select>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
                             Standard format for timestamp output
+                        </p>
+                    </div>
+
+                    {/* LLM Model */}
+                    <div className="space-y-2">
+                        <Label htmlFor="llm-model">LLM Model Used</Label>
+                        <Select
+                            value={preferences.llmModel}
+                            onValueChange={(value: LLMModel) =>
+                                updatePreference('llmModel', value)
+                            }
+                        >
+                            <SelectTrigger id="llm-model">
+                                <SelectValue placeholder="Select LLM model" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="deepseek-chat">
+                                    DeepSeek Chat (Default)
+                                </SelectItem>
+                                <SelectItem value="kimi-k2-turbo-preview">
+                                    Kimi K2 Turbo Preview
+                                </SelectItem>
+                                <SelectItem value="GLM-4.5-Air">
+                                    GLM-4.5-Air
+                                </SelectItem>
+                                <SelectItem value="GLM-4.6">
+                                    GLM-4.6
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                            Choose which language model processes your logs
                         </p>
                     </div>
                 </div>

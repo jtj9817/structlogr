@@ -239,9 +239,10 @@ export default function FormatterPage({
         initialHistory: initialHistory ?? undefined,
         routes: historyRouteConfig ?? undefined,
     });
-    const { applyPreferences } = usePreferences();
+    const { applyPreferences, preferences } = usePreferences();
     const { data, setData, post, processing, errors } = useForm({
         raw_log: '',
+        llm_model: preferences.llmModel,
     });
 
     const formattedOutput = useMemo(() => {
@@ -295,6 +296,10 @@ export default function FormatterPage({
     useEffect(() => {
         setDisplayLog(formattedLog);
     }, [formattedLog]);
+
+    useEffect(() => {
+        setData('llm_model', preferences.llmModel);
+    }, [preferences.llmModel, setData]);
 
     useEffect(() => {
         return () => {

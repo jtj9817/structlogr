@@ -9,6 +9,7 @@ const defaultPreferences: FormattingPreferences = {
     normalizeLogLevels: true,
     timezone: 'UTC',
     dateFormat: 'ISO8601',
+    llmModel: 'deepseek-chat',
 };
 
 export function usePreferences() {

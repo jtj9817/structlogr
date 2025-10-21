@@ -14,8 +14,9 @@ use Prism\Prism\Schema\StringSchema;
 
 class LogFormatterService
 {
-    public function format(string $rawLog): array
+    public function format(string $rawLog, ?string $llmModel = null): array
     {
+        $llmModel = $llmModel ?? 'deepseek-chat';
         $systemPrompt = <<<'PROMPT'
 You are StructLogr, an AI assistant that converts raw, multi-line log text into normalized JSON that helps developers debug quickly.
 
@@ -188,9 +189,17 @@ PROMPT;
             true
         );
 
-        $response = Prism::structured()
-            //->using(Provider::DeepSeek, 'deepseek-chat')
-            ->using(Provider::Gemini, 'gemini-2.5-flash')
+        $prismBuilder = Prism::structured();
+
+        match ($llmModel) {
+            'deepseek-chat' => $prismBuilder->using(Provider::DeepSeek, 'deepseek-chat'),
+            'kimi-k2-turbo-preview' => $prismBuilder->using(Provider::OpenRouter, 'moonshot/kimi-k2-turbo-preview'),
+            'GLM-4.5-Air' => $prismBuilder->using(Provider::OpenRouter, 'zhipuai/glm-4.5-air'),
+            'GLM-4.6' => $prismBuilder->using(Provider::OpenRouter, 'zhipuai/glm-4.6'),
+            default => throw new \InvalidArgumentException("Unsupported LLM model: {$llmModel}"),
+        };
+
+        $response = $prismBuilder
             ->withSystemPrompt($systemPrompt)
             ->withSchema($schema)
             ->withPrompt($rawLog)
@@ -199,7 +208,6 @@ PROMPT;
                 'connect_timeout' => config('services.http.connect_timeout', 60),
             ])
             ->asStructured();
-        // ->generate();
 
         return $response->structured;
     }
