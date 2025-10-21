@@ -73,6 +73,7 @@ app/
 │   │   │   ├── ProfileController.php
 │   │   │   └── TwoFactorAuthenticationController.php
 │   │   ├── Controller.php           # Base controller
+│   │   ├── HistoryController.php    # History management
 │   │   └── LogFormatterController.php # Log formatting feature
 │   ├── Middleware/
 │   │   ├── HandleAppearance.php     # Theme preference middleware
@@ -90,6 +91,7 @@ app/
 │   ├── AppServiceProvider.php
 │   └── FortifyServiceProvider.php    # Laravel Fortify configuration
 └── Services/
+    ├── HistoryService.php            # History management
     └── LogFormatterService.php       # Prism LLM integration
 ```
 
@@ -135,7 +137,57 @@ User settings management under `app/Http/Controllers/Settings/`:
 - **PasswordController**: Change password
 - **TwoFactorAuthenticationController**: Enable/disable 2FA, view recovery codes
 
+#### HistoryController
+
+**Location**: `app/Http/Controllers/HistoryController.php`
+
+**Methods**:
+- `index()`: Returns user's history (recent and saved entries)
+- `show(FormattedLog $formattedLog)`: Retrieves specific history entry
+- `destroy(FormattedLog $formattedLog)`: Deletes history entry
+- `toggleSave(FormattedLog $formattedLog)`: Toggles saved status
+- `clear()`: Clears all user history
+- `export()`: Exports history as JSON file
+
+**Routes**:
+```php
+Route::middleware('auth')->group(function () {
+    Route::get('/history', [HistoryController::class, 'index'])->name('history.index');
+    Route::get('/history/{formattedLog}', [HistoryController::class, 'show'])->name('history.show');
+    Route::delete('/history/{formattedLog}', [HistoryController::class, 'destroy'])->name('history.destroy');
+    Route::patch('/history/{formattedLog}/toggle-save', [HistoryController::class, 'toggleSave'])->name('history.toggle');
+    Route::delete('/history', [HistoryController::class, 'clear'])->name('history.clear');
+    Route::get('/history/export', [HistoryController::class, 'export'])->name('history.export');
+});
+```
+
 ### Services
+
+#### HistoryService
+
+**Location**: `app/Services/HistoryService.php`
+
+**Responsibilities**:
+- Retrieves user-specific history entries
+- Formats history data for frontend consumption
+- Separates recent vs saved entries
+- Generates preview text from raw logs
+
+**Key Methods**:
+
+```php
+public function entriesForUser(User $user, int $limit = 50): Collection
+```
+- Fetches latest formatted logs for user
+- Orders by created_at descending
+- Limits results for performance
+
+```php
+public function payloadForUser(User $user, int $limit = 50): array
+```
+- Returns structured payload with `recent` and `saved` arrays
+- Each entry includes: id, summary, preview, createdAt, detectedLogType, fieldCount, isSaved
+- Preview text is sanitized (120 char limit, newlines removed)
 
 #### LogFormatterService
 
