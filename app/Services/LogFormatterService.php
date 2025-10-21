@@ -40,8 +40,8 @@ class LogFormatterService
                     ->withSystemPrompt($systemPrompt)
                     ->withSchema($schema)
                     ->withPrompt($rawLog)
-                    ->temperature(0.0)
-                    ->maxTokens(8192)
+                    ->usingTemperature(0.0)
+                    ->withMaxTokens(8192)
                     ->withClientOptions([
                         'timeout' => config('services.http.timeout', 600),
                         'connect_timeout' => config('services.http.connect_timeout', 60),
