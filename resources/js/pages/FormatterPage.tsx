@@ -816,7 +816,38 @@ export default function FormatterPage({
                                             id={outputDisplayId}
                                             className="flex-1 min-h-0 overflow-auto rounded-lg border border-border/40 bg-background/80 text-sm leading-6"
                                         >
-                                            <div className="sticky top-0 z-10 flex justify-end bg-background/95 px-4 py-3 shadow-sm backdrop-blur">
+                                            <div className="sticky top-0 z-10 flex justify-end gap-2 bg-background/95 px-4 py-3 shadow-sm backdrop-blur">
+                                                <Button
+                                                    type="button"
+                                                    variant={
+                                                        copyStatus === 'error'
+                                                            ? 'destructive'
+                                                            : 'outline'
+                                                    }
+                                                    size="sm"
+                                                    onClick={handleCopyOutput}
+                                                    disabled={!formattedOutput}
+                                                    className="inline-flex items-center gap-2"
+                                                    aria-live="polite"
+                                                    aria-label="Copy formatted output to clipboard"
+                                                >
+                                                    {copyStatus === 'copied' ? (
+                                                        <>
+                                                            <Check className="h-4 w-4" />
+                                                            Copied!
+                                                        </>
+                                                    ) : copyStatus === 'error' ? (
+                                                        <>
+                                                            <ClipboardCopy className="h-4 w-4" />
+                                                            Copy Failed
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <ClipboardCopy className="h-4 w-4" />
+                                                            Copy Output
+                                                        </>
+                                                    )}
+                                                </Button>
                                                 <Button
                                                     type="button"
                                                     variant="outline"
