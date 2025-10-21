@@ -109,10 +109,6 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
         });
     };
 
-    const handleGetStarted = () => {
-        formRef.current?.scrollIntoView({ behavior: 'smooth' });
-    };
-
     const handleHistoryOpen = () => {
         setHistoryOpen(true);
     };
@@ -264,7 +260,7 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
                         {statusMessage}
                     </div>
 
-                    <HeroSection onGetStarted={handleGetStarted} />
+                    <HeroSection />
 
                     <section
                         id="formatter"
