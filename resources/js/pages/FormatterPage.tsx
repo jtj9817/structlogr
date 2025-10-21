@@ -158,7 +158,6 @@ export default function FormatterPage({
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const outputRef = useRef<HTMLPreElement>(null);
 
-    // Generate unique IDs for form elements
     const sampleLogsSelectId = 'formatter-sample-logs-select';
     const sampleLogsTestId = 'test-formatter-sample-logs';
 
@@ -167,6 +166,26 @@ export default function FormatterPage({
 
     const formatButtonId = 'formatter-format-button';
     const formatButtonTestId = 'test-formatter-format';
+
+    const headerId = 'app-header';
+    const mainNavId = 'main-navigation';
+    const mainContentId = 'main-content';
+    const formId = 'formatter-form';
+    const shortcutsButtonId = 'shortcuts-button';
+    const historyButtonId = 'history-button';
+    const settingsButtonId = 'settings-button';
+    const loginLinkId = 'login-link';
+    const registerLinkId = 'register-link';
+    const characterCounterId = 'character-counter';
+    const lineCounterId = 'line-counter';
+    const clearButtonId = 'clear-input-button';
+    const preferencesButtonId = 'preferences-button';
+    const outputDisplayId = 'output-display';
+    const statusLiveRegionId = 'status-live-region';
+    const formatterHeadingId = 'formatter-heading';
+    const inputCardId = 'input-card';
+    const outputCardId = 'output-card';
+    const footerId = 'app-footer';
     const [historyOpen, setHistoryOpen] = useState(false);
     const [preferencesOpen, setPreferencesOpen] = useState(false);
     const [settingsOpen, setSettingsOpen] = useState(false);
@@ -385,15 +404,17 @@ export default function FormatterPage({
             <Head title="StructLogr - Log Formatter" />
             <div className="flex min-h-screen flex-col bg-background">
                 <SkipNavigation />
-                <header className="border-b" role="banner">
+                <header id={headerId} className="border-b" role="banner">
                     <div className="container mx-auto flex h-16 items-center justify-between px-4">
                         <h1 className="text-xl font-semibold">StructLogr</h1>
                         <nav
+                            id={mainNavId}
                             className="flex items-center gap-4"
                             role="navigation"
                             aria-label="Main navigation"
                         >
                             <Button
+                                id={shortcutsButtonId}
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => setShortcutsOpen(true)}
@@ -404,6 +425,7 @@ export default function FormatterPage({
                                 Shortcuts
                             </Button>
                             <Button
+                                id={historyButtonId}
                                 variant="ghost"
                                 size="sm"
                                 onClick={handleHistoryOpen}
@@ -412,6 +434,7 @@ export default function FormatterPage({
                                 History
                             </Button>
                             <Button
+                                id={settingsButtonId}
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => setSettingsOpen(true)}
@@ -423,12 +446,14 @@ export default function FormatterPage({
                             {!auth.user && (
                                 <>
                                     <Link
+                                        id={loginLinkId}
                                         href={login()}
                                         className="text-sm text-muted-foreground hover:text-foreground"
                                     >
                                         Log in
                                     </Link>
                                     <Link
+                                        id={registerLinkId}
                                         href={register()}
                                         className="rounded-md border px-4 py-2 text-sm hover:bg-accent"
                                     >
@@ -440,9 +465,10 @@ export default function FormatterPage({
                     </div>
                 </header>
 
-                <main role="main" id="main-content">
+                <main id={mainContentId} role="main">
                     {/* Screen reader live region for status updates */}
                     <div
+                        id={statusLiveRegionId}
                         role="status"
                         aria-live="polite"
                         aria-atomic="true"
@@ -457,12 +483,12 @@ export default function FormatterPage({
                         id="formatter"
                         ref={formRef}
                         className="container mx-auto px-4 py-16 sm:px-6 lg:px-8 lg:py-24"
-                        aria-labelledby="formatter-heading"
+                        aria-labelledby={formatterHeadingId}
                     >
                         <div className="mx-auto flex max-w-6xl flex-col gap-10">
                             <div className="space-y-4 text-center">
                                 <h2
-                                    id="formatter-heading"
+                                    id={formatterHeadingId}
                                     className="text-3xl leading-tight font-bold lg:text-4xl"
                                 >
                                     Log Formatter
@@ -474,12 +500,13 @@ export default function FormatterPage({
                             </div>
 
                             <div className="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
-                                <Card className="shadow-sm transition-shadow hover:shadow-md">
+                                <Card id={inputCardId} className="shadow-sm transition-shadow hover:shadow-md">
                                     <CardHeader>
                                         <CardTitle>Raw Log Input</CardTitle>
                                     </CardHeader>
                                     <CardContent className="space-y-6">
                                         <form
+                                            id={formId}
                                             onSubmit={submit}
                                             className="space-y-6"
                                             aria-label="Log formatting form"
@@ -544,6 +571,7 @@ export default function FormatterPage({
                                                     />
                                                     {data.raw_log && (
                                                         <button
+                                                            id={clearButtonId}
                                                             type="button"
                                                             onClick={
                                                                 handleClearInput
@@ -558,8 +586,8 @@ export default function FormatterPage({
                                                 </div>
 
                                                 {/* Character and Line Counter */}
-                                                <div className="flex justify-between text-xs text-muted-foreground">
-                                                    <span>
+                                                <div id={characterCounterId} className="flex justify-between text-xs text-muted-foreground">
+                                                    <span id={lineCounterId}>
                                                         {getCharacterCount()}{' '}
                                                         characters •{' '}
                                                         {getLineCount()} lines
@@ -614,7 +642,7 @@ export default function FormatterPage({
                                     </CardContent>
                                 </Card>
 
-                                <Card className="shadow-sm transition-shadow hover:shadow-md">
+                                <Card id={outputCardId} className="shadow-sm transition-shadow hover:shadow-md">
                                     <CardHeader className="flex flex-col gap-2 text-left sm:flex-row sm:items-center sm:justify-between">
                                         <div>
                                             <CardTitle>Converted Log</CardTitle>
@@ -623,6 +651,7 @@ export default function FormatterPage({
                                             </p>
                                         </div>
                                         <Button
+                                            id={preferencesButtonId}
                                             variant="ghost"
                                             size="sm"
                                             onClick={() =>
@@ -647,7 +676,7 @@ export default function FormatterPage({
                                                 {statusMessage}
                                             </p>
                                         )}
-                                        <div className="max-h-[520px] min-h-[320px] overflow-auto rounded-lg border border-border/40 bg-background/80 p-4 font-mono text-sm leading-6">
+                                        <div id={outputDisplayId} className="max-h-[520px] min-h-[320px] overflow-auto rounded-lg border border-border/40 bg-background/80 p-4 font-mono text-sm leading-6">
                                             {renderOutputContent()}
                                         </div>
                                     </CardContent>
@@ -657,7 +686,7 @@ export default function FormatterPage({
                     </section>
                 </main>
 
-                <footer className="border-t py-6">
+                <footer id={footerId} className="border-t py-6">
                     <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
                         <p>Powered by Laravel + React + Prism</p>
                     </div>
