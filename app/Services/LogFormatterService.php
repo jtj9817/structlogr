@@ -115,12 +115,26 @@ PROMPT;
                                         new StringSchema('category', 'Category label for the item', true),
                                         new StringSchema('timestamp', 'Timestamp for the item if present', true),
                                         new StringSchema('duration', 'Duration associated with the item', true),
-                                        new ObjectSchema(
+                                        new ArraySchema(
                                             'details',
-                                            'Additional key-value details for this item',
-                                            [],
-                                            [],
-                                            true,
+                                            'Additional key-value details for this item represented as labeled entries',
+                                            new ObjectSchema(
+                                                'detail_entry',
+                                                'Describes a single key/value detail captured for the item',
+                                                [
+                                                    new StringSchema('key', 'Name of the detail field or attribute'),
+                                                    new StringSchema('value', 'String representation of the field value', true),
+                                                    new NumberSchema('value_number', 'Numeric representation of the value when applicable', true),
+                                                    new ArraySchema(
+                                                        'value_list',
+                                                        'List representation when the value contains multiple items',
+                                                        new StringSchema('value_item', 'Individual value contained in the list'),
+                                                        true
+                                                    ),
+                                                ],
+                                                ['key'],
+                                                true
+                                            ),
                                             true
                                         ),
                                     ],
@@ -130,12 +144,37 @@ PROMPT;
                                 ),
                                 true
                             ),
-                            new ObjectSchema(
+                            new ArraySchema(
                                 'data',
-                                'Section-specific structured data such as summaries or tables',
-                                [],
-                                [],
-                                true,
+                                'Section-specific structured data entries (key/value groups or nested items)',
+                                new ObjectSchema(
+                                    'data_entry',
+                                    'Structured data entry associated with the section',
+                                    [
+                                        new StringSchema('key', 'Identifier or label for this data entry'),
+                                        new StringSchema('value', 'String representation of the entry value', true),
+                                        new NumberSchema('value_number', 'Numeric representation when available', true),
+                                        new ArraySchema(
+                                            'items',
+                                            'Optional nested items that break down this data entry further',
+                                            new ObjectSchema(
+                                                'data_item',
+                                                'Nested item contained within a section data entry',
+                                                [
+                                                    new StringSchema('key', 'Key or label for the nested item', true),
+                                                    new StringSchema('value', 'String value for the nested item', true),
+                                                    new NumberSchema('value_number', 'Numeric value when applicable', true),
+                                                ],
+                                                [],
+                                                true,
+                                                true
+                                            ),
+                                            true
+                                        ),
+                                    ],
+                                    ['key'],
+                                    true
+                                ),
                                 true
                             ),
                         ],
@@ -150,7 +189,8 @@ PROMPT;
         );
 
         $response = Prism::structured()
-            ->using(Provider::DeepSeek, 'deepseek-chat')
+            //->using(Provider::DeepSeek, 'deepseek-chat')
+            ->using(Provider::Gemini, 'gemini-2.5-flash')
             ->withSystemPrompt($systemPrompt)
             ->withSchema($schema)
             ->withPrompt($rawLog)
