@@ -5,6 +5,232 @@ All notable changes to StructLogr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [October 21, 2025] - Major UI/UX Enhancement & Accessibility
+
+### Added
+
+#### History Management System
+- **HistoryController** with full CRUD operations
+  - `index()` - Retrieve user's history (recent and saved)
+  - `show()` - Get specific entry details
+  - `destroy()` - Delete individual entries
+  - `toggleSave()` - Toggle saved/unsaved status
+  - `clear()` - Clear all user history
+  - `export()` - Download history as JSON
+- **HistoryService** for business logic
+  - `entriesForUser()` - Fetch formatted logs for user
+  - `payloadForUser()` - Format data for frontend (recent/saved separation)
+  - Preview text generation (120 char limit, sanitized)
+- **Database migration** for enhanced `formatted_logs` table
+  - `user_id` foreign key with cascade delete
+  - `summary` field for quick preview
+  - `detected_log_type` for classification
+  - `field_count` for UI indicators
+  - `is_saved` boolean flag for pinned entries
+  - Soft deletes support
+  - Composite index on (user_id, created_at)
+- **HistorySidebar component** with tabbed interface
+  - Recent and Saved tabs
+  - Rich entry cards with metadata
+  - Bulk actions (Export, Clear All)
+  - Empty states for guests/authenticated users
+- **HistoryEntryCard component** with actions
+  - Load, Save/Unsave, Copy, Delete buttons
+  - Log type badges and field count indicators
+  - Timestamp and preview text display
+- **useHistory hook** for state management
+  - CRUD operations with CSRF protection
+  - Real-time state synchronization
+  - Authorization checks
+  - Export and clear functionality
+
+#### Accessibility Features
+- **Keyboard shortcuts** system
+  - `Ctrl+Enter` / `Cmd+Enter` - Format log
+  - `Ctrl+K` / `Cmd+K` - Toggle history sidebar
+  - `Ctrl+L` / `Cmd+L` - Clear input
+- **KeyboardShortcutsModal component** for help
+- **SkipNavigation component** for screen readers
+- **ARIA labels** throughout the application
+- **useUniqueId hook** for SSR-compatible IDs
+  - Generates unique IDs for form elements
+  - Prevents hydration mismatches
+  - Supports aria-labelledby and aria-describedby
+- **Enhanced form accessibility**
+  - Comprehensive ARIA attributes on all inputs
+  - Proper label associations
+  - Error announcements for screen readers
+  - Focus management
+
+#### UI/UX Enhancements
+- **Side-by-side formatter layout**
+  - Split-pane design with resizable panels
+  - Input on left, output on right
+  - Improved information density
+- **Settings panel** for formatting preferences
+  - Auto-format toggle
+  - Timestamp display options
+  - Font size adjustment
+  - Line height controls
+- **Sample log library**
+  - Pre-built example logs for testing
+  - Multiple log types (errors, access logs, test runners)
+  - One-click insertion
+- **Application footer**
+  - Status indicator for API health
+  - Newsletter signup form
+  - Quick links and social media
+  - Version information
+- **Mobile navigation**
+  - Responsive header with hamburger menu
+  - Drawer navigation for mobile devices
+  - Touch-optimized controls
+- **Hero section redesign**
+  - Simplified dark theme design
+  - Clear value proposition
+  - Call-to-action buttons
+- **Onboarding tour** for first-time users
+- **Error boundary** with friendly error messages
+- **Seasonal effects** for visual delight
+  - Subtle animations
+  - Holiday themes
+
+#### New UI Components
+- **ScrollArea** - Virtualized scrolling component
+- **Tabs** - Tabbed interface component
+- **Radio Group** - Radio button group
+- **Slider** - Range slider input
+- **Switch** - Toggle switch component
+
+#### Developer Experience
+- **Fun tips** data for loading states
+- **Loading messages** for better UX during processing
+- **ID generation utilities** for accessibility
+  - `generateId()` - Create unique IDs
+  - `generateAriaId()` - ARIA-specific IDs
+  - `useFormFieldIds()` - Form field ID management
+
+### Changed
+
+#### UI Redesign
+- **FormatterPage** completely redesigned
+  - Side-by-side layout replaces vertical stack
+  - History sidebar integration
+  - Sample logs dropdown
+  - Settings panel access
+  - Keyboard shortcut support
+- **Hero section** simplified for better clarity
+  - Removed complex animations
+  - Focused on core messaging
+  - Improved dark mode aesthetics
+- **App header** enhanced with mobile support
+  - Responsive navigation
+  - Mobile-friendly menu
+  - Scroll shadow effect
+
+#### Backend Updates
+- **LogFormatterController** updated for history
+  - Associates logs with authenticated users
+  - Generates summaries from formatted output
+  - Calculates field counts for metadata
+- **FormattedLog model** expanded attributes
+  - Added user relationship
+  - New metadata fields
+  - Soft delete support
+
+#### Frontend Architecture
+- **Component organization** improved
+  - Formatter-specific components in `components/formatter/`
+  - Static data in `data/` directory
+  - Enhanced hooks in `hooks/` directory
+- **Type definitions** enhanced
+  - HistoryEntry interface
+  - HistoryDetail interface
+  - HistoryRoutes interface
+  - Settings and Preferences types
+
+### Fixed
+
+#### Code Quality
+- **Comprehensive linting fixes**
+  - ESLint rule compliance across all files
+  - Prettier formatting standardization
+  - Import organization
+- **TypeScript improvements**
+  - Added missing type annotations
+  - Fixed type errors
+  - Enhanced interface definitions
+- **Accessibility improvements**
+  - Fixed missing ARIA labels
+  - Corrected label associations
+  - Improved keyboard navigation
+- **SSR compatibility**
+  - Fixed hydration mismatches
+  - Ensured unique IDs across renders
+  - Resolved client-server state sync issues
+
+### Technical Details
+
+#### New Routes
+```php
+Route::middleware('auth')->group(function () {
+    Route::get('/history', [HistoryController::class, 'index'])->name('history.index');
+    Route::get('/history/{formattedLog}', [HistoryController::class, 'show'])->name('history.show');
+    Route::delete('/history/{formattedLog}', [HistoryController::class, 'destroy'])->name('history.destroy');
+    Route::patch('/history/{formattedLog}/toggle-save', [HistoryController::class, 'toggleSave'])->name('history.toggle');
+    Route::delete('/history', [HistoryController::class, 'clear'])->name('history.clear');
+    Route::get('/history/export', [HistoryController::class, 'export'])->name('history.export');
+});
+```
+
+#### Database Schema Updates
+```sql
+ALTER TABLE formatted_logs ADD COLUMN user_id BIGINT UNSIGNED NULL;
+ALTER TABLE formatted_logs ADD COLUMN summary VARCHAR(255) NULL;
+ALTER TABLE formatted_logs ADD COLUMN detected_log_type VARCHAR(128) NULL;
+ALTER TABLE formatted_logs ADD COLUMN field_count INT UNSIGNED DEFAULT 0;
+ALTER TABLE formatted_logs ADD COLUMN is_saved BOOLEAN DEFAULT FALSE;
+ALTER TABLE formatted_logs ADD COLUMN deleted_at TIMESTAMP NULL;
+ALTER TABLE formatted_logs ADD INDEX (user_id, created_at);
+```
+
+#### Component Hierarchy
+```
+FormatterPage
+├── HeroSection
+├── FormatterForm (left panel)
+│   ├── Textarea (input)
+│   ├── SampleLogsDropdown
+│   └── FormatButton
+├── FormatterOutput (right panel)
+│   ├── JsonDisplay
+│   └── CopyButton
+├── HistorySidebar (slide-out)
+│   ├── Tabs (Recent/Saved)
+│   └── HistoryEntryCard[]
+├── SettingsPanel (slide-out)
+│   └── FormattingPreferences
+└── KeyboardShortcutsModal
+```
+
+### Performance
+
+- **Optimized history queries** with composite index
+- **Lazy loading** for entry details
+- **Client-side caching** of loaded entries
+- **Virtualized scrolling** for large history lists
+- **Debounced search** in history (future)
+
+### Security
+
+- **User authorization** on all history endpoints
+- **CSRF protection** on mutations
+- **SQL injection prevention** via Eloquent ORM
+- **XSS protection** via React escaping
+- **Cascade deletes** for data integrity
+
+---
+
 ## [October 15, 2025] - Core Implementation Complete
 
 ### Added

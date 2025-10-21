@@ -6,12 +6,14 @@ A modern web application for transforming raw log text into structured JSON form
 
 - **AI-Powered Log Parsing**: Convert unstructured log text into structured JSON using LLM technology
 - **Multiple LLM Providers**: Support for OpenAI, Anthropic, DeepSeek, Mistral, Groq, and more via Prism
+- **History Management**: Track, save, search, and export all formatted logs with user-specific history
 - **Modern Tech Stack**: Laravel 12 backend with React 19 + Inertia.js 2.0 frontend
 - **Full Authentication System**: Email/password authentication with two-factor support via Laravel Fortify
-- **Persistent Storage**: All formatted logs are saved to MySQL database
+- **Accessibility First**: Keyboard shortcuts, ARIA labels, screen reader support, and skip navigation
+- **Settings & Preferences**: Customizable formatting preferences, auto-format toggle, and appearance settings
 - **Type-Safe Routing**: Laravel Wayfinder integration for type-safe routes in TypeScript
 - **Dark Mode**: Built-in theme switching with user preferences
-- **Responsive UI**: Tailwind CSS 4.0 + Radix UI components
+- **Responsive UI**: Tailwind CSS 4.0 + Radix UI components with mobile navigation
 
 ## Technology Stack
 
@@ -125,9 +127,24 @@ The application will be available at **http://localhost:8001**
 ### Basic Log Formatting
 
 1. Navigate to the home page at `http://localhost:8001`
-2. Paste your raw log text into the textarea
-3. Click "Format Log" to process
-4. View the structured JSON output below the form
+2. Paste your raw log text into the textarea or select from sample logs
+3. Click "Format Log" to process (or use keyboard shortcut `Ctrl+Enter`)
+4. View the structured JSON output in the side-by-side layout
+
+### History Management
+
+Authenticated users can:
+- **View History**: Access all formatted logs via the History sidebar (`Ctrl+K`)
+- **Save Entries**: Mark important entries as saved for quick access
+- **Search**: Browse recent and saved entries with preview text
+- **Export**: Download entire history as JSON file
+- **Clear**: Remove all or individual history entries
+
+### Keyboard Shortcuts
+
+- `Ctrl+Enter` or `Cmd+Enter`: Format log
+- `Ctrl+K` or `Cmd+K`: Toggle history sidebar
+- `Ctrl+L` or `Cmd+L`: Clear input
 
 Example input:
 ```
@@ -192,10 +209,11 @@ Example output:
 ### User Settings
 
 Authenticated users can manage:
-- Profile information
-- Password changes
-- Two-factor authentication
-- Theme preferences (light/dark mode)
+- **Profile**: Update name and email address
+- **Password**: Change account password
+- **Two-Factor Authentication**: Enable/disable 2FA with recovery codes
+- **Appearance**: Theme selection (light/dark/system)
+- **Formatting Preferences**: Auto-format toggle, timestamp display options
 
 ## Development
 
@@ -237,6 +255,7 @@ structlogr/
 │   │   ├── Controllers/
 │   │   │   ├── Auth/              # Authentication controllers
 │   │   │   ├── Settings/          # User settings controllers
+│   │   │   ├── HistoryController.php # History management
 │   │   │   └── LogFormatterController.php
 │   │   ├── Middleware/
 │   │   └── Requests/
@@ -245,6 +264,7 @@ structlogr/
 │   │   └── User.php
 │   ├── Providers/
 │   └── Services/
+│       ├── HistoryService.php     # History management service
 │       └── LogFormatterService.php # Prism integration service
 ├── config/
 │   ├── prism.php                   # Prism LLM configuration
@@ -259,8 +279,14 @@ structlogr/
 │       ├── actions/                # Wayfinder actions
 │       ├── components/             # React components
 │       │   ├── ui/                 # Radix UI components
+│       │   ├── formatter/          # Formatter-specific components
 │       │   └── ...
+│       ├── data/                   # Static data (sample logs, tips)
 │       ├── hooks/                  # Custom React hooks
+│       │   ├── use-history.ts      # History management
+│       │   ├── use-settings.ts     # Settings management
+│       │   ├── use-keyboard-shortcuts.ts
+│       │   └── ...
 │       ├── layouts/                # Page layouts
 │       ├── pages/                  # Inertia pages
 │       │   ├── auth/               # Authentication pages
@@ -365,6 +391,7 @@ Ensure production environment variables are set:
 
 - **[Implementation Plan](docs/StructLogr_Implementation_Plan.md)**: Development phases and roadmap
 - **[Architecture Overview](docs/architecture-overview.md)**: Detailed system architecture
+- **[History Feature](docs/history-feature.md)**: History management system guide
 - **[UI/UX Improvements](docs/UI_UX_Improvements.md)**: Design system and component guide
 - **[CHANGELOG](docs/CHANGELOG.md)**: Version history and updates
 - **[CLAUDE.md](CLAUDE.md)**: Instructions for Claude Code assistant
