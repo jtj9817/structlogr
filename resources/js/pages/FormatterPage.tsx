@@ -17,6 +17,7 @@ import {
 import { usePreferences } from '@/hooks/use-preferences';
 import { login, register } from '@/routes';
 import { type SharedData } from '@/types';
+import type { HistoryEntry } from '@/types/history';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { HelpCircle, Settings } from 'lucide-react';
 import { FormEventHandler, useEffect, useRef, useState } from 'react';
@@ -109,6 +110,19 @@ const clockworkFrames = [
    -- clockwork syncing --`,
 ];
 
+type HistoryPayload = {
+    recent: HistoryEntry[];
+    saved: HistoryEntry[];
+};
+
+type HistoryRoutesConfig = {
+    index: string;
+    detail: string;
+    toggle: string;
+    clear: string;
+    export: string;
+};
+
 interface FormatterPageProps {
     formattedLog?: {
         timestamp?: string;
@@ -118,10 +132,28 @@ interface FormatterPageProps {
         metadata?: Record<string, unknown>;
         [key: string]: unknown;
     };
+    history?: HistoryPayload | null;
+    historyRoutes?: HistoryRoutesConfig | null;
 }
 
-export default function FormatterPage({ formattedLog }: FormatterPageProps) {
-    const { auth } = usePage<SharedData>().props;
+export default function FormatterPage({
+    formattedLog,
+    history,
+    historyRoutes,
+}: FormatterPageProps) {
+    const page = usePage<
+        SharedData & {
+            history?: HistoryPayload | null;
+            historyRoutes?: HistoryRoutesConfig | null;
+        }
+    >();
+    const { auth } = page.props;
+    const initialHistory =
+        history ?? (page.props.history as HistoryPayload | null) ?? null;
+    const historyRouteConfig =
+        historyRoutes ??
+        (page.props.historyRoutes as HistoryRoutesConfig | null) ??
+        null;
     const formRef = useRef<HTMLElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const outputRef = useRef<HTMLPreElement>(null);
@@ -132,11 +164,29 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
     const [statusMessage, setStatusMessage] = useState('');
     const [hasSubmitted, setHasSubmitted] = useState(false);
     const [animationFrame, setAnimationFrame] = useState(0);
-    const { addEntry } = useHistory();
+    const [displayLog, setDisplayLog] = useState(formattedLog);
+    const {
+        recentEntries,
+        savedEntries,
+        loadEntry: loadHistoryEntry,
+        removeEntry,
+        toggleSaved,
+        clearHistory,
+        exportHistory,
+        isLoading: historyLoading,
+        canManage,
+    } = useHistory({
+        initialHistory: initialHistory ?? undefined,
+        routes: historyRouteConfig ?? undefined,
+    });
     const { applyPreferences } = usePreferences();
     const { data, setData, post, processing, errors } = useForm({
         raw_log: '',
     });
+
+    useEffect(() => {
+        setDisplayLog(formattedLog);
+    }, [formattedLog]);
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -146,10 +196,6 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
         post('/format', {
             onSuccess: () => {
                 setStatusMessage('Log formatting complete');
-                // Add to history on successful formatting
-                if (formattedLog) {
-                    addEntry(data.raw_log, formattedLog);
-                }
                 // Clear status message after 3 seconds
                 setTimeout(() => setStatusMessage(''), 3000);
             },
@@ -164,12 +210,40 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
         setHistoryOpen(true);
     };
 
-    const handleLoadHistoryEntry = (
-        rawLog: string,
-        formattedLog: Record<string, unknown>,
-    ) => {
-        setData('raw_log', rawLog);
-        // The formatted log will be displayed through the props
+    const handleLoadHistoryEntry = async (entryId: number) => {
+        try {
+            const entry = await loadHistoryEntry(entryId);
+            if (!entry) {
+                setStatusMessage('Unable to load history entry');
+                setTimeout(() => setStatusMessage(''), 3000);
+                return;
+            }
+
+            setData('raw_log', entry.rawLog);
+            setDisplayLog(entry.formattedLog);
+            setHasSubmitted(true);
+            setStatusMessage('History entry loaded');
+            setTimeout(() => setStatusMessage(''), 3000);
+        } catch (error) {
+            setStatusMessage('Unable to load history entry');
+            setTimeout(() => setStatusMessage(''), 3000);
+        }
+    };
+
+    const handleCopyHistoryEntry = async (entryId: number) => {
+        try {
+            const entry = await loadHistoryEntry(entryId);
+            if (!entry) {
+                return null;
+            }
+
+            return JSON.stringify(entry.formattedLog, null, 2);
+        } catch (error) {
+            setStatusMessage('Unable to copy history entry');
+            setTimeout(() => setStatusMessage(''), 3000);
+
+            return null;
+        }
     };
 
     const handleLoadSampleLog = (sampleId: string) => {
@@ -264,7 +338,7 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
             );
         }
 
-        if (formattedLog) {
+        if (displayLog) {
             return (
                 <pre
                     ref={outputRef}
@@ -272,7 +346,7 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
                     tabIndex={0}
                     aria-label="Formatted JSON output"
                 >
-                    {JSON.stringify(applyPreferences(formattedLog), null, 2)}
+                    {JSON.stringify(applyPreferences(displayLog), null, 2)}
                 </pre>
             );
         }
@@ -536,7 +610,7 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
                                                 setPreferencesOpen(true)
                                             }
                                             className="h-9 gap-2 px-3"
-                                            disabled={!formattedLog}
+                                            disabled={!displayLog}
                                             aria-label="Open formatting preferences"
                                         >
                                             <Settings className="h-4 w-4" />
@@ -575,6 +649,15 @@ export default function FormatterPage({ formattedLog }: FormatterPageProps) {
                 open={historyOpen}
                 onOpenChange={setHistoryOpen}
                 onLoadEntry={handleLoadHistoryEntry}
+                onCopyEntry={handleCopyHistoryEntry}
+                onRemoveEntry={removeEntry}
+                onToggleSaved={toggleSaved}
+                onClearHistory={clearHistory}
+                onExportHistory={exportHistory}
+                recentEntries={recentEntries}
+                savedEntries={savedEntries}
+                isProcessing={historyLoading}
+                canManage={canManage}
             />
 
             <FormattingPreferences

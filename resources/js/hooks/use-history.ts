@@ -1,93 +1,212 @@
-import type { HistoryEntry } from '@/types/history';
-import { useEffect, useState } from 'react';
+import type { HistoryDetail, HistoryEntry } from '@/types/history';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
-const HISTORY_KEY = 'log-history';
-const MAX_ENTRIES = 20;
+interface HistoryRoutes {
+    index: string;
+    detail: string;
+    toggle: string;
+    clear: string;
+    export: string;
+}
 
-export function useHistory() {
-    const [history, setHistory] = useState<HistoryEntry[]>([]);
+interface HistoryStatePayload {
+    recent: HistoryEntry[];
+    saved: HistoryEntry[];
+}
 
-    // Load history from localStorage on mount
+interface UseHistoryOptions {
+    initialHistory?: HistoryStatePayload | null;
+    routes?: HistoryRoutes | null;
+}
+
+const CSRF_SELECTOR = 'meta[name="csrf-token"]';
+
+function getCsrfToken(): string | undefined {
+    if (typeof document === 'undefined') {
+        return undefined;
+    }
+
+    return document
+        .querySelector<HTMLMetaElement>(CSRF_SELECTOR)
+        ?.getAttribute('content') ?? undefined;
+}
+
+function buildUrl(template: string, id: number | string): string {
+    return template.replace(':id', id.toString());
+}
+
+async function request<T>(
+    url: string,
+    options: RequestInit = {},
+): Promise<T> {
+    const headers = new Headers(options.headers);
+
+    headers.set('Accept', 'application/json');
+    headers.set('X-Requested-With', 'XMLHttpRequest');
+
+    if (!headers.has('Content-Type') && options.body && !(options.body instanceof FormData)) {
+        headers.set('Content-Type', 'application/json');
+    }
+
+    const token = getCsrfToken();
+    if (token && !headers.has('X-CSRF-TOKEN')) {
+        headers.set('X-CSRF-TOKEN', token);
+    }
+
+    const response = await fetch(url, {
+        credentials: 'same-origin',
+        ...options,
+        headers,
+    });
+
+    if (!response.ok) {
+        throw new Error(`History request failed with status ${response.status}`);
+    }
+
+    if (response.status === 204) {
+        return {} as T;
+    }
+
+    return (await response.json()) as T;
+}
+
+export function useHistory({
+    initialHistory,
+    routes,
+}: UseHistoryOptions = {}) {
+    const [recentEntries, setRecentEntries] = useState<HistoryEntry[]>(
+        initialHistory?.recent ?? [],
+    );
+    const [savedEntries, setSavedEntries] = useState<HistoryEntry[]>(
+        initialHistory?.saved ?? [],
+    );
+    const [isLoading, setIsLoading] = useState(false);
+
     useEffect(() => {
-        try {
-            const stored = localStorage.getItem(HISTORY_KEY);
-            if (stored) {
-                const parsed = JSON.parse(stored);
-                setHistory(parsed);
-            }
-        } catch (error) {
-            console.error('Failed to load history:', error);
+        if (!initialHistory) {
+            return;
         }
+
+        setRecentEntries(initialHistory.recent);
+        setSavedEntries(initialHistory.saved);
+    }, [initialHistory?.recent, initialHistory?.saved]);
+
+    const canManage = useMemo(() => Boolean(routes), [routes]);
+
+    const syncState = useCallback((payload?: HistoryStatePayload | null) => {
+        if (!payload) {
+            return;
+        }
+
+        setRecentEntries(payload.recent);
+        setSavedEntries(payload.saved);
     }, []);
 
-    // Save history to localStorage whenever it changes
-    useEffect(() => {
-        try {
-            localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-        } catch (error) {
-            console.error('Failed to save history:', error);
+    const loadEntry = useCallback(
+        async (id: number): Promise<HistoryDetail | null> => {
+            if (!routes) {
+                return null;
+            }
+
+            try {
+                const data = await request<{
+                    data: {
+                        id: number;
+                        raw_log: string;
+                        formatted_log: Record<string, unknown>;
+                    };
+                }>(buildUrl(routes.detail, id));
+
+                return {
+                    id: data.data.id,
+                    rawLog: data.data.raw_log,
+                    formattedLog: data.data.formatted_log,
+                };
+            } catch (error) {
+                console.error('Failed to load history entry', error);
+
+                return null;
+            }
+        },
+        [routes],
+    );
+
+    const handleMutation = useCallback(
+        async (
+            url: string,
+            method: 'DELETE' | 'PATCH',
+        ) => {
+            if (!routes) {
+                return;
+            }
+
+            setIsLoading(true);
+
+            try {
+                const response = await request<{ data: HistoryStatePayload }>(
+                    url,
+                    {
+                        method,
+                    },
+                );
+
+                syncState(response.data);
+            } catch (error) {
+                console.error('History update failed', error);
+            } finally {
+                setIsLoading(false);
+            }
+        },
+        [routes, syncState],
+    );
+
+    const removeEntry = useCallback(
+        async (id: number) => {
+            if (!routes) {
+                return;
+            }
+
+            await handleMutation(buildUrl(routes.detail, id), 'DELETE');
+        },
+        [handleMutation, routes],
+    );
+
+    const toggleSaved = useCallback(
+        async (id: number) => {
+            if (!routes) {
+                return;
+            }
+
+            await handleMutation(buildUrl(routes.toggle, id), 'PATCH');
+        },
+        [handleMutation, routes],
+    );
+
+    const clearHistory = useCallback(async () => {
+        if (!routes) {
+            return;
         }
-    }, [history]);
 
-    const addEntry = (
-        rawLog: string,
-        formattedLog: Record<string, unknown>,
-    ) => {
-        const entry: HistoryEntry = {
-            id: Date.now().toString(),
-            rawLog,
-            formattedLog,
-            timestamp: Date.now(),
-            saved: false,
-        };
+        await handleMutation(routes.clear, 'DELETE');
+    }, [handleMutation, routes]);
 
-        setHistory((prev) => {
-            const newHistory = [entry, ...prev];
-            // Keep only the last MAX_ENTRIES
-            return newHistory.slice(0, MAX_ENTRIES);
-        });
-    };
+    const exportHistory = useCallback(() => {
+        if (!routes) {
+            return;
+        }
 
-    const removeEntry = (id: string) => {
-        setHistory((prev) => prev.filter((entry) => entry.id !== id));
-    };
-
-    const toggleSaved = (id: string) => {
-        setHistory((prev) =>
-            prev.map((entry) =>
-                entry.id === id ? { ...entry, saved: !entry.saved } : entry,
-            ),
-        );
-    };
-
-    const clearHistory = () => {
-        setHistory([]);
-    };
-
-    const exportHistory = () => {
-        const dataStr = JSON.stringify(history, null, 2);
-        const dataBlob = new Blob([dataStr], { type: 'application/json' });
-        const url = URL.createObjectURL(dataBlob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `log-history-${new Date().toISOString().split('T')[0]}.json`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-    };
-
-    const recentEntries = history.filter((entry) => !entry.saved);
-    const savedEntries = history.filter((entry) => entry.saved);
+        window.open(routes.export, '_blank', 'noopener');
+    }, [routes]);
 
     return {
-        history,
         recentEntries,
         savedEntries,
-        addEntry,
+        loadEntry,
         removeEntry,
         toggleSaved,
         clearHistory,
         exportHistory,
+        isLoading,
+        canManage,
     };
 }

@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\FormattedLog;
+use App\Models\User;
+use Illuminate\Support\Str;
 use Prism\Prism\Enums\Provider;
 use Prism\Prism\Prism;
 use Prism\Prism\Schema\ArraySchema;
@@ -162,11 +164,23 @@ PROMPT;
         return $response->structured;
     }
 
-    public function saveLog(string $rawLog, array $formattedLog): FormattedLog
+    public function saveLog(string $rawLog, array $formattedLog, ?User $user = null): ?FormattedLog
     {
+        if (! $user) {
+            return null;
+        }
+
+        $summary = data_get($formattedLog, 'summary.headline');
+        $detectedType = data_get($formattedLog, 'detected_log_type');
+        $fieldCount = is_array($formattedLog) ? count($formattedLog) : 0;
+
         return FormattedLog::create([
+            'user_id' => $user->id,
             'raw_log' => $rawLog,
             'formatted_log' => $formattedLog,
+            'summary' => $summary ? Str::limit($summary, 255) : Str::limit(trim($rawLog), 255),
+            'detected_log_type' => $detectedType,
+            'field_count' => $fieldCount,
         ]);
     }
 }

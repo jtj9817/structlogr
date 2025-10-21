@@ -8,45 +8,54 @@ import {
     SheetTitle,
 } from '@/components/ui/sheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useHistory } from '@/hooks/use-history';
 import type { HistoryEntry } from '@/types/history';
 import { Download, History, Trash2 } from 'lucide-react';
 
 interface HistorySidebarProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    onLoadEntry: (
-        rawLog: string,
-        formattedLog: Record<string, unknown>,
-    ) => void;
+    onLoadEntry: (id: number) => Promise<void>;
+    onCopyEntry: (id: number) => Promise<string | null>;
+    onRemoveEntry: (id: number) => Promise<void>;
+    onToggleSaved: (id: number) => Promise<void>;
+    onClearHistory: () => Promise<void>;
+    onExportHistory: () => void;
+    recentEntries: HistoryEntry[];
+    savedEntries: HistoryEntry[];
+    isProcessing?: boolean;
+    canManage: boolean;
 }
 
 export function HistorySidebar({
     open,
     onOpenChange,
     onLoadEntry,
+    onCopyEntry,
+    onRemoveEntry,
+    onToggleSaved,
+    onClearHistory,
+    onExportHistory,
+    recentEntries,
+    savedEntries,
+    isProcessing = false,
+    canManage,
 }: HistorySidebarProps) {
-    const {
-        recentEntries,
-        savedEntries,
-        removeEntry,
-        toggleSaved,
-        clearHistory,
-        exportHistory,
-    } = useHistory();
-
-    const handleLoadEntry = (entry: HistoryEntry) => {
-        onLoadEntry(entry.rawLog, entry.formattedLog);
+    const handleLoadEntry = async (entry: HistoryEntry) => {
+        await onLoadEntry(entry.id);
         onOpenChange(false);
     };
 
-    const handleClearHistory = () => {
-        if (
-            confirm(
-                'Are you sure you want to clear all history? This cannot be undone.',
-            )
-        ) {
-            clearHistory();
+    const handleClearHistory = async () => {
+        if (!canManage) {
+            return;
+        }
+
+        const confirmed = confirm(
+            'Are you sure you want to clear all history? This cannot be undone.',
+        );
+
+        if (confirmed) {
+            await onClearHistory();
         }
     };
 
@@ -56,6 +65,13 @@ export function HistorySidebar({
             <p className="text-sm text-muted-foreground">{message}</p>
         </div>
     );
+
+    const recentEmptyMessage = canManage
+        ? 'No recent entries yet'
+        : 'Log in to start building history.';
+    const savedEmptyMessage = canManage
+        ? 'No saved entries yet'
+        : 'Mark entries as saved to pin them here.';
 
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
@@ -84,22 +100,20 @@ export function HistorySidebar({
                     >
                         <ScrollArea className="flex-1 rounded-lg border border-border/40 bg-background/80 pr-4">
                             {recentEntries.length === 0 ? (
-                                <EmptyState message="No recent entries yet" />
+                                <EmptyState message={recentEmptyMessage} />
                             ) : (
                                 <div className="space-y-3 p-4">
                                     {recentEntries.map((entry) => (
                                         <HistoryEntryCard
                                             key={entry.id}
                                             entry={entry}
-                                            onLoad={() =>
-                                                handleLoadEntry(entry)
-                                            }
-                                            onDelete={() =>
-                                                removeEntry(entry.id)
-                                            }
+                                            onLoad={() => handleLoadEntry(entry)}
+                                            onDelete={() => onRemoveEntry(entry.id)}
                                             onToggleSave={() =>
-                                                toggleSaved(entry.id)
+                                                onToggleSaved(entry.id)
                                             }
+                                            onCopy={() => onCopyEntry(entry.id)}
+                                            disabled={isProcessing || !canManage}
                                         />
                                     ))}
                                 </div>
@@ -113,22 +127,20 @@ export function HistorySidebar({
                     >
                         <ScrollArea className="flex-1 rounded-lg border border-border/40 bg-background/80 pr-4">
                             {savedEntries.length === 0 ? (
-                                <EmptyState message="No saved entries yet" />
+                                <EmptyState message={savedEmptyMessage} />
                             ) : (
                                 <div className="space-y-3 p-4">
                                     {savedEntries.map((entry) => (
                                         <HistoryEntryCard
                                             key={entry.id}
                                             entry={entry}
-                                            onLoad={() =>
-                                                handleLoadEntry(entry)
-                                            }
-                                            onDelete={() =>
-                                                removeEntry(entry.id)
-                                            }
+                                            onLoad={() => handleLoadEntry(entry)}
+                                            onDelete={() => onRemoveEntry(entry.id)}
                                             onToggleSave={() =>
-                                                toggleSaved(entry.id)
+                                                onToggleSaved(entry.id)
                                             }
+                                            onCopy={() => onCopyEntry(entry.id)}
+                                            disabled={isProcessing || !canManage}
                                         />
                                     ))}
                                 </div>
@@ -141,8 +153,9 @@ export function HistorySidebar({
                     <Button
                         variant="outline"
                         size="sm"
-                        onClick={exportHistory}
+                        onClick={onExportHistory}
                         className="flex-1 justify-center"
+                        disabled={!canManage}
                     >
                         <Download className="mr-2 h-4 w-4" />
                         Export
@@ -152,6 +165,7 @@ export function HistorySidebar({
                         size="sm"
                         onClick={handleClearHistory}
                         className="flex-1 justify-center text-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/20"
+                        disabled={!canManage || isProcessing}
                     >
                         <Trash2 className="mr-2 h-4 w-4" />
                         Clear All
