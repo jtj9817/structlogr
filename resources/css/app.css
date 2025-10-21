@@ -204,7 +204,7 @@ html {
     .app-header,
     .app-footer,
     button:not(.print-visible),
-    [role="button"]:not(.print-visible),
+    [role='button']:not(.print-visible),
     .no-print {
         @apply hidden;
     }
@@ -225,7 +225,7 @@ html {
 
     /* Style cards and sections */
     .card,
-    [role="region"],
+    [role='region'],
     section {
         page-break-inside: avoid;
         border: 1px solid #ccc;
@@ -255,7 +255,7 @@ html {
     }
 
     a[href]:after {
-        content: " (" attr(href) ")";
+        content: ' (' attr(href) ')';
         font-size: 0.8em;
         color: #666;
     }

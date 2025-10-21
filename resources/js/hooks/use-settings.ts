@@ -105,8 +105,14 @@ const sanitizeSettings = (value: unknown): Settings => {
         settings.apiKey = value.apiKey;
     }
 
-    if (typeof value.timeoutSeconds === 'number' && !Number.isNaN(value.timeoutSeconds)) {
-        settings.timeoutSeconds = Math.max(5, Math.min(120, value.timeoutSeconds));
+    if (
+        typeof value.timeoutSeconds === 'number' &&
+        !Number.isNaN(value.timeoutSeconds)
+    ) {
+        settings.timeoutSeconds = Math.max(
+            5,
+            Math.min(120, value.timeoutSeconds),
+        );
     }
 
     return settings;

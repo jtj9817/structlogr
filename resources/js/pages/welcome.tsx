@@ -50,7 +50,7 @@ export default function Welcome() {
                     </h1>
 
                     <details className="group mx-auto max-w-xl rounded-xl border border-[#285669] bg-[#012c3c]/60 px-6 py-5 text-left text-base shadow-lg">
-                        <summary className="cursor-pointer select-none text-sm font-medium uppercase tracking-[0.3em] text-[#c6bfbb] transition group-open:text-white">
+                        <summary className="cursor-pointer text-sm font-medium tracking-[0.3em] text-[#c6bfbb] uppercase transition select-none group-open:text-white">
                             What does StructLogr do?
                         </summary>
                         <p className="mt-4 text-sm leading-relaxed text-[#c6bfbb]/85">

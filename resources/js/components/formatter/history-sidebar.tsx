@@ -107,13 +107,19 @@ export function HistorySidebar({
                                         <HistoryEntryCard
                                             key={entry.id}
                                             entry={entry}
-                                            onLoad={() => handleLoadEntry(entry)}
-                                            onDelete={() => onRemoveEntry(entry.id)}
+                                            onLoad={() =>
+                                                handleLoadEntry(entry)
+                                            }
+                                            onDelete={() =>
+                                                onRemoveEntry(entry.id)
+                                            }
                                             onToggleSave={() =>
                                                 onToggleSaved(entry.id)
                                             }
                                             onCopy={() => onCopyEntry(entry.id)}
-                                            disabled={isProcessing || !canManage}
+                                            disabled={
+                                                isProcessing || !canManage
+                                            }
                                         />
                                     ))}
                                 </div>
@@ -121,10 +127,7 @@ export function HistorySidebar({
                         </ScrollArea>
                     </TabsContent>
 
-                    <TabsContent
-                        value="saved"
-                        className="flex flex-1 flex-col"
-                    >
+                    <TabsContent value="saved" className="flex flex-1 flex-col">
                         <ScrollArea className="flex-1 rounded-lg border border-border/40 bg-background/80 pr-4">
                             {savedEntries.length === 0 ? (
                                 <EmptyState message={savedEmptyMessage} />
@@ -134,13 +137,19 @@ export function HistorySidebar({
                                         <HistoryEntryCard
                                             key={entry.id}
                                             entry={entry}
-                                            onLoad={() => handleLoadEntry(entry)}
-                                            onDelete={() => onRemoveEntry(entry.id)}
+                                            onLoad={() =>
+                                                handleLoadEntry(entry)
+                                            }
+                                            onDelete={() =>
+                                                onRemoveEntry(entry.id)
+                                            }
                                             onToggleSave={() =>
                                                 onToggleSaved(entry.id)
                                             }
                                             onCopy={() => onCopyEntry(entry.id)}
-                                            disabled={isProcessing || !canManage}
+                                            disabled={
+                                                isProcessing || !canManage
+                                            }
                                         />
                                     ))}
                                 </div>

@@ -5,8 +5,8 @@ import {
     CardFooter,
     CardHeader,
 } from '@/components/ui/card';
-import type { HistoryEntry } from '@/types/history';
 import { useClipboard } from '@/hooks/use-clipboard';
+import type { HistoryEntry } from '@/types/history';
 import { Clock, FileText, Star, Trash2 } from 'lucide-react';
 
 interface HistoryEntryCardProps {
@@ -73,10 +73,10 @@ export function HistoryEntryCard({
                 <div className="flex items-start gap-2">
                     <FileText className="mt-0.5 h-4 w-4 flex-shrink-0 text-muted-foreground" />
                     <div className="min-w-0 flex-1">
-                        <p className="truncate font-medium text-sm text-foreground">
+                        <p className="truncate text-sm font-medium text-foreground">
                             {headline}
                         </p>
-                        <p className="mt-1 text-xs uppercase tracking-wide text-muted-foreground">
+                        <p className="mt-1 text-xs tracking-wide text-muted-foreground uppercase">
                             {logTypeLabel} • {entry.fieldCount ?? 0} fields
                         </p>
                     </div>

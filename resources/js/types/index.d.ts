@@ -23,11 +23,7 @@ export interface NavItem {
     external?: boolean;
 }
 
-export type ApiStatusState =
-    | 'operational'
-    | 'degraded'
-    | 'outage'
-    | 'unknown';
+export type ApiStatusState = 'operational' | 'degraded' | 'outage' | 'unknown';
 
 export interface FooterSharedConfig {
     version?: string;

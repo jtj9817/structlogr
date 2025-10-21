@@ -1,21 +1,21 @@
+import { Icon } from '@/components/icon';
 import { NewsletterSignup } from '@/components/newsletter-signup';
 import { StatusIndicator } from '@/components/status-indicator';
-import { Icon } from '@/components/icon';
 import { cn } from '@/lib/utils';
-import { usePage, Link } from '@inertiajs/react';
-import {
-    Github,
-    Twitter,
-    MessageSquare,
-    ExternalLink,
-    ArrowUpRight,
-} from 'lucide-react';
-import { type ComponentType } from 'react';
 import {
     type ApiStatusState,
     type FooterSharedConfig,
     type SharedData,
 } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
+import {
+    ArrowUpRight,
+    ExternalLink,
+    Github,
+    MessageSquare,
+    Twitter,
+} from 'lucide-react';
+import { type ComponentType } from 'react';
 
 type FooterLink = {
     label: string;
@@ -112,14 +112,11 @@ export function AppFooter({ className }: { className?: string }) {
         (page.props.footer as FooterSharedConfig | undefined) ?? {};
 
     const version =
-        sharedConfig.version ??
-        import.meta.env.VITE_APP_VERSION ??
-        'v1.0.0';
+        sharedConfig.version ?? import.meta.env.VITE_APP_VERSION ?? 'v1.0.0';
 
     const statusState = normalizeStatus(sharedConfig.status?.state);
 
-    const statusMessage =
-        sharedConfig.status?.message ?? 'All systems go';
+    const statusMessage = sharedConfig.status?.message ?? 'All systems go';
 
     const statusHref = sharedConfig.status?.href ?? null;
 
@@ -143,7 +140,8 @@ export function AppFooter({ className }: { className?: string }) {
                                 Stay in the loop
                             </h3>
                             <p className="mt-2 text-sm text-muted-foreground">
-                                Subscribe for release notes and new parsing recipes.
+                                Subscribe for release notes and new parsing
+                                recipes.
                             </p>
                         </div>
                         <StatusIndicator
@@ -161,7 +159,10 @@ export function AppFooter({ className }: { className?: string }) {
                                     className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border/70 text-muted-foreground transition hover:border-foreground/80 hover:text-foreground dark:border-gray-700 dark:hover:border-gray-500"
                                     aria-label={social.label}
                                 >
-                                    <Icon iconNode={social.icon} className="h-5 w-5" />
+                                    <Icon
+                                        iconNode={social.icon}
+                                        className="h-5 w-5"
+                                    />
                                 </a>
                             ))}
                         </div>
@@ -171,7 +172,10 @@ export function AppFooter({ className }: { className?: string }) {
 
                 <div className="flex flex-col gap-4 border-t border-border/50 pt-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between dark:border-gray-800">
                     <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
-                        <span>© {new Date().getFullYear()} StructLogr. All rights reserved.</span>
+                        <span>
+                            © {new Date().getFullYear()} StructLogr. All rights
+                            reserved.
+                        </span>
                         <span className="hidden sm:inline" aria-hidden="true">
                             •
                         </span>
@@ -179,7 +183,9 @@ export function AppFooter({ className }: { className?: string }) {
                     </div>
                     <div className="flex items-center gap-3">
                         <ExternalLink className="h-4 w-4 text-muted-foreground" />
-                        <span className="font-medium text-foreground">Version {version}</span>
+                        <span className="font-medium text-foreground">
+                            Version {version}
+                        </span>
                     </div>
                 </div>
             </div>

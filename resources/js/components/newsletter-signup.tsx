@@ -27,7 +27,9 @@ export function NewsletterSignup({
 
         if (!consent) {
             setStatus('error');
-            setMessage('Please confirm you would like to receive product updates.');
+            setMessage(
+                'Please confirm you would like to receive product updates.',
+            );
             return;
         }
 
@@ -79,7 +81,8 @@ export function NewsletterSignup({
                     Join our newsletter
                 </Label>
                 <p className="text-xs text-muted-foreground">
-                    Keep up with new parsing features, API improvements, and workflow tips.
+                    Keep up with new parsing features, API improvements, and
+                    workflow tips.
                 </p>
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                     <Input
@@ -108,7 +111,8 @@ export function NewsletterSignup({
                     aria-label="I agree to receive updates"
                 />
                 <span>
-                    I agree to receive StructLogr product updates and marketing communications.
+                    I agree to receive StructLogr product updates and marketing
+                    communications.
                 </span>
             </label>
 

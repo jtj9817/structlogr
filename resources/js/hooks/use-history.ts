@@ -26,25 +26,28 @@ function getCsrfToken(): string | undefined {
         return undefined;
     }
 
-    return document
-        .querySelector<HTMLMetaElement>(CSRF_SELECTOR)
-        ?.getAttribute('content') ?? undefined;
+    return (
+        document
+            .querySelector<HTMLMetaElement>(CSRF_SELECTOR)
+            ?.getAttribute('content') ?? undefined
+    );
 }
 
 function buildUrl(template: string, id: number | string): string {
     return template.replace(':id', id.toString());
 }
 
-async function request<T>(
-    url: string,
-    options: RequestInit = {},
-): Promise<T> {
+async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
     const headers = new Headers(options.headers);
 
     headers.set('Accept', 'application/json');
     headers.set('X-Requested-With', 'XMLHttpRequest');
 
-    if (!headers.has('Content-Type') && options.body && !(options.body instanceof FormData)) {
+    if (
+        !headers.has('Content-Type') &&
+        options.body &&
+        !(options.body instanceof FormData)
+    ) {
         headers.set('Content-Type', 'application/json');
     }
 
@@ -60,7 +63,9 @@ async function request<T>(
     });
 
     if (!response.ok) {
-        throw new Error(`History request failed with status ${response.status}`);
+        throw new Error(
+            `History request failed with status ${response.status}`,
+        );
     }
 
     if (response.status === 204) {
@@ -70,10 +75,7 @@ async function request<T>(
     return (await response.json()) as T;
 }
 
-export function useHistory({
-    initialHistory,
-    routes,
-}: UseHistoryOptions = {}) {
+export function useHistory({ initialHistory, routes }: UseHistoryOptions = {}) {
     const [recentEntries, setRecentEntries] = useState<HistoryEntry[]>(
         initialHistory?.recent ?? [],
     );
@@ -132,10 +134,7 @@ export function useHistory({
     );
 
     const handleMutation = useCallback(
-        async (
-            url: string,
-            method: 'DELETE' | 'PATCH',
-        ) => {
+        async (url: string, method: 'DELETE' | 'PATCH') => {
             if (!routes) {
                 return;
             }

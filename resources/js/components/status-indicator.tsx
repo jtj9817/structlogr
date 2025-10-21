@@ -78,9 +78,7 @@ export function StatusIndicator({
                 href={href}
                 target={href.startsWith('http') ? '_blank' : undefined}
                 rel={
-                    href.startsWith('http')
-                        ? 'noopener noreferrer'
-                        : undefined
+                    href.startsWith('http') ? 'noopener noreferrer' : undefined
                 }
                 className="block"
                 aria-label={`API status: ${variant.label}`}

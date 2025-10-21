@@ -4,6 +4,8 @@ import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { ExternalLink, Menu } from 'lucide-react';
 import { type ReactNode } from 'react';
+import AppLogo from './app-logo';
+import { Icon } from './icon';
 import { Button } from './ui/button';
 import {
     Sheet,
@@ -13,8 +15,6 @@ import {
     SheetTitle,
     SheetTrigger,
 } from './ui/sheet';
-import AppLogo from './app-logo';
-import { Icon } from './icon';
 
 interface MobileNavigationProps {
     mainLinks: NavItem[];
@@ -36,8 +36,7 @@ export function MobileNavigation({
     const cleanup = useMobileNavigation();
 
     const renderLink = (item: NavItem) => {
-        const href =
-            typeof item.href === 'string' ? item.href : item.href.url;
+        const href = typeof item.href === 'string' ? item.href : item.href.url;
         const content = (
             <span className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-base font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground">
                 {item.icon && <Icon iconNode={item.icon} className="size-5" />}
@@ -66,12 +65,7 @@ export function MobileNavigation({
 
         return (
             <SheetClose asChild key={item.title}>
-                <Link
-                    href={href}
-                    prefetch
-                    className="w-full"
-                    onClick={cleanup}
-                >
+                <Link href={href} prefetch className="w-full" onClick={cleanup}>
                     {content}
                 </Link>
             </SheetClose>
@@ -111,7 +105,7 @@ export function MobileNavigation({
                     </nav>
                     {secondaryLinks.length > 0 && (
                         <div className="mt-2 border-t border-border/60 px-4 py-4">
-                            <p className="mb-2 text-xs font-semibold uppercase text-muted-foreground">
+                            <p className="mb-2 text-xs font-semibold text-muted-foreground uppercase">
                                 Resources
                             </p>
                             <div className="space-y-1">

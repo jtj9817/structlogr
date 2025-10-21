@@ -27,7 +27,7 @@ export default function AppLogo({
                 <AppLogoIcon className="size-5 fill-current text-white/90 dark:text-black" />
             </span>
             {showWordmark && (
-                <span className="truncate text-base font-bold leading-tight text-neutral-900 dark:text-neutral-50">
+                <span className="truncate text-base leading-tight font-bold text-neutral-900 dark:text-neutral-50">
                     StructLogr
                 </span>
             )}
