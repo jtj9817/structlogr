@@ -7,6 +7,15 @@ import { SettingsPanel } from '@/components/settings-panel';
 import SkipNavigation from '@/components/skip-navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 import { useHistory } from '@/hooks/use-history';
@@ -15,12 +24,26 @@ import {
     useKeyboardShortcuts,
 } from '@/hooks/use-keyboard-shortcuts';
 import { usePreferences } from '@/hooks/use-preferences';
+import { cn } from '@/lib/utils';
 import { login, register } from '@/routes';
 import { type SharedData } from '@/types';
 import type { HistoryEntry } from '@/types/history';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { HelpCircle, Settings } from 'lucide-react';
-import { FormEventHandler, useEffect, useRef, useState } from 'react';
+import {
+    Check,
+    ClipboardCopy,
+    HelpCircle,
+    Maximize2,
+    Settings,
+} from 'lucide-react';
+import {
+    FormEventHandler,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 
 // Sample logs data
 const sampleLogs = [
@@ -107,8 +130,38 @@ const clockworkFrames = [
    [===]   [===]
       ==   ==
      ==     ==
-   -- clockwork syncing --`,
+    -- clockwork syncing --`,
 ];
+
+const syntaxHighlightJson = (json: string) => {
+    const sanitized = json
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+    return sanitized.replace(
+        /("(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)/g,
+        (match) => {
+            let className = 'text-muted-foreground';
+
+            if (match.startsWith('"')) {
+                if (match.endsWith(':')) {
+                    className = 'text-sky-500 dark:text-sky-300';
+                } else {
+                    className = 'text-emerald-500 dark:text-emerald-300';
+                }
+            } else if (match === 'true' || match === 'false') {
+                className = 'text-amber-500 dark:text-amber-300';
+            } else if (match === 'null') {
+                className = 'text-rose-500 dark:text-rose-300';
+            } else {
+                className = 'text-indigo-500 dark:text-indigo-300';
+            }
+
+            return `<span class="${className}">${match}</span>`;
+        },
+    );
+};
 
 type HistoryPayload = {
     recent: HistoryEntry[];
@@ -157,6 +210,7 @@ export default function FormatterPage({
     const formRef = useRef<HTMLElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const outputRef = useRef<HTMLPreElement>(null);
+    const copyResetTimeoutRef = useRef<number | undefined>(undefined);
 
     const sampleLogsSelectId = 'formatter-sample-logs-select';
     const sampleLogsTestId = 'test-formatter-sample-logs';
@@ -191,9 +245,14 @@ export default function FormatterPage({
     const [settingsOpen, setSettingsOpen] = useState(false);
     const [shortcutsOpen, setShortcutsOpen] = useState(false);
     const [statusMessage, setStatusMessage] = useState('');
-    const [hasSubmitted, setHasSubmitted] = useState(false);
-    const [animationFrame, setAnimationFrame] = useState(0);
-    const [displayLog, setDisplayLog] = useState(formattedLog);
+   const [hasSubmitted, setHasSubmitted] = useState(false);
+   const [animationFrame, setAnimationFrame] = useState(0);
+   const [displayLog, setDisplayLog] = useState(formattedLog);
+    const [outputAnimating, setOutputAnimating] = useState(false);
+    const [isOutputModalOpen, setOutputModalOpen] = useState(false);
+    const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'error'>(
+        'idle',
+    );
     const {
         recentEntries,
         savedEntries,
@@ -213,9 +272,75 @@ export default function FormatterPage({
         raw_log: '',
     });
 
+    const formattedOutput = useMemo(() => {
+        if (!displayLog) {
+            return '';
+        }
+
+        try {
+            return JSON.stringify(applyPreferences(displayLog), null, 2);
+        } catch (error) {
+            console.error('Unable to format output preview', error);
+            return '';
+        }
+    }, [applyPreferences, displayLog]);
+
+    const highlightedOutput = useMemo(() => {
+        if (!formattedOutput) {
+            return '';
+        }
+
+        return syntaxHighlightJson(formattedOutput);
+    }, [formattedOutput]);
+
+    const handleCopyOutput = useCallback(async () => {
+        if (!formattedOutput) {
+            return;
+        }
+
+        try {
+            if (typeof navigator === 'undefined' || !navigator.clipboard) {
+                throw new Error('Clipboard API unavailable');
+            }
+
+            if (copyResetTimeoutRef.current) {
+                window.clearTimeout(copyResetTimeoutRef.current);
+            }
+
+            await navigator.clipboard.writeText(formattedOutput);
+            setCopyStatus('copied');
+        } catch (error) {
+            console.error('Unable to copy formatted output', error);
+            setCopyStatus('error');
+        } finally {
+            copyResetTimeoutRef.current = window.setTimeout(() => {
+                setCopyStatus('idle');
+                copyResetTimeoutRef.current = undefined;
+            }, 2000);
+        }
+    }, [formattedOutput]);
+
     useEffect(() => {
         setDisplayLog(formattedLog);
     }, [formattedLog]);
+
+    useEffect(() => {
+        return () => {
+            if (copyResetTimeoutRef.current) {
+                window.clearTimeout(copyResetTimeoutRef.current);
+            }
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!isOutputModalOpen) {
+            setCopyStatus('idle');
+            if (copyResetTimeoutRef.current) {
+                window.clearTimeout(copyResetTimeoutRef.current);
+                copyResetTimeoutRef.current = undefined;
+            }
+        }
+    }, [isOutputModalOpen]);
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -356,24 +481,38 @@ export default function FormatterPage({
         return () => window.clearInterval(interval);
     }, [processing]);
 
+    useEffect(() => {
+        if (!processing && !displayLog) {
+            return;
+        }
+
+        setOutputAnimating(true);
+
+        const timeout = window.setTimeout(() => {
+            setOutputAnimating(false);
+        }, 400);
+
+        return () => window.clearTimeout(timeout);
+    }, [displayLog, processing]);
+
     const renderOutputContent = () => {
         if (processing) {
             return (
-                <pre className="font-mono text-sm leading-6 whitespace-pre-line text-accent-foreground/90">
+                <pre className="m-0 font-mono text-sm leading-6 whitespace-pre-line text-accent-foreground/90">
                     {clockworkFrames[animationFrame]}
                 </pre>
             );
         }
 
-        if (displayLog) {
+        if (formattedOutput) {
             return (
                 <pre
                     ref={outputRef}
-                    className="text-sm"
+                    className="m-0 whitespace-pre-wrap text-sm leading-6"
                     tabIndex={0}
                     aria-label="Formatted JSON output"
                 >
-                    {JSON.stringify(applyPreferences(displayLog), null, 2)}
+                    {formattedOutput}
                 </pre>
             );
         }
@@ -385,15 +524,15 @@ export default function FormatterPage({
                         Unable to display formatted output.
                     </p>
                     <p className="text-muted-foreground">
-                        {statusMessage ||
-                            'Something went wrong while fetching results. Please try again.'}
+                        Something went wrong while fetching results. Please try
+                        again.
                     </p>
                 </div>
             );
         }
 
         return (
-            <pre className="text-left text-sm whitespace-pre-wrap text-muted-foreground">
+            <pre className="m-0 whitespace-pre-wrap text-left text-sm text-muted-foreground">
                 {dummyFormattedPreview}
             </pre>
         );
@@ -482,10 +621,10 @@ export default function FormatterPage({
                     <section
                         id="formatter"
                         ref={formRef}
-                        className="container mx-auto px-4 py-16 sm:px-6 lg:px-8 lg:py-24"
+                        className="container mx-auto flex min-h-[90vh] flex-col px-4 py-8 sm:px-6 lg:px-8"
                         aria-labelledby={formatterHeadingId}
                     >
-                        <div className="mx-auto flex max-w-6xl flex-col gap-10">
+                        <div className="mx-auto flex h-full max-w-6xl flex-1 flex-col gap-8">
                             <div className="space-y-4 text-center">
                                 <h2
                                     id={formatterHeadingId}
@@ -499,16 +638,19 @@ export default function FormatterPage({
                                 </p>
                             </div>
 
-                            <div className="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
-                                <Card id={inputCardId} className="shadow-sm transition-shadow hover:shadow-md">
+                            <div className="grid min-h-0 flex-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+                                <Card
+                                    id={inputCardId}
+                                    className="flex h-full flex-col shadow-sm transition-shadow hover:shadow-md"
+                                >
                                     <CardHeader>
                                         <CardTitle>Raw Log Input</CardTitle>
                                     </CardHeader>
-                                    <CardContent className="space-y-6">
+                                    <CardContent className="flex flex-1 flex-col gap-6 overflow-hidden">
                                         <form
                                             id={formId}
                                             onSubmit={submit}
-                                            className="space-y-6"
+                                            className="flex h-full flex-1 flex-col gap-6"
                                             aria-label="Log formatting form"
                                         >
                                             {/* Sample Logs Dropdown */}
@@ -549,8 +691,8 @@ export default function FormatterPage({
                                             </div>
 
                                             {/* Textarea with Clear Button */}
-                                            <div className="space-y-2">
-                                                <div className="relative">
+                                            <div className="flex min-h-0 flex-1 flex-col gap-3">
+                                                <div className="relative flex min-h-0 flex-1">
                                                     <Textarea
                                                         ref={textareaRef}
                                                         id={rawLogTextareaId}
@@ -559,7 +701,7 @@ export default function FormatterPage({
                                                         }
                                                         name="raw_log"
                                                         placeholder="Paste your raw log text here..."
-                                                        className="min-h-[200px] rounded-md pr-10"
+                                                        className="min-h-[280px] flex-1 resize-none rounded-md pr-10"
                                                         value={data.raw_log}
                                                         onChange={(e) =>
                                                             setData(
@@ -614,7 +756,7 @@ export default function FormatterPage({
                                                 )}
                                             </div>
 
-                                            <div className="flex items-center">
+                                            <div className="mt-auto flex justify-end">
                                                 <Button
                                                     id={formatButtonId}
                                                     data-testid={
@@ -642,42 +784,57 @@ export default function FormatterPage({
                                     </CardContent>
                                 </Card>
 
-                                <Card id={outputCardId} className="shadow-sm transition-shadow hover:shadow-md">
-                                    <CardHeader className="flex flex-col gap-2 text-left sm:flex-row sm:items-center sm:justify-between">
+                                <Card
+                                    id={outputCardId}
+                                    className={cn(
+                                        'flex h-full flex-col shadow-sm transition-shadow hover:shadow-md',
+                                        outputAnimating &&
+                                            'animate-in fade-in slide-in-from-right-4',
+                                    )}
+                                >
+                                    <CardHeader className="flex flex-col gap-2 text-left">
                                         <div>
                                             <CardTitle>Converted Log</CardTitle>
                                             <p className="text-sm text-muted-foreground">
                                                 Structured output preview
                                             </p>
                                         </div>
-                                        <Button
-                                            id={preferencesButtonId}
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() =>
-                                                setPreferencesOpen(true)
-                                            }
-                                            className="h-9 gap-2 px-3"
-                                            disabled={!displayLog}
-                                            aria-label="Open formatting preferences"
-                                        >
-                                            <Settings className="h-4 w-4" />
-                                            <span className="hidden sm:inline">
-                                                Preferences
-                                            </span>
-                                        </Button>
                                     </CardHeader>
-                                    <CardContent className="space-y-4">
-                                        {statusMessage && (
+                                    <CardContent className="flex flex-1 flex-col gap-4 overflow-hidden">
+                                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                             <p
                                                 className="text-sm text-muted-foreground"
                                                 aria-live="polite"
                                             >
-                                                {statusMessage}
+                                                {statusMessage ||
+                                                    (formattedOutput
+                                                        ? 'Preview updated. Open the full output to inspect or copy the JSON.'
+                                                        : 'Run the formatter or load a sample log to generate structured output.')}
                                             </p>
-                                        )}
-                                        <div id={outputDisplayId} className="max-h-[520px] min-h-[320px] overflow-auto rounded-lg border border-border/40 bg-background/80 p-4 font-mono text-sm leading-6">
-                                            {renderOutputContent()}
+                                        </div>
+                                        <div
+                                            id={outputDisplayId}
+                                            className="flex-1 min-h-0 overflow-auto rounded-lg border border-border/40 bg-background/80 text-sm leading-6"
+                                        >
+                                            <div className="sticky top-0 z-10 flex justify-end bg-background/95 px-4 py-3 shadow-sm backdrop-blur">
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() =>
+                                                        setOutputModalOpen(true)
+                                                    }
+                                                    disabled={!formattedOutput}
+                                                    className="inline-flex items-center gap-2"
+                                                    aria-label="Open full formatted output in a modal dialog"
+                                                >
+                                                    <Maximize2 className="h-4 w-4" />
+                                                    View Full Output
+                                                </Button>
+                                            </div>
+                                            <div className="px-4 pb-4">
+                                                {renderOutputContent()}
+                                            </div>
                                         </div>
                                     </CardContent>
                                 </Card>
@@ -692,6 +849,18 @@ export default function FormatterPage({
                     </div>
                 </footer>
             </div>
+
+            <Button
+                id={preferencesButtonId}
+                variant="secondary"
+                size="lg"
+                onClick={() => setPreferencesOpen(true)}
+                className="focus-ring fixed bottom-4 right-4 z-50 inline-flex h-11 gap-2 px-5 shadow-lg sm:bottom-6 sm:right-6"
+                aria-label="Open formatting preferences"
+            >
+                <Settings className="h-4 w-4" />
+                Preferences
+            </Button>
 
             <HistorySidebar
                 open={historyOpen}
@@ -719,6 +888,71 @@ export default function FormatterPage({
                 open={shortcutsOpen}
                 onOpenChange={setShortcutsOpen}
             />
+
+            <Dialog
+                open={isOutputModalOpen}
+                onOpenChange={setOutputModalOpen}
+            >
+                <DialogContent className="max-w-3xl">
+                    <DialogHeader>
+                        <DialogTitle>Formatted JSON Output</DialogTitle>
+                        <DialogDescription>
+                            Review the full transformed log and copy it for your
+                            workflow.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <ScrollArea className="max-h-[70vh] rounded-md border border-border/40">
+                        {formattedOutput ? (
+                            <pre
+                                className="whitespace-pre-wrap p-4 text-sm leading-6"
+                                dangerouslySetInnerHTML={{
+                                    __html: highlightedOutput,
+                                }}
+                            />
+                        ) : (
+                            <div className="p-4 text-sm text-muted-foreground">
+                                No formatted output is available yet. Run the
+                                formatter to generate a preview.
+                            </div>
+                        )}
+                    </ScrollArea>
+                    <DialogFooter className="gap-2">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => setOutputModalOpen(false)}
+                        >
+                            Close
+                        </Button>
+                        <Button
+                            type="button"
+                            variant={
+                                copyStatus === 'error' ? 'destructive' : 'default'
+                            }
+                            onClick={handleCopyOutput}
+                            disabled={!formattedOutput}
+                            aria-live="polite"
+                        >
+                            {copyStatus === 'copied' ? (
+                                <>
+                                    <Check className="mr-2 h-4 w-4" />
+                                    Copied!
+                                </>
+                            ) : copyStatus === 'error' ? (
+                                <>
+                                    <ClipboardCopy className="mr-2 h-4 w-4" />
+                                    Copy Failed
+                                </>
+                            ) : (
+                                <>
+                                    <ClipboardCopy className="mr-2 h-4 w-4" />
+                                    Copy to Clipboard
+                                </>
+                            )}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </>
     );
 }
