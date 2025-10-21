@@ -177,6 +177,9 @@ export function FormattingPreferences({
                                 <SelectItem value="deepseek-chat">
                                     DeepSeek Chat (Default)
                                 </SelectItem>
+                                <SelectItem value="gemini-2.5-flash">
+                                    Gemini 2.5 Flash
+                                </SelectItem>
                                 <SelectItem value="kimi-k2-turbo-preview">
                                     Kimi K2 Turbo Preview
                                 </SelectItem>

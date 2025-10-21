@@ -1,4 +1,4 @@
-export type LLMModel = 'deepseek-chat' | 'kimi-k2-turbo-preview' | 'GLM-4.5-Air' | 'GLM-4.6';
+export type LLMModel = 'deepseek-chat' | 'kimi-k2-turbo-preview' | 'GLM-4.5-Air' | 'GLM-4.6' | 'gemini-2.5-flash';
 
 export interface FormattingPreferences {
     includeMetadata: boolean;

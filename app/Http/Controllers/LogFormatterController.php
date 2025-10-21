@@ -22,7 +22,7 @@ class LogFormatterController extends Controller
     {
         $validated = $request->validate([
             'raw_log' => 'required|string',
-            'llm_model' => 'nullable|string|in:deepseek-chat,kimi-k2-turbo-preview,GLM-4.5-Air,GLM-4.6',
+            'llm_model' => 'nullable|string|in:deepseek-chat,gemini-2.5-flash,kimi-k2-turbo-preview,GLM-4.5-Air,GLM-4.6',
         ]);
 
         $rawLog = $validated['raw_log'];

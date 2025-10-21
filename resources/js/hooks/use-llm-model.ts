@@ -53,6 +53,7 @@ export function useLLMModel() {
 function isValidLLMModel(value: string): boolean {
     const validModels: LLMModel[] = [
         'deepseek-chat',
+        'gemini-2.5-flash',
         'kimi-k2-turbo-preview',
         'GLM-4.5-Air',
         'GLM-4.6',
