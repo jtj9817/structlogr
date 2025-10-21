@@ -106,33 +106,6 @@ const dummyFormattedPreview = `{
   ]
 }`;
 
-const clockworkFrames = [
-    `   [===]   [===]
-  <  o  > <  *  >
-   [===]   [===]
-     \\\\     //
-      \\\\   //
-   -- clockwork syncing --`,
-    `   [===]   [===]
-  <  *  > <  o  >
-   [===]   [===]
-      ||   ||
-      ||   ||
-   -- clockwork syncing --`,
-    `   [===]   [===]
-  <  o  > <  *  >
-   [===]   [===]
-      //   \\\\
-     //     \\\\
-   -- clockwork syncing --`,
-    `   [===]   [===]
-  <  *  > <  o  >
-   [===]   [===]
-      ==   ==
-     ==     ==
-    -- clockwork syncing --`,
-];
-
 const syntaxHighlightJson = (json: string) => {
     const sanitized = json
         .replace(/&/g, '&amp;')
@@ -245,9 +218,8 @@ export default function FormatterPage({
     const [settingsOpen, setSettingsOpen] = useState(false);
     const [shortcutsOpen, setShortcutsOpen] = useState(false);
     const [statusMessage, setStatusMessage] = useState('');
-   const [hasSubmitted, setHasSubmitted] = useState(false);
-   const [animationFrame, setAnimationFrame] = useState(0);
-   const [displayLog, setDisplayLog] = useState(formattedLog);
+    const [hasSubmitted, setHasSubmitted] = useState(false);
+    const [displayLog, setDisplayLog] = useState(formattedLog);
     const [outputAnimating, setOutputAnimating] = useState(false);
     const [isOutputModalOpen, setOutputModalOpen] = useState(false);
     const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'error'>(
@@ -345,7 +317,6 @@ export default function FormatterPage({
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
         setHasSubmitted(true);
-        setAnimationFrame(0);
         setStatusMessage('Processing your log...');
         post('/format', {
             onSuccess: () => {
@@ -469,19 +440,6 @@ export default function FormatterPage({
     }, []);
 
     useEffect(() => {
-        if (!processing) {
-            setAnimationFrame(0);
-            return;
-        }
-
-        const interval = window.setInterval(() => {
-            setAnimationFrame((frame) => (frame + 1) % clockworkFrames.length);
-        }, 220);
-
-        return () => window.clearInterval(interval);
-    }, [processing]);
-
-    useEffect(() => {
         if (!processing && !displayLog) {
             return;
         }
@@ -498,9 +456,16 @@ export default function FormatterPage({
     const renderOutputContent = () => {
         if (processing) {
             return (
-                <pre className="m-0 font-mono text-sm leading-6 whitespace-pre-line text-accent-foreground/90">
-                    {clockworkFrames[animationFrame]}
-                </pre>
+                <div
+                    className="flex min-h-[200px] items-center justify-center gap-3 py-12"
+                    role="status"
+                    aria-live="polite"
+                >
+                    <Spinner className="h-5 w-5" />
+                    <span className="text-sm text-muted-foreground">
+                        Formatting your log...
+                    </span>
+                </div>
             );
         }
 
@@ -814,6 +779,7 @@ export default function FormatterPage({
                                         </div>
                                         <div
                                             id={outputDisplayId}
+                                            aria-busy={processing}
                                             className="flex-1 min-h-0 overflow-auto rounded-lg border border-border/40 bg-background/80 text-sm leading-6"
                                         >
                                             <div className="sticky top-0 z-10 flex justify-end gap-2 bg-background/95 px-4 py-3 shadow-sm backdrop-blur">
