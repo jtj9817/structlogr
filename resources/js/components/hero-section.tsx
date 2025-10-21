@@ -2,9 +2,9 @@ export default function HeroSection() {
     return (
         <section
             id="hero-section"
-            className="relative flex h-[10vh] min-h-[10vh] max-h-[10vh] flex-col items-center justify-center overflow-hidden bg-[#061417] px-4 py-4 text-center text-[#c6bfbb]"
+            className="relative flex min-h-[10vh] flex-col items-center justify-center bg-[#061417] px-4 py-4 text-center text-[#c6bfbb]"
         >
-            <div className="w-full max-w-2xl space-y-4 overflow-y-auto">
+            <div className="w-full max-w-2xl space-y-4">
                 <h1
                     id="hero-title"
                     className="text-2xl font-semibold tracking-tight sm:text-3xl"
