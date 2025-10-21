@@ -1,7 +1,8 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../wayfinder'
 /**
 * @see \App\Http\Controllers\LogFormatterController::show
-* @see app/Http/Controllers/LogFormatterController.php:15
+* @see app/Http/Controllers/LogFormatterController.php:13
 * @route '/'
 */
 export const show = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +17,7 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\LogFormatterController::show
-* @see app/Http/Controllers/LogFormatterController.php:15
+* @see app/Http/Controllers/LogFormatterController.php:13
 * @route '/'
 */
 show.url = (options?: RouteQueryOptions) => {
@@ -25,7 +26,7 @@ show.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\LogFormatterController::show
-* @see app/Http/Controllers/LogFormatterController.php:15
+* @see app/Http/Controllers/LogFormatterController.php:13
 * @route '/'
 */
 show.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -35,7 +36,7 @@ show.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\LogFormatterController::show
-* @see app/Http/Controllers/LogFormatterController.php:15
+* @see app/Http/Controllers/LogFormatterController.php:13
 * @route '/'
 */
 show.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -45,7 +46,7 @@ show.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\LogFormatterController::show
-* @see app/Http/Controllers/LogFormatterController.php:15
+* @see app/Http/Controllers/LogFormatterController.php:13
 * @route '/'
 */
 const showForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -55,7 +56,7 @@ const showForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\LogFormatterController::show
-* @see app/Http/Controllers/LogFormatterController.php:15
+* @see app/Http/Controllers/LogFormatterController.php:13
 * @route '/'
 */
 showForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -65,7 +66,7 @@ showForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\LogFormatterController::show
-* @see app/Http/Controllers/LogFormatterController.php:15
+* @see app/Http/Controllers/LogFormatterController.php:13
 * @route '/'
 */
 showForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -82,7 +83,7 @@ show.form = showForm
 
 /**
 * @see \App\Http\Controllers\LogFormatterController::format
-* @see app/Http/Controllers/LogFormatterController.php:23
+* @see app/Http/Controllers/LogFormatterController.php:21
 * @route '/format'
 */
 export const format = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -97,7 +98,7 @@ format.definition = {
 
 /**
 * @see \App\Http\Controllers\LogFormatterController::format
-* @see app/Http/Controllers/LogFormatterController.php:23
+* @see app/Http/Controllers/LogFormatterController.php:21
 * @route '/format'
 */
 format.url = (options?: RouteQueryOptions) => {
@@ -106,7 +107,7 @@ format.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\LogFormatterController::format
-* @see app/Http/Controllers/LogFormatterController.php:23
+* @see app/Http/Controllers/LogFormatterController.php:21
 * @route '/format'
 */
 format.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -116,7 +117,7 @@ format.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\LogFormatterController::format
-* @see app/Http/Controllers/LogFormatterController.php:23
+* @see app/Http/Controllers/LogFormatterController.php:21
 * @route '/format'
 */
 const formatForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -126,7 +127,7 @@ const formatForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> =>
 
 /**
 * @see \App\Http\Controllers\LogFormatterController::format
-* @see app/Http/Controllers/LogFormatterController.php:23
+* @see app/Http/Controllers/LogFormatterController.php:21
 * @route '/format'
 */
 formatForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

@@ -8,9 +8,7 @@ use Illuminate\Http\Request;
 
 class LogFormatterController extends Controller
 {
-    public function __construct(private HistoryService $historyService)
-    {
-    }
+    public function __construct(private HistoryService $historyService) {}
 
     public function show(Request $request)
     {

@@ -10,9 +10,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class HistoryController extends Controller
 {
-    public function __construct(private HistoryService $historyService)
-    {
-    }
+    public function __construct(private HistoryService $historyService) {}
 
     public function index(Request $request): JsonResponse
     {

@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\HistoryController::index
-* @see app/Http/Controllers/HistoryController.php:17
+* @see app/Http/Controllers/HistoryController.php:15
 * @route '/history'
 */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ index.definition = {
 
 /**
 * @see \App\Http\Controllers\HistoryController::index
-* @see app/Http/Controllers/HistoryController.php:17
+* @see app/Http/Controllers/HistoryController.php:15
 * @route '/history'
 */
 index.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ index.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\HistoryController::index
-* @see app/Http/Controllers/HistoryController.php:17
+* @see app/Http/Controllers/HistoryController.php:15
 * @route '/history'
 */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -35,7 +35,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\HistoryController::index
-* @see app/Http/Controllers/HistoryController.php:17
+* @see app/Http/Controllers/HistoryController.php:15
 * @route '/history'
 */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -45,7 +45,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\HistoryController::index
-* @see app/Http/Controllers/HistoryController.php:17
+* @see app/Http/Controllers/HistoryController.php:15
 * @route '/history'
 */
 const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -55,7 +55,7 @@ const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => (
 
 /**
 * @see \App\Http\Controllers\HistoryController::index
-* @see app/Http/Controllers/HistoryController.php:17
+* @see app/Http/Controllers/HistoryController.php:15
 * @route '/history'
 */
 indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -65,7 +65,7 @@ indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\HistoryController::index
-* @see app/Http/Controllers/HistoryController.php:17
+* @see app/Http/Controllers/HistoryController.php:15
 * @route '/history'
 */
 indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -82,7 +82,7 @@ index.form = indexForm
 
 /**
 * @see \App\Http\Controllers\HistoryController::exportMethod
-* @see app/Http/Controllers/HistoryController.php:68
+* @see app/Http/Controllers/HistoryController.php:66
 * @route '/history/export'
 */
 export const exportMethod = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -97,7 +97,7 @@ exportMethod.definition = {
 
 /**
 * @see \App\Http\Controllers\HistoryController::exportMethod
-* @see app/Http/Controllers/HistoryController.php:68
+* @see app/Http/Controllers/HistoryController.php:66
 * @route '/history/export'
 */
 exportMethod.url = (options?: RouteQueryOptions) => {
@@ -106,7 +106,7 @@ exportMethod.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\HistoryController::exportMethod
-* @see app/Http/Controllers/HistoryController.php:68
+* @see app/Http/Controllers/HistoryController.php:66
 * @route '/history/export'
 */
 exportMethod.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -116,7 +116,7 @@ exportMethod.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\HistoryController::exportMethod
-* @see app/Http/Controllers/HistoryController.php:68
+* @see app/Http/Controllers/HistoryController.php:66
 * @route '/history/export'
 */
 exportMethod.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -126,7 +126,7 @@ exportMethod.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\HistoryController::exportMethod
-* @see app/Http/Controllers/HistoryController.php:68
+* @see app/Http/Controllers/HistoryController.php:66
 * @route '/history/export'
 */
 const exportMethodForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -136,7 +136,7 @@ const exportMethodForm = (options?: RouteQueryOptions): RouteFormDefinition<'get
 
 /**
 * @see \App\Http\Controllers\HistoryController::exportMethod
-* @see app/Http/Controllers/HistoryController.php:68
+* @see app/Http/Controllers/HistoryController.php:66
 * @route '/history/export'
 */
 exportMethodForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -146,7 +146,7 @@ exportMethodForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'>
 
 /**
 * @see \App\Http\Controllers\HistoryController::exportMethod
-* @see app/Http/Controllers/HistoryController.php:68
+* @see app/Http/Controllers/HistoryController.php:66
 * @route '/history/export'
 */
 exportMethodForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -163,7 +163,7 @@ exportMethod.form = exportMethodForm
 
 /**
 * @see \App\Http\Controllers\HistoryController::show
-* @see app/Http/Controllers/HistoryController.php:26
+* @see app/Http/Controllers/HistoryController.php:24
 * @route '/history/{formattedLog}'
 */
 export const show = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -178,7 +178,7 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\HistoryController::show
-* @see app/Http/Controllers/HistoryController.php:26
+* @see app/Http/Controllers/HistoryController.php:24
 * @route '/history/{formattedLog}'
 */
 show.url = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -211,7 +211,7 @@ show.url = (args: { formattedLog: number | { id: number } } | [formattedLog: num
 
 /**
 * @see \App\Http\Controllers\HistoryController::show
-* @see app/Http/Controllers/HistoryController.php:26
+* @see app/Http/Controllers/HistoryController.php:24
 * @route '/history/{formattedLog}'
 */
 show.get = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -221,7 +221,7 @@ show.get = (args: { formattedLog: number | { id: number } } | [formattedLog: num
 
 /**
 * @see \App\Http\Controllers\HistoryController::show
-* @see app/Http/Controllers/HistoryController.php:26
+* @see app/Http/Controllers/HistoryController.php:24
 * @route '/history/{formattedLog}'
 */
 show.head = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -231,7 +231,7 @@ show.head = (args: { formattedLog: number | { id: number } } | [formattedLog: nu
 
 /**
 * @see \App\Http\Controllers\HistoryController::show
-* @see app/Http/Controllers/HistoryController.php:26
+* @see app/Http/Controllers/HistoryController.php:24
 * @route '/history/{formattedLog}'
 */
 const showForm = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -241,7 +241,7 @@ const showForm = (args: { formattedLog: number | { id: number } } | [formattedLo
 
 /**
 * @see \App\Http\Controllers\HistoryController::show
-* @see app/Http/Controllers/HistoryController.php:26
+* @see app/Http/Controllers/HistoryController.php:24
 * @route '/history/{formattedLog}'
 */
 showForm.get = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -251,7 +251,7 @@ showForm.get = (args: { formattedLog: number | { id: number } } | [formattedLog:
 
 /**
 * @see \App\Http\Controllers\HistoryController::show
-* @see app/Http/Controllers/HistoryController.php:26
+* @see app/Http/Controllers/HistoryController.php:24
 * @route '/history/{formattedLog}'
 */
 showForm.head = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -268,7 +268,7 @@ show.form = showForm
 
 /**
 * @see \App\Http\Controllers\HistoryController::toggleSave
-* @see app/Http/Controllers/HistoryController.php:47
+* @see app/Http/Controllers/HistoryController.php:45
 * @route '/history/{formattedLog}/toggle-save'
 */
 export const toggleSave = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -283,7 +283,7 @@ toggleSave.definition = {
 
 /**
 * @see \App\Http\Controllers\HistoryController::toggleSave
-* @see app/Http/Controllers/HistoryController.php:47
+* @see app/Http/Controllers/HistoryController.php:45
 * @route '/history/{formattedLog}/toggle-save'
 */
 toggleSave.url = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -316,7 +316,7 @@ toggleSave.url = (args: { formattedLog: number | { id: number } } | [formattedLo
 
 /**
 * @see \App\Http\Controllers\HistoryController::toggleSave
-* @see app/Http/Controllers/HistoryController.php:47
+* @see app/Http/Controllers/HistoryController.php:45
 * @route '/history/{formattedLog}/toggle-save'
 */
 toggleSave.patch = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -326,7 +326,7 @@ toggleSave.patch = (args: { formattedLog: number | { id: number } } | [formatted
 
 /**
 * @see \App\Http\Controllers\HistoryController::toggleSave
-* @see app/Http/Controllers/HistoryController.php:47
+* @see app/Http/Controllers/HistoryController.php:45
 * @route '/history/{formattedLog}/toggle-save'
 */
 const toggleSaveForm = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -341,7 +341,7 @@ const toggleSaveForm = (args: { formattedLog: number | { id: number } } | [forma
 
 /**
 * @see \App\Http\Controllers\HistoryController::toggleSave
-* @see app/Http/Controllers/HistoryController.php:47
+* @see app/Http/Controllers/HistoryController.php:45
 * @route '/history/{formattedLog}/toggle-save'
 */
 toggleSaveForm.patch = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -358,7 +358,7 @@ toggleSave.form = toggleSaveForm
 
 /**
 * @see \App\Http\Controllers\HistoryController::destroy
-* @see app/Http/Controllers/HistoryController.php:39
+* @see app/Http/Controllers/HistoryController.php:37
 * @route '/history/{formattedLog}'
 */
 export const destroy = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -373,7 +373,7 @@ destroy.definition = {
 
 /**
 * @see \App\Http\Controllers\HistoryController::destroy
-* @see app/Http/Controllers/HistoryController.php:39
+* @see app/Http/Controllers/HistoryController.php:37
 * @route '/history/{formattedLog}'
 */
 destroy.url = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -406,7 +406,7 @@ destroy.url = (args: { formattedLog: number | { id: number } } | [formattedLog: 
 
 /**
 * @see \App\Http\Controllers\HistoryController::destroy
-* @see app/Http/Controllers/HistoryController.php:39
+* @see app/Http/Controllers/HistoryController.php:37
 * @route '/history/{formattedLog}'
 */
 destroy.delete = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -416,7 +416,7 @@ destroy.delete = (args: { formattedLog: number | { id: number } } | [formattedLo
 
 /**
 * @see \App\Http\Controllers\HistoryController::destroy
-* @see app/Http/Controllers/HistoryController.php:39
+* @see app/Http/Controllers/HistoryController.php:37
 * @route '/history/{formattedLog}'
 */
 const destroyForm = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -431,7 +431,7 @@ const destroyForm = (args: { formattedLog: number | { id: number } } | [formatte
 
 /**
 * @see \App\Http\Controllers\HistoryController::destroy
-* @see app/Http/Controllers/HistoryController.php:39
+* @see app/Http/Controllers/HistoryController.php:37
 * @route '/history/{formattedLog}'
 */
 destroyForm.delete = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -448,7 +448,7 @@ destroy.form = destroyForm
 
 /**
 * @see \App\Http\Controllers\HistoryController::clear
-* @see app/Http/Controllers/HistoryController.php:57
+* @see app/Http/Controllers/HistoryController.php:55
 * @route '/history'
 */
 export const clear = (options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -463,7 +463,7 @@ clear.definition = {
 
 /**
 * @see \App\Http\Controllers\HistoryController::clear
-* @see app/Http/Controllers/HistoryController.php:57
+* @see app/Http/Controllers/HistoryController.php:55
 * @route '/history'
 */
 clear.url = (options?: RouteQueryOptions) => {
@@ -472,7 +472,7 @@ clear.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\HistoryController::clear
-* @see app/Http/Controllers/HistoryController.php:57
+* @see app/Http/Controllers/HistoryController.php:55
 * @route '/history'
 */
 clear.delete = (options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -482,7 +482,7 @@ clear.delete = (options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
 
 /**
 * @see \App\Http\Controllers\HistoryController::clear
-* @see app/Http/Controllers/HistoryController.php:57
+* @see app/Http/Controllers/HistoryController.php:55
 * @route '/history'
 */
 const clearForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -497,7 +497,7 @@ const clearForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => 
 
 /**
 * @see \App\Http\Controllers\HistoryController::clear
-* @see app/Http/Controllers/HistoryController.php:57
+* @see app/Http/Controllers/HistoryController.php:55
 * @route '/history'
 */
 clearForm.delete = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
