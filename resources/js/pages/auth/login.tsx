@@ -17,6 +17,18 @@ interface LoginProps {
 }
 
 export default function Login({ status, canResetPassword }: LoginProps) {
+    // Generate unique IDs for form elements
+    const emailInputId = 'auth-login-email-input';
+    const emailTestId = 'test-auth-login-email';
+    const emailErrorId = 'auth-login-email-error';
+
+    const passwordInputId = 'auth-login-password-input';
+    const passwordTestId = 'test-auth-login-password';
+    const passwordErrorId = 'auth-login-password-error';
+
+    const rememberInputId = 'auth-login-remember-input';
+    const rememberTestId = 'test-auth-login-remember';
+
     return (
         <AuthLayout
             title="Log in to your account"
@@ -33,9 +45,15 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                     <>
                         <div className="grid gap-6">
                             <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
+                                <Label
+                                    htmlFor={emailInputId}
+                                    data-testid={emailTestId}
+                                >
+                                    Email address
+                                </Label>
                                 <Input
-                                    id="email"
+                                    id={emailInputId}
+                                    data-testid={emailTestId}
                                     type="email"
                                     name="email"
                                     required
@@ -43,13 +61,25 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                     tabIndex={1}
                                     autoComplete="email"
                                     placeholder="email@example.com"
+                                    aria-describedby={
+                                        errors.email ? emailErrorId : undefined
+                                    }
                                 />
-                                <InputError message={errors.email} />
+                                <InputError
+                                    message={errors.email}
+                                    id={emailErrorId}
+                                    data-testid={emailTestId}
+                                />
                             </div>
 
                             <div className="grid gap-2">
                                 <div className="flex items-center">
-                                    <Label htmlFor="password">Password</Label>
+                                    <Label
+                                        htmlFor={passwordInputId}
+                                        data-testid={passwordTestId}
+                                    >
+                                        Password
+                                    </Label>
                                     {canResetPassword && (
                                         <TextLink
                                             href={request()}
@@ -61,24 +91,40 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                     )}
                                 </div>
                                 <Input
-                                    id="password"
+                                    id={passwordInputId}
+                                    data-testid={passwordTestId}
                                     type="password"
                                     name="password"
                                     required
                                     tabIndex={2}
                                     autoComplete="current-password"
                                     placeholder="Password"
+                                    aria-describedby={
+                                        errors.password
+                                            ? passwordErrorId
+                                            : undefined
+                                    }
                                 />
-                                <InputError message={errors.password} />
+                                <InputError
+                                    message={errors.password}
+                                    id={passwordErrorId}
+                                    data-testid={passwordTestId}
+                                />
                             </div>
 
                             <div className="flex items-center space-x-3">
                                 <Checkbox
-                                    id="remember"
+                                    id={rememberInputId}
+                                    data-testid={rememberTestId}
                                     name="remember"
                                     tabIndex={3}
                                 />
-                                <Label htmlFor="remember">Remember me</Label>
+                                <Label
+                                    htmlFor={rememberInputId}
+                                    data-testid={rememberTestId}
+                                >
+                                    Remember me
+                                </Label>
                             </div>
 
                             <Button
@@ -86,7 +132,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                 className="mt-4 w-full"
                                 tabIndex={4}
                                 disabled={processing}
-                                data-test="login-button"
+                                data-testid="test-auth-login-submit"
                             >
                                 {processing && <Spinner />}
                                 Log in

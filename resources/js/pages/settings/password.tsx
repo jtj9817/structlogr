@@ -24,6 +24,16 @@ export default function Password() {
     const passwordInput = useRef<HTMLInputElement>(null);
     const currentPasswordInput = useRef<HTMLInputElement>(null);
 
+    // Generate unique IDs for form elements
+    const currentPasswordInputId = 'settings-password-current-input';
+    const currentPasswordTestId = 'test-settings-password-current';
+
+    const passwordInputId = 'settings-password-new-input';
+    const passwordTestId = 'test-settings-password-new';
+
+    const passwordConfirmationInputId = 'settings-password-confirmation-input';
+    const passwordConfirmationTestId = 'test-settings-password-confirmation';
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Password settings" />
@@ -60,12 +70,16 @@ export default function Password() {
                         {({ errors, processing, recentlySuccessful }) => (
                             <>
                                 <div className="grid gap-2">
-                                    <Label htmlFor="current_password">
+                                    <Label
+                                        htmlFor={currentPasswordInputId}
+                                        data-testid={currentPasswordTestId}
+                                    >
                                         Current password
                                     </Label>
 
                                     <Input
-                                        id="current_password"
+                                        id={currentPasswordInputId}
+                                        data-testid={currentPasswordTestId}
                                         ref={currentPasswordInput}
                                         name="current_password"
                                         type="password"
@@ -80,12 +94,16 @@ export default function Password() {
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="password">
+                                    <Label
+                                        htmlFor={passwordInputId}
+                                        data-testid={passwordTestId}
+                                    >
                                         New password
                                     </Label>
 
                                     <Input
-                                        id="password"
+                                        id={passwordInputId}
+                                        data-testid={passwordTestId}
                                         ref={passwordInput}
                                         name="password"
                                         type="password"
@@ -98,12 +116,16 @@ export default function Password() {
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="password_confirmation">
+                                    <Label
+                                        htmlFor={passwordConfirmationInputId}
+                                        data-testid={passwordConfirmationTestId}
+                                    >
                                         Confirm password
                                     </Label>
 
                                     <Input
-                                        id="password_confirmation"
+                                        id={passwordConfirmationInputId}
+                                        data-testid={passwordConfirmationTestId}
                                         name="password_confirmation"
                                         type="password"
                                         className="mt-1 block w-full"
@@ -119,7 +141,7 @@ export default function Password() {
                                 <div className="flex items-center gap-4">
                                     <Button
                                         disabled={processing}
-                                        data-test="update-password-button"
+                                        data-testid="test-settings-password-submit"
                                     >
                                         Save password
                                     </Button>

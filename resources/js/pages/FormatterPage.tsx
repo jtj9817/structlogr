@@ -157,6 +157,16 @@ export default function FormatterPage({
     const formRef = useRef<HTMLElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const outputRef = useRef<HTMLPreElement>(null);
+
+    // Generate unique IDs for form elements
+    const sampleLogsSelectId = 'formatter-sample-logs-select';
+    const sampleLogsTestId = 'test-formatter-sample-logs';
+
+    const rawLogTextareaId = 'formatter-raw-log-textarea';
+    const rawLogTestId = 'test-formatter-raw-log';
+
+    const formatButtonId = 'formatter-format-button';
+    const formatButtonTestId = 'test-formatter-format';
     const [historyOpen, setHistoryOpen] = useState(false);
     const [preferencesOpen, setPreferencesOpen] = useState(false);
     const [settingsOpen, setSettingsOpen] = useState(false);
@@ -321,9 +331,7 @@ export default function FormatterPage({
         }
 
         const interval = window.setInterval(() => {
-            setAnimationFrame(
-                (frame) => (frame + 1) % clockworkFrames.length,
-            );
+            setAnimationFrame((frame) => (frame + 1) % clockworkFrames.length);
         }, 220);
 
         return () => window.clearInterval(interval);
@@ -332,7 +340,7 @@ export default function FormatterPage({
     const renderOutputContent = () => {
         if (processing) {
             return (
-                <pre className="whitespace-pre-line text-sm font-mono leading-6 text-accent-foreground/90">
+                <pre className="font-mono text-sm leading-6 whitespace-pre-line text-accent-foreground/90">
                     {clockworkFrames[animationFrame]}
                 </pre>
             );
@@ -366,7 +374,7 @@ export default function FormatterPage({
         }
 
         return (
-            <pre className="whitespace-pre-wrap text-left text-sm text-muted-foreground">
+            <pre className="text-left text-sm whitespace-pre-wrap text-muted-foreground">
                 {dummyFormattedPreview}
             </pre>
         );
@@ -455,7 +463,7 @@ export default function FormatterPage({
                             <div className="space-y-4 text-center">
                                 <h2
                                     id="formatter-heading"
-                                    className="text-3xl font-bold leading-tight lg:text-4xl"
+                                    className="text-3xl leading-tight font-bold lg:text-4xl"
                                 >
                                     Log Formatter
                                 </h2>
@@ -479,19 +487,22 @@ export default function FormatterPage({
                                             {/* Sample Logs Dropdown */}
                                             <div className="space-y-2">
                                                 <label
-                                                    htmlFor="sample-logs"
+                                                    htmlFor={sampleLogsSelectId}
                                                     className="text-sm font-medium"
                                                 >
                                                     Try an example
                                                 </label>
                                                 <select
-                                                    id="sample-logs"
+                                                    id={sampleLogsSelectId}
+                                                    data-testid={
+                                                        sampleLogsTestId
+                                                    }
                                                     onChange={(e) =>
                                                         handleLoadSampleLog(
                                                             e.target.value,
                                                         )
                                                     }
-                                                    className="focus-ring w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                                    className="focus-ring w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
                                                     defaultValue=""
                                                     aria-label="Select a sample log to load"
                                                 >
@@ -515,6 +526,10 @@ export default function FormatterPage({
                                                 <div className="relative">
                                                     <Textarea
                                                         ref={textareaRef}
+                                                        id={rawLogTextareaId}
+                                                        data-testid={
+                                                            rawLogTestId
+                                                        }
                                                         name="raw_log"
                                                         placeholder="Paste your raw log text here..."
                                                         className="min-h-[200px] rounded-md pr-10"
@@ -533,7 +548,7 @@ export default function FormatterPage({
                                                             onClick={
                                                                 handleClearInput
                                                             }
-                                                            className="focus-ring absolute right-3 top-3 rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                                                            className="focus-ring absolute top-3 right-3 rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
                                                             aria-label="Clear input"
                                                             tabIndex={0}
                                                         >
@@ -573,6 +588,10 @@ export default function FormatterPage({
 
                                             <div className="flex items-center">
                                                 <Button
+                                                    id={formatButtonId}
+                                                    data-testid={
+                                                        formatButtonTestId
+                                                    }
                                                     type="submit"
                                                     disabled={
                                                         processing ||
@@ -628,7 +647,7 @@ export default function FormatterPage({
                                                 {statusMessage}
                                             </p>
                                         )}
-                                        <div className="min-h-[320px] max-h-[520px] overflow-auto rounded-lg border border-border/40 bg-background/80 p-4 font-mono text-sm leading-6">
+                                        <div className="max-h-[520px] min-h-[320px] overflow-auto rounded-lg border border-border/40 bg-background/80 p-4 font-mono text-sm leading-6">
                                             {renderOutputContent()}
                                         </div>
                                     </CardContent>

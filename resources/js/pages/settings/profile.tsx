@@ -35,6 +35,13 @@ export default function Profile({
         return null;
     }
 
+    // Generate unique IDs for form elements
+    const nameInputId = 'settings-profile-name-input';
+    const nameTestId = 'test-settings-profile-name';
+
+    const emailInputId = 'settings-profile-email-input';
+    const emailTestId = 'test-settings-profile-email';
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Profile settings" />
@@ -56,10 +63,16 @@ export default function Profile({
                         {({ processing, recentlySuccessful, errors }) => (
                             <>
                                 <div className="grid gap-2">
-                                    <Label htmlFor="name">Name</Label>
+                                    <Label
+                                        htmlFor={nameInputId}
+                                        data-testid={nameTestId}
+                                    >
+                                        Name
+                                    </Label>
 
                                     <Input
-                                        id="name"
+                                        id={nameInputId}
+                                        data-testid={nameTestId}
                                         className="mt-1 block w-full"
                                         defaultValue={user.name}
                                         name="name"
@@ -75,10 +88,16 @@ export default function Profile({
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="email">Email address</Label>
+                                    <Label
+                                        htmlFor={emailInputId}
+                                        data-testid={emailTestId}
+                                    >
+                                        Email address
+                                    </Label>
 
                                     <Input
-                                        id="email"
+                                        id={emailInputId}
+                                        data-testid={emailTestId}
                                         type="email"
                                         className="mt-1 block w-full"
                                         defaultValue={user.email}
@@ -124,7 +143,7 @@ export default function Profile({
                                 <div className="flex items-center gap-4">
                                     <Button
                                         disabled={processing}
-                                        data-test="update-profile-button"
+                                        data-testid="test-settings-profile-submit"
                                     >
                                         Save
                                     </Button>

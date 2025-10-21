@@ -11,6 +11,21 @@ import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/auth-layout';
 
 export default function Register() {
+    // Generate unique IDs for form elements
+    const nameInputId = 'auth-register-name-input';
+    const nameTestId = 'test-auth-register-name';
+
+    const emailInputId = 'auth-register-email-input';
+    const emailTestId = 'test-auth-register-email';
+
+    const passwordInputId = 'auth-register-password-input';
+    const passwordTestId = 'test-auth-register-password';
+
+    const passwordConfirmationInputId =
+        'auth-register-password-confirmation-input';
+    const passwordConfirmationTestId =
+        'test-auth-register-password-confirmation';
+
     return (
         <AuthLayout
             title="Create an account"
@@ -27,9 +42,15 @@ export default function Register() {
                     <>
                         <div className="grid gap-6">
                             <div className="grid gap-2">
-                                <Label htmlFor="name">Name</Label>
+                                <Label
+                                    htmlFor={nameInputId}
+                                    data-testid={nameTestId}
+                                >
+                                    Name
+                                </Label>
                                 <Input
-                                    id="name"
+                                    id={nameInputId}
+                                    data-testid={nameTestId}
                                     type="text"
                                     required
                                     autoFocus
@@ -45,9 +66,15 @@ export default function Register() {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
+                                <Label
+                                    htmlFor={emailInputId}
+                                    data-testid={emailTestId}
+                                >
+                                    Email address
+                                </Label>
                                 <Input
-                                    id="email"
+                                    id={emailInputId}
+                                    data-testid={emailTestId}
                                     type="email"
                                     required
                                     tabIndex={2}
@@ -59,9 +86,15 @@ export default function Register() {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="password">Password</Label>
+                                <Label
+                                    htmlFor={passwordInputId}
+                                    data-testid={passwordTestId}
+                                >
+                                    Password
+                                </Label>
                                 <Input
-                                    id="password"
+                                    id={passwordInputId}
+                                    data-testid={passwordTestId}
                                     type="password"
                                     required
                                     tabIndex={3}
@@ -73,11 +106,15 @@ export default function Register() {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="password_confirmation">
+                                <Label
+                                    htmlFor={passwordConfirmationInputId}
+                                    data-testid={passwordConfirmationTestId}
+                                >
                                     Confirm password
                                 </Label>
                                 <Input
-                                    id="password_confirmation"
+                                    id={passwordConfirmationInputId}
+                                    data-testid={passwordConfirmationTestId}
                                     type="password"
                                     required
                                     tabIndex={4}
@@ -94,7 +131,7 @@ export default function Register() {
                                 type="submit"
                                 className="mt-2 w-full"
                                 tabIndex={5}
-                                data-test="register-user-button"
+                                data-testid="test-auth-register-submit"
                             >
                                 {processing && <Spinner />}
                                 Create account
