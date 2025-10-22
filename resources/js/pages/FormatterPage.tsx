@@ -29,7 +29,7 @@ import { usePreferences } from '@/hooks/use-preferences';
 import { cn } from '@/lib/utils';
 import { type SharedData } from '@/types';
 import type { HistoryEntry } from '@/types/history';
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
 import {
     Check,
     ClipboardCopy,
@@ -173,7 +173,6 @@ export default function FormatterPage({
             historyRoutes?: HistoryRoutesConfig | null;
         }
     >();
-    const { auth } = page.props;
     const initialHistory =
         history ?? (page.props.history as HistoryPayload | null) ?? null;
     const historyRouteConfig =
