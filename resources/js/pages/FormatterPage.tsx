@@ -15,7 +15,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 import { useFormattingTimer } from '@/hooks/use-formatting-timer';
@@ -1062,21 +1062,20 @@ export default function FormatterPage({
                         </DialogDescription>
                     </DialogHeader>
                     <ScrollArea id={inputModalScrollAreaId} className="max-h-[70vh] rounded-md border border-border/40">
-                        <div className="overflow-x-auto">
-                            {data.raw_log.trim() ? (
-                                <pre
-                                    id={inputModalPreId}
-                                    className="whitespace-pre p-4 text-sm leading-6"
-                                >
-                                    {data.raw_log}
-                                </pre>
-                            ) : (
-                                <div id={inputModalEmptyId} className="p-4 text-sm text-muted-foreground">
-                                    No input text is available yet. Enter log text to
-                                    view it here.
-                                </div>
-                            )}
-                        </div>
+                        {data.raw_log.trim() ? (
+                            <pre
+                                id={inputModalPreId}
+                                className="whitespace-pre p-4 text-sm leading-6"
+                            >
+                                {data.raw_log}
+                            </pre>
+                        ) : (
+                            <div id={inputModalEmptyId} className="p-4 text-sm text-muted-foreground">
+                                No input text is available yet. Enter log text to
+                                view it here.
+                            </div>
+                        )}
+                        <ScrollBar orientation="horizontal" />
                     </ScrollArea>
                     <DialogFooter id={inputModalFooterId} className="gap-2">
                         <Button
@@ -1131,22 +1130,21 @@ export default function FormatterPage({
                         </DialogDescription>
                     </DialogHeader>
                     <ScrollArea id={outputModalScrollAreaId} className="max-h-[70vh] rounded-md border border-border/40">
-                        <div className="overflow-x-auto">
-                            {formattedOutput ? (
-                                <pre
-                                    id={outputModalPreId}
-                                    className="whitespace-pre p-4 text-sm leading-6"
-                                    dangerouslySetInnerHTML={{
-                                        __html: highlightedOutput,
-                                    }}
-                                />
-                            ) : (
-                                <div id={outputModalEmptyId} className="p-4 text-sm text-muted-foreground">
-                                    No formatted output is available yet. Run the
-                                    formatter to generate a preview.
-                                </div>
-                            )}
-                        </div>
+                        {formattedOutput ? (
+                            <pre
+                                id={outputModalPreId}
+                                className="whitespace-pre p-4 text-sm leading-6"
+                                dangerouslySetInnerHTML={{
+                                    __html: highlightedOutput,
+                                }}
+                            />
+                        ) : (
+                            <div id={outputModalEmptyId} className="p-4 text-sm text-muted-foreground">
+                                No formatted output is available yet. Run the
+                                formatter to generate a preview.
+                            </div>
+                        )}
+                        <ScrollBar orientation="horizontal" />
                     </ScrollArea>
                     <DialogFooter id={outputModalFooterId} className="gap-2">
                         <Button
