@@ -87,7 +87,7 @@ export function HistorySidebar({
 
                 <Tabs
                     defaultValue="recent"
-                    className="flex flex-1 flex-col gap-4"
+                    className="flex flex-1 flex-col gap-4 overflow-hidden"
                 >
                     <TabsList className="grid grid-cols-2 gap-2 rounded-lg bg-muted p-1">
                         <TabsTrigger value="recent">Recent</TabsTrigger>
@@ -96,9 +96,9 @@ export function HistorySidebar({
 
                     <TabsContent
                         value="recent"
-                        className="flex flex-1 flex-col"
+                        className="flex flex-1 flex-col overflow-hidden"
                     >
-                        <ScrollArea className="flex-1 rounded-lg border border-border/40 bg-background/80 pr-4">
+                        <ScrollArea className="h-full min-h-0 rounded-lg border border-border/40 bg-background/80 pr-4">
                             {recentEntries.length === 0 ? (
                                 <EmptyState message={recentEmptyMessage} />
                             ) : (
@@ -127,8 +127,8 @@ export function HistorySidebar({
                         </ScrollArea>
                     </TabsContent>
 
-                    <TabsContent value="saved" className="flex flex-1 flex-col">
-                        <ScrollArea className="flex-1 rounded-lg border border-border/40 bg-background/80 pr-4">
+                    <TabsContent value="saved" className="flex flex-1 flex-col overflow-hidden">
+                        <ScrollArea className="h-full min-h-0 rounded-lg border border-border/40 bg-background/80 pr-4">
                             {savedEntries.length === 0 ? (
                                 <EmptyState message={savedEmptyMessage} />
                             ) : (
