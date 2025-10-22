@@ -46,17 +46,11 @@ class LogFormatterController extends Controller
                 'historyRoutes' => $this->historyRoutes(),
             ]);
         } catch (\InvalidArgumentException $e) {
-            return inertia('FormatterPage', [
-                'history' => $this->historyPayload($request),
-                'historyRoutes' => $this->historyRoutes(),
-            ])->withErrors([
+            return back()->withErrors([
                 'llm_model' => 'Invalid LLM model selected. Please choose a supported model.',
             ]);
         } catch (\Exception $e) {
-            return inertia('FormatterPage', [
-                'history' => $this->historyPayload($request),
-                'historyRoutes' => $this->historyRoutes(),
-            ])->withErrors([
+            return back()->withErrors([
                 'raw_log' => 'Failed to format log. Please try again or select a different model.',
             ]);
         }
