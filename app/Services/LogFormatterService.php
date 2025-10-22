@@ -21,11 +21,34 @@ class LogFormatterService
         $llmModel = $llmModel ?? 'deepseek-chat';
         $attempt = 0;
 
+        \Log::info('=== LogFormatterService::format() START ===', [
+            'llm_model' => $llmModel,
+            'preferences' => $preferences,
+            'max_retries' => $maxRetries,
+            'raw_log_length' => strlen($rawLog),
+            'raw_log_preview' => substr($rawLog, 0, 200),
+        ]);
+
         while ($attempt < $maxRetries) {
             try {
+                \Log::info("Attempt {$attempt}/{$maxRetries} starting", [
+                    'attempt' => $attempt,
+                    'model' => $llmModel,
+                ]);
+
                 $schema = $this->getSchema();
+                \Log::debug('Schema generated', ['schema_name' => $schema->name]);
+
                 $systemPrompt = $this->getSystemPrompt($llmModel);
+                \Log::debug('System prompt generated', [
+                    'model' => $llmModel,
+                    'prompt_length' => strlen($systemPrompt),
+                ]);
+
                 $prismBuilder = Prism::structured();
+                \Log::debug('Prism builder initialized');
+
+                \Log::info('Configuring LLM provider', ['model' => $llmModel]);
 
                 match ($llmModel) {
                     'deepseek-chat' => $this->configureDeepseek($prismBuilder),
@@ -35,6 +58,18 @@ class LogFormatterService
                     'GLM-4.6' => $this->configureGLM($prismBuilder, $schema, 'zhipuai/glm-4.6'),
                     default => throw new \InvalidArgumentException("Unsupported LLM model: {$llmModel}"),
                 };
+
+                \Log::info('LLM provider configured successfully', ['model' => $llmModel]);
+
+                \Log::info('Sending request to LLM API', [
+                    'model' => $llmModel,
+                    'temperature' => 0.0,
+                    'max_tokens' => 8192,
+                    'timeout' => config('services.http.timeout', 600),
+                    'connect_timeout' => config('services.http.connect_timeout', 60),
+                ]);
+
+                $startTime = microtime(true);
 
                 $response = $prismBuilder
                     ->withSystemPrompt($systemPrompt)
@@ -48,29 +83,59 @@ class LogFormatterService
                     ])
                     ->asStructured();
 
+                $duration = round((microtime(true) - $startTime) * 1000, 2);
+                \Log::info('LLM API response received', [
+                    'model' => $llmModel,
+                    'duration_ms' => $duration,
+                ]);
+
                 $structured = $response->structured;
 
+                \Log::debug('Structured output extracted', [
+                    'has_data' => !empty($structured),
+                    'keys' => !empty($structured) ? array_keys($structured) : [],
+                ]);
+
                 if (empty($structured)) {
+                    \Log::error('Empty response from API', ['model' => $llmModel]);
                     throw new \Exception('Empty response from API');
                 }
 
+                \Log::info('Validating structured output');
                 $this->validateStructuredOutput($structured);
+                \Log::info('Structured output validated successfully');
 
                 if ($preferences) {
+                    \Log::info('Applying preferences to formatted log', ['preferences' => $preferences]);
                     $structured = $this->applyPreferences($structured, $preferences);
+                    \Log::debug('Preferences applied successfully');
                 }
+
+                \Log::info('=== LogFormatterService::format() SUCCESS ===', [
+                    'model' => $llmModel,
+                    'attempt' => $attempt,
+                    'detected_log_type' => $structured['detected_log_type'] ?? 'unknown',
+                    'sections_count' => count($structured['sections'] ?? []),
+                ]);
 
                 return $structured;
 
             } catch (PrismException $e) {
                 $attempt++;
-                \Log::warning("Structured output attempt {$attempt} failed", [
+                \Log::warning("[PrismException] Structured output attempt {$attempt} failed", [
                     'model' => $llmModel,
                     'error' => $e->getMessage(),
                     'code' => $e->getCode(),
+                    'attempt' => $attempt,
+                    'max_retries' => $maxRetries,
                 ]);
 
                 if ($attempt >= $maxRetries) {
+                    \Log::error('=== LogFormatterService::format() FAILED (Max retries exceeded) ===', [
+                        'model' => $llmModel,
+                        'attempts' => $attempt,
+                        'error' => $e->getMessage(),
+                    ]);
                     throw new \Exception(
                         "Failed to format log after {$maxRetries} attempts: ".$e->getMessage(),
                         $e->getCode(),
@@ -78,23 +143,39 @@ class LogFormatterService
                     );
                 }
 
-                sleep(pow(2, $attempt));
+                $backoffSeconds = pow(2, $attempt);
+                \Log::info("Retrying after backoff", ['backoff_seconds' => $backoffSeconds]);
+                sleep($backoffSeconds);
 
             } catch (\Exception $e) {
                 $attempt++;
-                \Log::warning("Structured output attempt {$attempt} failed", [
+                \Log::warning("[Exception] Structured output attempt {$attempt} failed", [
                     'model' => $llmModel,
                     'error' => $e->getMessage(),
+                    'exception_type' => get_class($e),
+                    'attempt' => $attempt,
+                    'max_retries' => $maxRetries,
                 ]);
 
                 if ($attempt >= $maxRetries) {
+                    \Log::error('=== LogFormatterService::format() FAILED (Max retries exceeded) ===', [
+                        'model' => $llmModel,
+                        'attempts' => $attempt,
+                        'error' => $e->getMessage(),
+                    ]);
                     throw $e;
                 }
 
-                sleep(pow(2, $attempt));
+                $backoffSeconds = pow(2, $attempt);
+                \Log::info("Retrying after backoff", ['backoff_seconds' => $backoffSeconds]);
+                sleep($backoffSeconds);
             }
         }
 
+        \Log::critical('=== LogFormatterService::format() CRITICAL: Exceeded retry loop ===', [
+            'model' => $llmModel,
+            'attempts' => $attempt,
+        ]);
         throw new \Exception('Unexpected error: exceeded retry loop');
     }
 
@@ -149,6 +230,12 @@ PROMPT;
 
     private function configureDeepseek($builder): void
     {
+        \Log::debug('Configuring DeepSeek provider', [
+            'provider' => 'DeepSeek',
+            'model' => 'deepseek-chat',
+            'response_format' => 'json_object',
+        ]);
+
         $builder->using(Provider::DeepSeek, 'deepseek-chat')
             ->withProviderOptions([
                 'response_format' => ['type' => 'json_object'],
@@ -157,6 +244,12 @@ PROMPT;
 
     private function configureGemini($builder, ObjectSchema $schema): void
     {
+        \Log::debug('Configuring Gemini provider', [
+            'provider' => 'Gemini',
+            'model' => 'gemini-2.5-flash',
+            'response_mime_type' => 'application/json',
+        ]);
+
         $builder->using(Provider::Gemini, 'gemini-2.5-flash')
             ->withProviderOptions([
                 'generationConfig' => [
@@ -168,6 +261,12 @@ PROMPT;
 
     private function configureMoonshot($builder, ObjectSchema $schema): void
     {
+        \Log::debug('Configuring Moonshot provider', [
+            'provider' => 'OpenRouter',
+            'model' => 'moonshot/kimi-k2-turbo-preview',
+            'response_format' => 'json_schema',
+        ]);
+
         $builder->using(Provider::OpenRouter, 'moonshot/kimi-k2-turbo-preview')
             ->withProviderOptions([
                 'response_format' => [
@@ -182,6 +281,14 @@ PROMPT;
 
     private function configureGLM($builder, ObjectSchema $schema, string $model): void
     {
+        \Log::debug('Configuring GLM provider', [
+            'provider' => 'OpenRouter',
+            'model' => $model,
+            'response_format' => 'json_schema',
+            'strict' => true,
+            'thinking' => 'disabled',
+        ]);
+
         $builder->using(Provider::OpenRouter, $model)
             ->withProviderOptions([
                 'response_format' => [
@@ -198,21 +305,37 @@ PROMPT;
 
     private function validateStructuredOutput(array $data): void
     {
+        \Log::debug('Validating structured output fields');
+
         if (! isset($data['detected_log_type'])) {
+            \Log::error('Validation failed: Missing detected_log_type');
             throw new \Exception('Missing required field: detected_log_type');
         }
+        \Log::debug('Validation passed: detected_log_type', ['value' => $data['detected_log_type']]);
 
         if (! isset($data['summary']) || ! is_array($data['summary'])) {
+            \Log::error('Validation failed: Missing or invalid summary');
             throw new \Exception('Missing or invalid required field: summary');
         }
+        \Log::debug('Validation passed: summary exists');
 
         if (! isset($data['summary']['status']) || ! isset($data['summary']['headline'])) {
+            \Log::error('Validation failed: Missing summary.status or summary.headline', [
+                'has_status' => isset($data['summary']['status']),
+                'has_headline' => isset($data['summary']['headline']),
+            ]);
             throw new \Exception('Missing required summary fields: status or headline');
         }
+        \Log::debug('Validation passed: summary.status and summary.headline', [
+            'status' => $data['summary']['status'],
+            'headline' => substr($data['summary']['headline'], 0, 100),
+        ]);
 
         if (! isset($data['sections']) || ! is_array($data['sections'])) {
+            \Log::error('Validation failed: Missing or invalid sections');
             throw new \Exception('Missing or invalid required field: sections');
         }
+        \Log::debug('Validation passed: sections', ['count' => count($data['sections'])]);
     }
 
     private function convertSchemaToJsonSchema(ObjectSchema $schema): array
@@ -532,7 +655,13 @@ PROMPT;
 
     private function applyPreferences(array $formattedLog, array $preferences): array
     {
+        \Log::debug('Applying preferences', ['preferences' => $preferences]);
+
         if (isset($preferences['parseTimestamps']) && $preferences['parseTimestamps']) {
+            \Log::info('Transforming timestamps', [
+                'date_format' => $preferences['dateFormat'] ?? 'ISO8601',
+                'timezone' => $preferences['timezone'] ?? 'UTC',
+            ]);
             $formattedLog = $this->transformTimestamps(
                 $formattedLog,
                 $preferences['dateFormat'] ?? 'ISO8601',
@@ -541,9 +670,11 @@ PROMPT;
         }
 
         if (isset($preferences['normalizeLogLevels']) && $preferences['normalizeLogLevels']) {
+            \Log::info('Normalizing log levels');
             $formattedLog = $this->normalizeLogLevels($formattedLog);
         }
 
+        \Log::debug('Preferences applied successfully');
         return $formattedLog;
     }
 
