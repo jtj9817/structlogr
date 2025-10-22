@@ -1,3 +1,4 @@
+import { AppHeader } from '@/components/app-header';
 import { FormattingPreferences } from '@/components/formatter/formatting-preferences';
 import { HistorySidebar } from '@/components/formatter/history-sidebar';
 import HeroSection from '@/components/hero-section';
@@ -26,16 +27,13 @@ import {
 } from '@/hooks/use-keyboard-shortcuts';
 import { usePreferences } from '@/hooks/use-preferences';
 import { cn } from '@/lib/utils';
-import { login, register } from '@/routes';
 import { type SharedData } from '@/types';
 import type { HistoryEntry } from '@/types/history';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import {
     Check,
     ClipboardCopy,
-    HelpCircle,
     Maximize2,
-    Settings,
 } from 'lucide-react';
 import {
     FormEventHandler,
@@ -203,15 +201,8 @@ export default function FormatterPage({
     const buttonsContainerId = 'formatter-buttons-container';
     const modelTimerContainerId = 'formatter-model-timer-container';
 
-    const headerId = 'app-header';
-    const mainNavId = 'main-navigation';
     const mainContentId = 'main-content';
     const formId = 'formatter-form';
-    const shortcutsButtonId = 'shortcuts-button';
-    const historyButtonId = 'history-button';
-    const settingsButtonId = 'settings-button';
-    const loginLinkId = 'login-link';
-    const registerLinkId = 'register-link';
     const characterCounterId = 'character-counter';
     const clearButtonId = 'clear-input-button';
     const preferencesButtonId = 'preferences-button';
@@ -645,66 +636,11 @@ export default function FormatterPage({
             <Head title="StructLogr - Log Formatter" />
             <div className="flex min-h-screen flex-col bg-background">
                 <SkipNavigation />
-                <header id={headerId} className="border-b" role="banner">
-                    <div className="container mx-auto flex h-16 items-center justify-between px-4">
-                        <h1 className="text-xl font-semibold">StructLogr</h1>
-                        <nav
-                            id={mainNavId}
-                            className="flex items-center gap-4"
-                            role="navigation"
-                            aria-label="Main navigation"
-                        >
-                            <Button
-                                id={shortcutsButtonId}
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setShortcutsOpen(true)}
-                                className="text-sm"
-                                aria-label="Show keyboard shortcuts (Ctrl+/)"
-                            >
-                                <HelpCircle className="mr-2 h-4 w-4" />
-                                Shortcuts
-                            </Button>
-                            <Button
-                                id={historyButtonId}
-                                variant="ghost"
-                                size="sm"
-                                onClick={handleHistoryOpen}
-                                className="text-sm"
-                            >
-                                History
-                            </Button>
-                            <Button
-                                id={settingsButtonId}
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setSettingsOpen(true)}
-                                className="text-sm"
-                            >
-                                <Settings className="mr-2 h-4 w-4" />
-                                Settings
-                            </Button>
-                            {!auth.user && (
-                                <>
-                                    <Link
-                                        id={loginLinkId}
-                                        href={login()}
-                                        className="text-sm text-muted-foreground hover:text-foreground"
-                                    >
-                                        Log in
-                                    </Link>
-                                    <Link
-                                        id={registerLinkId}
-                                        href={register()}
-                                        className="rounded-md border px-4 py-2 text-sm hover:bg-accent"
-                                    >
-                                        Register
-                                    </Link>
-                                </>
-                            )}
-                        </nav>
-                    </div>
-                </header>
+                <AppHeader
+                    onShortcutsOpen={() => setShortcutsOpen(true)}
+                    onHistoryOpen={handleHistoryOpen}
+                    onSettingsOpen={() => setSettingsOpen(true)}
+                />
 
                 <main id={mainContentId} role="main">
                     {/* Screen reader live region for status updates */}

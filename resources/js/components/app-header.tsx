@@ -86,6 +86,7 @@ interface AppHeaderProps {
     onHistoryOpen?: () => void;
     onHelpOpen?: () => void;
     onSettingsOpen?: () => void;
+    onShortcutsOpen?: () => void;
 }
 
 export function AppHeader({
@@ -93,6 +94,7 @@ export function AppHeader({
     onHistoryOpen,
     onHelpOpen,
     onSettingsOpen,
+    onShortcutsOpen,
 }: AppHeaderProps) {
     const page = usePage<SharedData>();
     const { auth } = page.props;
@@ -358,6 +360,25 @@ export function AppHeader({
                         {desktopCreditsBadge}
                         {desktopUpgradeButton}
                         <AppearanceToggleDropdown className="hidden sm:block" />
+                        {onShortcutsOpen && (
+                            <TooltipProvider delayDuration={0}>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="hidden h-9 w-9 md:inline-flex"
+                                            onClick={onShortcutsOpen}
+                                        >
+                                            <HelpCircle className="size-5 opacity-80" />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>Keyboard Shortcuts</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        )}
                         {onHistoryOpen && (
                             <TooltipProvider delayDuration={0}>
                                 <Tooltip>
@@ -427,7 +448,7 @@ export function AppHeader({
                                 <DropdownMenuTrigger asChild>
                                     <Button
                                         variant="ghost"
-                                        className="flex size-10 items-center justify-center rounded-full p-1"
+                                        className="flex h-10 items-center gap-2 rounded-full px-2 md:px-3"
                                     >
                                         <Avatar className="size-9 rounded-full">
                                             <AvatarImage
@@ -438,6 +459,9 @@ export function AppHeader({
                                                 {getInitials(user.name)}
                                             </AvatarFallback>
                                         </Avatar>
+                                        <span className="hidden max-w-[120px] truncate text-sm font-medium md:inline-block">
+                                            {user.name}
+                                        </span>
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent
