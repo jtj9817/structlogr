@@ -91,7 +91,7 @@ export function useHistory({ initialHistory, routes }: UseHistoryOptions = {}) {
 
         setRecentEntries(initialHistory.recent);
         setSavedEntries(initialHistory.saved);
-    }, [initialHistory?.recent, initialHistory?.saved]);
+    }, [initialHistory]);
 
     const canManage = useMemo(() => Boolean(routes), [routes]);
 

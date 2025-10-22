@@ -47,7 +47,7 @@ const companyLinks: FooterLink[] = [
     { label: 'Contact', href: '/contact' },
 ];
 
-const socialLinks: (FooterLink & { icon: ComponentType<any> })[] = [
+const socialLinks: (FooterLink & { icon: ComponentType<{ className?: string }> })[] = [
     {
         label: 'GitHub',
         href: 'https://github.com/structlogr/structlogr',

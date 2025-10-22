@@ -388,7 +388,7 @@ export default function FormatterPage({
             setHasSubmitted(true);
             setStatusMessage('History entry loaded');
             setTimeout(() => setStatusMessage(''), 3000);
-        } catch (error) {
+        } catch {
             setStatusMessage('Unable to load history entry');
             setTimeout(() => setStatusMessage(''), 3000);
         }
@@ -402,7 +402,7 @@ export default function FormatterPage({
             }
 
             return JSON.stringify(entry.formattedLog, null, 2);
-        } catch (error) {
+        } catch {
             setStatusMessage('Unable to copy history entry');
             setTimeout(() => setStatusMessage(''), 3000);
 
@@ -437,8 +437,10 @@ export default function FormatterPage({
                 if (data.raw_log.trim() && !processing) {
                     const formEvent = new Event('submit', {
                         cancelable: true,
-                    }) as any;
-                    formEvent.preventDefault = () => {};
+                    }) as unknown as React.FormEvent<HTMLFormElement>;
+                    Object.defineProperty(formEvent, 'preventDefault', {
+                        value: () => {},
+                    });
                     submit(formEvent);
                 }
             },

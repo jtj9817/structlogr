@@ -120,12 +120,6 @@ export function AppHeader({
     const resolveLinkHref = (item: NavItem) =>
         typeof item.href === 'string' ? item.href : item.href.url;
 
-    const numericUserProp = (prop: string) => {
-        if (!user) return null;
-        const value = (user as Record<string, unknown>)[prop];
-        return typeof value === 'number' ? value : null;
-    };
-
     const stringUserProp = (prop: string) => {
         if (!user) return null;
         const value = (user as Record<string, unknown>)[prop];
@@ -140,6 +134,11 @@ export function AppHeader({
 
     const credits = useMemo(() => {
         if (!user) return null;
+
+        const numericUserProp = (prop: string) => {
+            const value = (user as Record<string, unknown>)[prop];
+            return typeof value === 'number' ? value : null;
+        };
 
         const current =
             numericUserProp('credits') ??
