@@ -13,6 +13,8 @@ class LogFormatterController extends Controller
     public function show(Request $request)
     {
         return inertia('FormatterPage', [
+            'formattedLog' => session('formattedLog'),
+            'success' => session('success'),
             'history' => $this->historyPayload($request),
             'historyRoutes' => $this->historyRoutes(),
         ]);
@@ -39,12 +41,10 @@ class LogFormatterController extends Controller
             $formattedLog = $logFormatterService->format($rawLog, $llmModel, $preferences);
             $logFormatterService->saveLog($rawLog, $formattedLog, $request->user());
 
-            return inertia('FormatterPage', [
-                'formattedLog' => $formattedLog,
-                'success' => 'Log formatted successfully!',
-                'history' => $this->historyPayload($request),
-                'historyRoutes' => $this->historyRoutes(),
-            ]);
+            return redirect()
+                ->route('formatter.show')
+                ->with('formattedLog', $formattedLog)
+                ->with('success', 'Log formatted successfully!');
         } catch (\InvalidArgumentException $e) {
             return back()->withErrors([
                 'llm_model' => 'Invalid LLM model selected. Please choose a supported model.',

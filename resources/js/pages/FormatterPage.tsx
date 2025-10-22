@@ -264,7 +264,6 @@ export default function FormatterPage({
     const outputCardSubtitleId = 'output-card-subtitle';
     const outputCardContentId = 'output-card-content';
     const errorAlertId = 'error-alert';
-    const formatterDescriptionId = 'formatter-description';
     const readyStatusId = 'formatter-ready-status';
     const [historyOpen, setHistoryOpen] = useState(false);
     const [preferencesOpen, setPreferencesOpen] = useState(false);
