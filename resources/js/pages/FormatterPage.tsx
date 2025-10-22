@@ -882,8 +882,7 @@ export default function FormatterPage({
                                         <div
                                             id={outputDisplayId}
                                             aria-busy={processing}
-                                            className="flex flex-col overflow-hidden rounded-lg border border-border/40 bg-background/80 text-sm leading-6"
-                                            style={{ height: '400px' }}
+                                            className="flex h-[60vh] flex-col overflow-hidden rounded-lg border border-border/40 bg-background/80 text-sm leading-6"
                                         >
                                             <div id={outputToolbarId} className="flex flex-shrink-0 justify-end gap-2 bg-background/95 px-4 py-3 shadow-sm backdrop-blur">
                                                 <Button
