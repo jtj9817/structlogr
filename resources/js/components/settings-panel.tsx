@@ -1,6 +1,4 @@
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
@@ -21,7 +19,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAppearance } from '@/hooks/use-appearance';
 import { useSettings } from '@/hooks/use-settings';
 import {
-    ExternalLink,
     Monitor,
     Moon,
     RotateCcw,
@@ -82,12 +79,6 @@ export function SettingsPanel({ open, onOpenChange }: SettingsPanelProps) {
                             className="flex-1 min-w-[120px] px-6 py-2.5"
                         >
                             Display
-                        </TabsTrigger>
-                        <TabsTrigger
-                            value="advanced"
-                            className="flex-1 min-w-[120px] px-6 py-2.5"
-                        >
-                            Advanced
                         </TabsTrigger>
                     </TabsList>
 
@@ -269,29 +260,6 @@ export function SettingsPanel({ open, onOpenChange }: SettingsPanelProps) {
                                     />
                                 </section>
 
-                                {/* Anonymous Analytics */}
-                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-5 shadow-sm transition-colors hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600 sm:flex-row sm:items-center sm:justify-between">
-                                    <div className="space-y-1.5">
-                                        <Label htmlFor="analytics" className="font-medium">
-                                            Anonymous Usage Analytics
-                                        </Label>
-                                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                                            Help improve StructLogr with
-                                            anonymous usage data
-                                        </p>
-                                    </div>
-                                    <Switch
-                                        id="analytics"
-                                        checked={settings.anonymousAnalytics}
-                                        onCheckedChange={(checked: boolean) =>
-                                            updateSetting(
-                                                'anonymousAnalytics',
-                                                checked,
-                                            )
-                                        }
-                                    />
-                                </section>
-
                                 {/* Don't Store Sensitive Data */}
                                 <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-5 shadow-sm transition-colors hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600 sm:flex-row sm:items-center sm:justify-between">
                                     <div className="space-y-1.5">
@@ -431,137 +399,6 @@ export function SettingsPanel({ open, onOpenChange }: SettingsPanelProps) {
                                     </p>
                                 </section>
 
-                                {/* Reduce Animations */}
-                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-5 shadow-sm transition-colors hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600 sm:flex-row sm:items-center sm:justify-between">
-                                    <div className="space-y-1.5">
-                                        <Label htmlFor="reduce-animations" className="font-medium">
-                                            Reduce Animations
-                                        </Label>
-                                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                                            Minimize motion and animations for
-                                            better accessibility
-                                        </p>
-                                    </div>
-                                    <Switch
-                                        id="reduce-animations"
-                                        checked={settings.reduceAnimations}
-                                        onCheckedChange={(checked: boolean) =>
-                                            updateSetting(
-                                                'reduceAnimations',
-                                                checked,
-                                            )
-                                        }
-                                    />
-                                </section>
-                            </div>
-                        </div>
-                    </TabsContent>
-
-                    <TabsContent value="advanced" className="mt-8">
-                        <div className="flex flex-col gap-8">
-                            <h3 className="text-lg font-semibold">
-                                Advanced Configuration
-                            </h3>
-
-                            <div className="flex flex-col gap-6">
-                                {/* Custom API Endpoint */}
-                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-5 shadow-sm transition-colors hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600">
-                                    <div className="flex flex-col gap-2.5">
-                                        <Label htmlFor="custom-endpoint" className="font-medium">
-                                            Custom API Endpoint
-                                        </Label>
-                                        <Input
-                                            id="custom-endpoint"
-                                            type="url"
-                                            placeholder="https://api.example.com/format"
-                                            value={settings.customApiEndpoint}
-                                            onChange={(e) =>
-                                                updateSetting(
-                                                    'customApiEndpoint',
-                                                    e.target.value,
-                                                )
-                                            }
-                                        />
-                                    </div>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                                        For self-hosted or custom API endpoints
-                                    </p>
-                                    {settings.customApiEndpoint && (
-                                        <Badge
-                                            variant="secondary"
-                                            className="w-fit text-xs"
-                                        >
-                                            <ExternalLink className="mr-1 h-3 w-3" />
-                                            Custom endpoint active
-                                        </Badge>
-                                    )}
-                                </section>
-
-                                {/* API Key */}
-                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-5 shadow-sm transition-colors hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600">
-                                    <div className="flex flex-col gap-2.5">
-                                        <Label htmlFor="api-key" className="font-medium">API Key</Label>
-                                        <Input
-                                            id="api-key"
-                                            type="password"
-                                            placeholder="Enter your API key"
-                                            value={settings.apiKey}
-                                            onChange={(e) =>
-                                                updateSetting(
-                                                    'apiKey',
-                                                    e.target.value,
-                                                )
-                                            }
-                                        />
-                                    </div>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                                        API key for authentication with custom
-                                        endpoints
-                                    </p>
-                                </section>
-
-                                {/* Timeout Duration */}
-                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-5 shadow-sm transition-colors hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600">
-                                    <div className="flex flex-col gap-2.5">
-                                        <Label htmlFor="timeout" className="font-medium">
-                                            Timeout Duration (seconds)
-                                        </Label>
-                                        <Input
-                                            id="timeout"
-                                            type="number"
-                                            min="5"
-                                            max="120"
-                                            value={settings.timeoutSeconds}
-                                            onChange={(e) => {
-                                                const value = parseInt(
-                                                    e.target.value,
-                                                );
-                                                if (!isNaN(value)) {
-                                                    updateSetting(
-                                                        'timeoutSeconds',
-                                                        value,
-                                                    );
-                                                }
-                                            }}
-                                        />
-                                    </div>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                                        Maximum time to wait for API response
-                                        (5-120 seconds)
-                                    </p>
-                                </section>
-
-                                <section className="rounded-lg border border-amber-200 bg-amber-50 p-5 dark:border-amber-900 dark:bg-amber-950/30">
-                                    <h4 className="mb-2 font-medium text-amber-900 dark:text-amber-100">
-                                        Advanced Settings
-                                    </h4>
-                                    <p className="text-sm text-amber-800 dark:text-amber-200">
-                                        These settings are intended for advanced
-                                        users and self-hosted deployments.
-                                        Incorrect configuration may cause the
-                                        application to malfunction.
-                                    </p>
-                                </section>
                             </div>
                         </div>
                     </TabsContent>
