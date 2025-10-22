@@ -16,7 +16,7 @@ use Prism\Prism\Schema\StringSchema;
 
 class LogFormatterService
 {
-    public function format(string $rawLog, ?string $llmModel = null, int $maxRetries = 3): array
+    public function format(string $rawLog, ?string $llmModel = null, ?array $preferences = null, int $maxRetries = 3): array
     {
         $llmModel = $llmModel ?? 'deepseek-chat';
         $attempt = 0;
@@ -55,6 +55,10 @@ class LogFormatterService
                 }
 
                 $this->validateStructuredOutput($structured);
+
+                if ($preferences) {
+                    $structured = $this->applyPreferences($structured, $preferences);
+                }
 
                 return $structured;
 
@@ -524,5 +528,101 @@ PROMPT;
             ['detected_log_type', 'summary', 'sections'],
             true
         );
+    }
+
+    private function applyPreferences(array $formattedLog, array $preferences): array
+    {
+        if (isset($preferences['parseTimestamps']) && $preferences['parseTimestamps']) {
+            $formattedLog = $this->transformTimestamps(
+                $formattedLog,
+                $preferences['dateFormat'] ?? 'ISO8601',
+                $preferences['timezone'] ?? 'UTC'
+            );
+        }
+
+        if (isset($preferences['normalizeLogLevels']) && $preferences['normalizeLogLevels']) {
+            $formattedLog = $this->normalizeLogLevels($formattedLog);
+        }
+
+        return $formattedLog;
+    }
+
+    private function transformTimestamps(array $data, string $format, string $timezone): array
+    {
+        if (isset($data['summary']['timestamp']) && ! empty($data['summary']['timestamp'])) {
+            $data['summary']['timestamp'] = $this->formatTimestamp(
+                $data['summary']['timestamp'],
+                $format,
+                $timezone
+            );
+        }
+
+        if (isset($data['sections']) && is_array($data['sections'])) {
+            foreach ($data['sections'] as $sectionIdx => $section) {
+                if (isset($section['items']) && is_array($section['items'])) {
+                    foreach ($section['items'] as $itemIdx => $item) {
+                        if (isset($item['timestamp']) && ! empty($item['timestamp'])) {
+                            $data['sections'][$sectionIdx]['items'][$itemIdx]['timestamp'] =
+                                $this->formatTimestamp($item['timestamp'], $format, $timezone);
+                        }
+                    }
+                }
+            }
+        }
+
+        return $data;
+    }
+
+    private function formatTimestamp(string $timestamp, string $format, string $timezone): string
+    {
+        try {
+            $date = new \DateTime($timestamp);
+
+            if ($timezone === 'UTC') {
+                $date->setTimezone(new \DateTimeZone('UTC'));
+            } elseif ($timezone === 'Local') {
+                $date->setTimezone(new \DateTimeZone(config('app.timezone', 'UTC')));
+            }
+
+            return match ($format) {
+                'ISO8601' => $date->format('c'),
+                'Unix' => (string) $date->getTimestamp(),
+                'Custom' => $date->format('Y-m-d H:i:s'),
+                default => $timestamp,
+            };
+        } catch (\Exception $e) {
+            \Log::warning("Failed to parse timestamp: {$timestamp}", ['error' => $e->getMessage()]);
+
+            return $timestamp;
+        }
+    }
+
+    private function normalizeLogLevels(array $data): array
+    {
+        if (isset($data['summary']['status'])) {
+            $data['summary']['status'] = strtoupper($data['summary']['status']);
+
+            if ($data['summary']['status'] === 'WARN') {
+                $data['summary']['status'] = 'WARNING';
+            }
+        }
+
+        if (isset($data['sections']) && is_array($data['sections'])) {
+            foreach ($data['sections'] as $sectionIdx => $section) {
+                if (isset($section['items']) && is_array($section['items'])) {
+                    foreach ($section['items'] as $itemIdx => $item) {
+                        if (isset($item['status'])) {
+                            $normalized = strtoupper($item['status']);
+                            if ($normalized === 'WARN') {
+                                $normalized = 'WARNING';
+                            }
+                            $data['sections'][$sectionIdx]['items'][$itemIdx]['status'] = $normalized;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $data;
     }
 }

@@ -23,13 +23,20 @@ class LogFormatterController extends Controller
         $validated = $request->validate([
             'raw_log' => 'required|string',
             'llm_model' => 'nullable|string|in:deepseek-chat,gemini-2.5-flash,kimi-k2-turbo-preview,GLM-4.5-Air,GLM-4.6',
+            'preferences' => 'nullable|array',
+            'preferences.includeMetadata' => 'nullable|boolean',
+            'preferences.parseTimestamps' => 'nullable|boolean',
+            'preferences.normalizeLogLevels' => 'nullable|boolean',
+            'preferences.timezone' => 'nullable|string|in:UTC,Local',
+            'preferences.dateFormat' => 'nullable|string|in:ISO8601,Unix,Custom',
         ]);
 
         $rawLog = $validated['raw_log'];
         $llmModel = $validated['llm_model'] ?? 'deepseek-chat';
+        $preferences = $validated['preferences'] ?? null;
 
         try {
-            $formattedLog = $logFormatterService->format($rawLog, $llmModel);
+            $formattedLog = $logFormatterService->format($rawLog, $llmModel, $preferences);
             $logFormatterService->saveLog($rawLog, $formattedLog, $request->user());
 
             return inertia('FormatterPage', [

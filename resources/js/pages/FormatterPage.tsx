@@ -246,6 +246,13 @@ export default function FormatterPage({
     const { data, setData, post, processing, errors } = useForm({
         raw_log: '',
         llm_model: preferences.llmModel,
+        preferences: {
+            includeMetadata: preferences.includeMetadata,
+            parseTimestamps: preferences.parseTimestamps,
+            normalizeLogLevels: preferences.normalizeLogLevels,
+            timezone: preferences.timezone,
+            dateFormat: preferences.dateFormat,
+        },
     });
 
     const formattedOutput = useMemo(() => {
@@ -303,6 +310,23 @@ export default function FormatterPage({
     useEffect(() => {
         setData('llm_model', preferences.llmModel);
     }, [preferences.llmModel, setData]);
+
+    useEffect(() => {
+        setData('preferences', {
+            includeMetadata: preferences.includeMetadata,
+            parseTimestamps: preferences.parseTimestamps,
+            normalizeLogLevels: preferences.normalizeLogLevels,
+            timezone: preferences.timezone,
+            dateFormat: preferences.dateFormat,
+        });
+    }, [
+        preferences.includeMetadata,
+        preferences.parseTimestamps,
+        preferences.normalizeLogLevels,
+        preferences.timezone,
+        preferences.dateFormat,
+        setData,
+    ]);
 
     useEffect(() => {
         return () => {
