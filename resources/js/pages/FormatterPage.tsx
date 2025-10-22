@@ -882,9 +882,10 @@ export default function FormatterPage({
                                         <div
                                             id={outputDisplayId}
                                             aria-busy={processing}
-                                            className="flex-1 min-h-0 overflow-auto rounded-lg border border-border/40 bg-background/80 text-sm leading-6"
+                                            className="flex flex-col overflow-hidden rounded-lg border border-border/40 bg-background/80 text-sm leading-6"
+                                            style={{ height: '400px' }}
                                         >
-                                            <div id={outputToolbarId} className="sticky top-0 z-10 flex justify-end gap-2 bg-background/95 px-4 py-3 shadow-sm backdrop-blur">
+                                            <div id={outputToolbarId} className="flex flex-shrink-0 justify-end gap-2 bg-background/95 px-4 py-3 shadow-sm backdrop-blur">
                                                 <Button
                                                     id={copyOutputButtonId}
                                                     type="button"
@@ -933,7 +934,7 @@ export default function FormatterPage({
                                                     View Full Output
                                                 </Button>
                                             </div>
-                                            <div id={outputContentWrapperId} className="px-4 pb-4">
+                                            <div id={outputContentWrapperId} className="flex-1 overflow-auto px-4 pb-4">
                                                 {renderOutputContent()}
                                             </div>
                                         </div>
