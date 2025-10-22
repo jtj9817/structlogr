@@ -1054,7 +1054,7 @@ export default function FormatterPage({
                 open={isInputModalOpen}
                 onOpenChange={setInputModalOpen}
             >
-                <DialogContent id={inputModalId} className="max-w-[min(80vw,1200px)] w-full">
+                <DialogContent id={inputModalId} className="sm:max-w-[min(80vw,1200px)]">
                     <DialogHeader>
                         <DialogTitle id={inputModalTitleId}>Raw Log Input</DialogTitle>
                         <DialogDescription id={inputModalDescId}>
@@ -1122,7 +1122,7 @@ export default function FormatterPage({
                 open={isOutputModalOpen}
                 onOpenChange={setOutputModalOpen}
             >
-                <DialogContent id={outputModalId} className="max-w-[min(80vw,1200px)] w-full">
+                <DialogContent id={outputModalId} className="sm:max-w-[min(80vw,1200px)]">
                     <DialogHeader>
                         <DialogTitle id={outputModalTitleId}>Formatted JSON Output</DialogTitle>
                         <DialogDescription id={outputModalDescId}>
