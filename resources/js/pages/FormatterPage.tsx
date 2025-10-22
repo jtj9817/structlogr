@@ -212,7 +212,6 @@ export default function FormatterPage({
     const loginLinkId = 'login-link';
     const registerLinkId = 'register-link';
     const characterCounterId = 'character-counter';
-    const lineCounterId = 'line-counter';
     const clearButtonId = 'clear-input-button';
     const preferencesButtonId = 'preferences-button';
     const outputDisplayId = 'output-display';
