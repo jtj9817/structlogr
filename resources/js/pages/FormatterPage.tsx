@@ -34,6 +34,7 @@ import {
     Check,
     ClipboardCopy,
     Maximize2,
+    Settings,
 } from 'lucide-react';
 import {
     FormEventHandler,
