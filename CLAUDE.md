@@ -188,9 +188,16 @@ npm run build:ssr
 - Main route: `/` (FormatterPage)
 - POST `/format` endpoint processes raw logs
 - LogFormatterService with Prism SDK v2
-- DeepSeek LLM provider (configurable)
-- Structured output: timestamp, level, message, source, metadata
+- Multiple LLM providers:
+  - DeepSeek (deepseek-chat) - default
+  - Google Gemini (gemini-2.5-flash)
+  - Moonshot AI (kimi-k2-turbo-preview) via OpenRouter
+  - ZhipuAI (GLM-4.5-Air, GLM-4.6) via OpenRouter
+- Structured output: detected_log_type, summary, entities, metrics, sections
 - Database persistence in `formatted_logs` table
+- Comprehensive logging system with request timing
+- Retry logic with exponential backoff (3 attempts)
+- Schema validation and user preferences support
 
 **Authentication:**
 - Laravel Fortify with 2FA support
@@ -203,8 +210,64 @@ npm run build:ssr
 **Project Documentation:**
 - `README.md` - Project overview, installation, usage guide
 - `docs/architecture-overview.md` - Comprehensive system architecture
+- `docs/llm-providers.md` - LLM provider configuration and comparison
+- `docs/logging-and-debugging.md` - Logging system and debugging guide
+- `docs/history-feature.md` - History management system documentation
 - `docs/StructLogr_Implementation_Plan.md` - Development phases (COMPLETED)
 - `docs/UI_UX_Improvements.md` - Design system and component guide
 - `docs/CHANGELOG.md` - Version history and updates
 - `CLAUDE.md` - This file (AI assistant instructions)
 - `AGENTS.md` - Multi-agent system coordination
+
+## Debugging & Logging
+
+**Viewing Logs:**
+```bash
+./vendor/bin/sail exec laravel.test tail -f storage/logs/laravel.log
+```
+
+**Filter for formatter service:**
+```bash
+./vendor/bin/sail exec laravel.test tail -f storage/logs/laravel.log | grep "LogFormatterService"
+```
+
+**Check request duration:**
+```bash
+grep "duration_ms" storage/logs/laravel.log | tail -20
+```
+
+**Log Levels:**
+- Use `LOG_LEVEL=debug` in development for comprehensive logging
+- Use `LOG_LEVEL=info` in production to reduce log volume
+- LogFormatterService logs at all stages: info, debug, warning, error, critical
+
+**Common Issues:**
+- Empty API response → Check API key, provider status
+- Validation failures → Review schema conversion for provider
+- Timeout errors → Increase HTTP_TIMEOUT in .env
+- Max retries exceeded → Check provider status, switch providers
+
+**See**: `docs/logging-and-debugging.md` for comprehensive debugging guide
+
+## LLM Provider Selection
+
+**Available Models:**
+- `deepseek-chat` - Fast, cost-effective (default)
+- `gemini-2.5-flash` - Very fast, Google Gemini
+- `kimi-k2-turbo-preview` - Large context, via OpenRouter
+- `GLM-4.5-Air` - Free tier, via OpenRouter
+- `GLM-4.6` - High accuracy, via OpenRouter
+
+**Configuration:**
+```env
+# Choose provider API keys as needed
+DEEPSEEK_API_KEY=sk-xxx
+GEMINI_API_KEY=AIza-xxx
+OPENROUTER_API_KEY=sk-or-xxx
+
+# HTTP timeouts
+HTTP_TIMEOUT=600
+HTTP_CONNECT_TIMEOUT=60
+```
+
+**See**: `docs/llm-providers.md` for detailed provider comparison and configuration

@@ -5,6 +5,215 @@ All notable changes to StructLogr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [October 21, 2025] - Logging System, LLM Provider Expansion & Bug Fixes
+
+### Added
+
+#### Comprehensive Logging System
+- **LogFormatterService comprehensive logging**
+  - Detailed logging at all stages of log formatting process
+  - Request/response timing measurements
+  - Retry attempt tracking with exponential backoff logging
+  - Schema validation logging with detailed error messages
+  - Provider configuration logging for debugging
+  - Input preview logging (first 200 chars) for troubleshooting
+  - Structured log context with relevant metadata
+  - Log levels: `info`, `debug`, `warning`, `error`, `critical`
+- **Request timer feature**
+  - `useFormattingTimer` hook for frontend timing
+  - Real-time display of request duration
+  - Millisecond precision timing
+  - Visual feedback during API calls
+
+#### New LLM Provider Support
+- **Gemini 2.5 Flash** support via Google AI
+  - Provider-specific schema conversion to Gemini format
+  - Response MIME type configuration (`application/json`)
+  - Property ordering for consistent output
+  - Nullable field support
+- **Kimi K2 Turbo Preview** (Moonshot AI) via OpenRouter
+  - JSON Schema structured output
+  - Custom schema conversion for OpenRouter format
+- **GLM-4.5-Air** and **GLM-4.6** (ZhipuAI) via OpenRouter
+  - Strict JSON Schema mode
+  - Thinking mode disabled for deterministic output
+  - Provider-specific response format configuration
+
+#### Enhanced LLM Configuration
+- **Provider-specific configuration methods**
+  - `configureDeepseek()` - DeepSeek with json_object response format
+  - `configureGemini()` - Gemini with response schema
+  - `configureMoonshot()` - Moonshot/Kimi with JSON Schema
+  - `configureGLM()` - GLM models with strict schema validation
+- **Schema format conversion utilities**
+  - `convertSchemaToJsonSchema()` - OpenAI/OpenRouter JSON Schema format
+  - `convertSchemaToGeminiFormat()` - Google Gemini schema format
+- **HTTP client timeout configuration**
+  - Configurable timeout (default: 600s)
+  - Configurable connect timeout (default: 60s)
+  - Environment-based configuration via `config/services.php`
+
+#### UI/UX Enhancements
+- **Copy-to-clipboard button** for formatted output
+  - One-click copy functionality
+  - Visual feedback on copy success
+  - Clipboard API integration
+- **Modal output display** for formatted logs
+  - Enhanced readability with modal view
+  - Syntax highlighting for JSON
+  - Monospace font rendering
+- **LLM model display** in formatter interface
+  - Shows currently selected model
+  - Real-time model updates
+  - Visual model indicator
+
+### Changed
+
+#### Backend Improvements
+- **LogFormatterService signature updates**
+  - Added `$llmModel` parameter for dynamic model selection
+  - Added `$preferences` parameter for user preferences
+  - Added `$maxRetries` parameter (default: 3)
+  - Enhanced `saveLog()` to accept optional `User` parameter
+  - Returns `null` for guest users (no database save)
+- **Retry logic with exponential backoff**
+  - 3 retry attempts by default
+  - Exponential backoff: 2^attempt seconds
+  - Separate handling for `PrismException` and general exceptions
+  - Detailed logging of each retry attempt
+- **Improved validation**
+  - `validateStructuredOutput()` method with comprehensive checks
+  - Required field validation for schema compliance
+  - Detailed error messages for debugging
+- **System prompt optimization**
+  - Model-specific prompt variations
+  - DeepSeek gets explicit "JSON only" instruction
+  - Comprehensive rules for log parsing behavior
+  - Clear guidelines for edge cases
+
+#### Frontend Refactoring
+- **Settings panel redesign**
+  - Single-column layout for better mobile support
+  - Improved visual hierarchy
+  - Enhanced spacing and typography
+  - Better grouping of related settings
+- **FormatterPage enhancements**
+  - Modal-based output display
+  - Copy button integration
+  - Model selector integration
+  - Request timer display
+  - Improved loading states
+- **React type safety improvements**
+  - Better dependency array handling
+  - Stricter TypeScript types
+  - Removed unused variables
+  - Enhanced props interfaces
+
+### Fixed
+
+#### Critical Bug Fixes
+- **Infinite loop in preferences sync** (resources/js/hooks/use-preferences.ts:5ea98ac)
+  - Added dependency tracking to prevent cross-component sync loops
+  - Implemented effect guards with internal state tracking
+  - Fixed localStorage sync race conditions
+- **Formatting timer not updating during API request** (resources/js/hooks/use-formatting-timer.ts:aad4480)
+  - Changed dependency array to trigger timer on `isFormatting` changes
+  - Ensured timer updates every second during active requests
+- **Model display reactivity issues** (resources/js/pages/FormatterPage.tsx:b58b8fe)
+  - Added unique IDs to form elements for proper React reconciliation
+  - Enhanced model state management
+  - Fixed stale closure issues in event handlers
+- **Removed unused lineCounterId variable** (resources/js/pages/FormatterPage.tsx:e2aa794)
+  - Code cleanup for better maintainability
+
+#### Code Quality Improvements
+- **Enhanced accessibility**
+  - Added unique IDs to all form elements
+  - Improved ARIA labels and descriptions
+  - Better keyboard navigation support
+  - Screen reader compatibility enhancements
+- **Type safety fixes**
+  - Corrected React hook dependencies
+  - Fixed TypeScript errors in components
+  - Better type inference for hooks
+
+### Technical Details
+
+#### New Configuration Options
+
+**config/services.php** (recommended):
+```php
+'http' => [
+    'timeout' => env('HTTP_TIMEOUT', 600),
+    'connect_timeout' => env('HTTP_CONNECT_TIMEOUT', 60),
+],
+```
+
+**.env additions**:
+```env
+# Gemini
+GEMINI_API_KEY=your_gemini_api_key
+
+# OpenRouter (for Kimi and GLM models)
+OPENROUTER_API_KEY=your_openrouter_api_key
+
+# HTTP Timeouts
+HTTP_TIMEOUT=600
+HTTP_CONNECT_TIMEOUT=60
+```
+
+#### Logging Output Example
+
+```
+[2025-10-21 14:23:45] local.INFO: === LogFormatterService::format() START === {"llm_model":"deepseek-chat","preferences":null,"max_retries":3,"raw_log_length":245,"raw_log_preview":"2024-10-15 14:23:45 [ERROR] Database connection failed..."}
+[2025-10-21 14:23:45] local.INFO: Attempt 0/3 starting {"attempt":0,"model":"deepseek-chat"}
+[2025-10-21 14:23:45] local.DEBUG: Schema generated {"schema_name":"formatted_log"}
+[2025-10-21 14:23:45] local.INFO: Configuring LLM provider {"model":"deepseek-chat"}
+[2025-10-21 14:23:45] local.DEBUG: Configuring DeepSeek provider {"provider":"DeepSeek","model":"deepseek-chat","response_format":"json_object"}
+[2025-10-21 14:23:45] local.INFO: Sending request to LLM API {"model":"deepseek-chat","temperature":0.0,"max_tokens":8192}
+[2025-10-21 14:23:47] local.INFO: LLM API response received {"model":"deepseek-chat","duration_ms":1847.32}
+[2025-10-21 14:23:47] local.INFO: Validating structured output
+[2025-10-21 14:23:47] local.INFO: === LogFormatterService::format() SUCCESS === {"model":"deepseek-chat","attempt":0,"detected_log_type":"application_error","sections_count":1}
+```
+
+#### Supported LLM Models
+
+| Model | Provider | Configuration Method | Response Format |
+|-------|----------|---------------------|-----------------|
+| deepseek-chat | DeepSeek | `configureDeepseek()` | `json_object` |
+| gemini-2.5-flash | Google Gemini | `configureGemini()` | Response schema |
+| kimi-k2-turbo-preview | Moonshot (via OpenRouter) | `configureMoonshot()` | JSON Schema |
+| GLM-4.5-Air | ZhipuAI (via OpenRouter) | `configureGLM()` | Strict JSON Schema |
+| GLM-4.6 | ZhipuAI (via OpenRouter) | `configureGLM()` | Strict JSON Schema |
+
+#### Frontend Hooks
+
+**useFormattingTimer**:
+```typescript
+const { elapsedTime, isRunning, startTimer, stopTimer, resetTimer } = useFormattingTimer();
+```
+
+**useLLMModel**:
+```typescript
+const { model, setModel, availableModels } = useLLMModel();
+```
+
+### Performance
+
+- **Request timing**: Average API response times logged for monitoring
+- **Retry backoff**: Exponential backoff prevents API rate limit issues
+- **Schema caching**: Schema objects created once per request
+- **Timeout configuration**: Prevents hung requests with configurable timeouts
+
+### Developer Experience
+
+- **Enhanced debugging**: Comprehensive logs at all stages
+- **Error tracking**: Detailed error messages with context
+- **Performance monitoring**: Request duration tracking
+- **Configuration flexibility**: Easy provider switching
+
+---
+
 ## [October 21, 2025] - Major UI/UX Enhancement & Accessibility
 
 ### Added

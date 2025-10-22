@@ -198,16 +198,28 @@ public function payloadForUser(User $user, int $limit = 50): array
 - Defines LLM system prompt for log parsing
 - Defines JSON schema for structured output
 - Makes LLM API calls via Prism
+- Handles retry logic with exponential backoff
+- Validates structured output
+- Applies user preferences to formatted logs
+- Comprehensive logging for debugging
 - Persists formatted logs to database
 
 **Key Methods**:
 
 ```php
-public function format(string $rawLog): array
+public function format(string $rawLog, ?string $llmModel = null, ?array $preferences = null, int $maxRetries = 3): array
 ```
-- Accepts raw log text
-- Uses Prism structured generation with schema
-- Configured provider: DeepSeek (deepseek-chat model)
+- Accepts raw log text, optional LLM model selection, user preferences, and retry configuration
+- Uses Prism structured generation with provider-specific schema conversion
+- Supports multiple LLM providers:
+  - DeepSeek (deepseek-chat) - default
+  - Google Gemini (gemini-2.5-flash)
+  - Moonshot AI (kimi-k2-turbo-preview) via OpenRouter
+  - ZhipuAI (GLM-4.5-Air, GLM-4.6) via OpenRouter
+- Implements retry logic with exponential backoff (default: 3 attempts)
+- Comprehensive logging at all stages (info, debug, warning, error, critical)
+- Times API requests and logs duration
+- Validates structured output against schema requirements
 - Returns structured array with fields:
   - `detected_log_type`: High-level classification such as `test_runner`, `application_error`, or `http_access`
   - `summary`: Object containing `status`, `headline`, optional `primary_subject`, `key_points`, `duration`, and `timestamp`
@@ -217,12 +229,42 @@ public function format(string $rawLog): array
   - Optional additional data may be included inside section `data` objects to capture domain-specific structures
 
 ```php
-public function saveLog(string $rawLog, array $formattedLog): FormattedLog
+public function saveLog(string $rawLog, array $formattedLog, ?User $user = null): ?FormattedLog
 ```
 - Persists raw and formatted logs to database
+- Accepts optional User parameter
+- Returns `null` for guest users (no database save)
+- Extracts summary, detected type, and field count for metadata
 - Returns saved `FormattedLog` model instance
 
-**Prism Configuration**:
+```php
+private function configureDeepseek($builder): void
+private function configureGemini($builder, ObjectSchema $schema): void
+private function configureMoonshot($builder, ObjectSchema $schema): void
+private function configureGLM($builder, ObjectSchema $schema, string $model): void
+```
+- Provider-specific configuration methods
+- Handle different response format requirements
+- Convert schemas to provider-specific formats
+- Configure temperature, max tokens, and client options
+
+```php
+private function validateStructuredOutput(array $data): void
+```
+- Validates required fields in structured output
+- Ensures schema compliance
+- Throws exceptions with detailed error messages
+- Logs validation progress
+
+```php
+private function applyPreferences(array $formattedLog, array $preferences): array
+```
+- Applies user preferences to formatted log
+- Supports timestamp transformation (ISO8601, Unix, Custom)
+- Supports log level normalization
+- Timezone conversion (UTC, Local)
+
+**Prism Configuration Example**:
 
 ```php
 Prism::structured()
@@ -230,7 +272,25 @@ Prism::structured()
     ->withSystemPrompt($systemPrompt)
     ->withSchema($schema)
     ->withPrompt($rawLog)
-    ->generate();
+    ->usingTemperature(0.0)
+    ->withMaxTokens(8192)
+    ->withClientOptions([
+        'timeout' => 600,
+        'connect_timeout' => 60,
+    ])
+    ->asStructured();
+```
+
+**Logging Example**:
+
+```php
+\Log::info('=== LogFormatterService::format() START ===', [
+    'llm_model' => 'deepseek-chat',
+    'preferences' => null,
+    'max_retries' => 3,
+    'raw_log_length' => 245,
+    'raw_log_preview' => '2024-10-15 14:23:45 [ERROR]...',
+]);
 ```
 
 ### Models
@@ -643,6 +703,51 @@ const { appearance, setAppearance } = useAppearance();
 **API**:
 ```typescript
 const { copy, copied } = useClipboard();
+```
+
+#### useFormattingTimer
+
+**Location**: `resources/js/hooks/use-formatting-timer.ts`
+
+**Purpose**: Track and display formatting request duration
+
+**Features**:
+- Real-time elapsed time tracking
+- Millisecond precision
+- Automatic start/stop/reset
+- Integrates with formatting state
+
+**API**:
+```typescript
+const { elapsedTime, isRunning, startTimer, stopTimer, resetTimer } = useFormattingTimer();
+```
+
+#### useLLMModel
+
+**Location**: `resources/js/hooks/use-llm-model.ts`
+
+**Purpose**: Manage LLM model selection and persistence
+
+**Features**:
+- Model selection with localStorage persistence
+- Available models list
+- Default model configuration
+- Reactive model updates
+
+**API**:
+```typescript
+const { model, setModel, availableModels } = useLLMModel();
+```
+
+**Available Models**:
+```typescript
+const availableModels = [
+  { value: 'deepseek-chat', label: 'DeepSeek Chat' },
+  { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash' },
+  { value: 'kimi-k2-turbo-preview', label: 'Kimi K2 Turbo' },
+  { value: 'GLM-4.5-Air', label: 'GLM-4.5-Air' },
+  { value: 'GLM-4.6', label: 'GLM-4.6' },
+];
 ```
 
 ### Routing

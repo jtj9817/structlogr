@@ -5,8 +5,10 @@ A modern web application for transforming raw log text into structured JSON form
 ## Features
 
 - **AI-Powered Log Parsing**: Convert unstructured log text into structured JSON using LLM technology
-- **Multiple LLM Providers**: Support for OpenAI, Anthropic, DeepSeek, Mistral, Groq, and more via Prism
+- **Multiple LLM Providers**: Support for DeepSeek, Gemini 2.5 Flash, Kimi K2, GLM-4.5-Air, GLM-4.6, and more via Prism
 - **History Management**: Track, save, search, and export all formatted logs with user-specific history
+- **Comprehensive Logging**: Detailed request/response logging with timing metrics for debugging
+- **Request Timer**: Real-time display of formatting request duration
 - **Modern Tech Stack**: Laravel 12 backend with React 19 + Inertia.js 2.0 frontend
 - **Full Authentication System**: Email/password authentication with two-factor support via Laravel Fortify
 - **Accessibility First**: Keyboard shortcuts, ARIA labels, screen reader support, and skip navigation
@@ -341,6 +343,16 @@ DEEPSEEK_API_KEY=your_key
 DEEPSEEK_URL=https://api.deepseek.com/v1
 ```
 
+**Google Gemini**:
+```env
+GEMINI_API_KEY=your_key
+```
+
+**OpenRouter** (for Kimi K2, GLM models):
+```env
+OPENROUTER_API_KEY=your_key
+```
+
 **OpenAI**:
 ```env
 OPENAI_API_KEY=your_key
@@ -353,7 +365,20 @@ ANTHROPIC_API_KEY=your_key
 ANTHROPIC_API_VERSION=2023-06-01
 ```
 
-See `config/prism.php` for all supported providers.
+**HTTP Timeout Configuration**:
+```env
+HTTP_TIMEOUT=600
+HTTP_CONNECT_TIMEOUT=60
+```
+
+**Supported Models**:
+- `deepseek-chat` - DeepSeek (default)
+- `gemini-2.5-flash` - Google Gemini 2.5 Flash
+- `kimi-k2-turbo-preview` - Moonshot AI Kimi K2 (via OpenRouter)
+- `GLM-4.5-Air` - ZhipuAI GLM-4.5-Air (via OpenRouter)
+- `GLM-4.6` - ZhipuAI GLM-4.6 (via OpenRouter)
+
+See `config/prism.php` for all supported providers and `docs/llm-providers.md` for detailed configuration guide.
 
 ### Port Configuration
 
@@ -392,6 +417,8 @@ Ensure production environment variables are set:
 - **[Implementation Plan](docs/StructLogr_Implementation_Plan.md)**: Development phases and roadmap
 - **[Architecture Overview](docs/architecture-overview.md)**: Detailed system architecture
 - **[History Feature](docs/history-feature.md)**: History management system guide
+- **[LLM Providers Guide](docs/llm-providers.md)**: Comprehensive LLM provider configuration
+- **[Logging and Debugging](docs/logging-and-debugging.md)**: Logging system and debugging guide
 - **[UI/UX Improvements](docs/UI_UX_Improvements.md)**: Design system and component guide
 - **[CHANGELOG](docs/CHANGELOG.md)**: Version history and updates
 - **[CLAUDE.md](CLAUDE.md)**: Instructions for Claude Code assistant
