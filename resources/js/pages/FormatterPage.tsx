@@ -18,6 +18,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
+import { useFormattingTimer } from '@/hooks/use-formatting-timer';
 import { useHistory } from '@/hooks/use-history';
 import {
     commonShortcuts,
@@ -225,6 +226,8 @@ export default function FormatterPage({
     const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'error'>(
         'idle',
     );
+    const { elapsedTime, isRunning: timerRunning, start: startTimer, stop: stopTimer, reset: resetTimer } = useFormattingTimer();
+    const [formattingDuration, setFormattingDuration] = useState<number | null>(null);
     const {
         recentEntries,
         savedEntries,
@@ -323,14 +326,21 @@ export default function FormatterPage({
         e.preventDefault();
         setHasSubmitted(true);
         setStatusMessage('Processing your log...');
+        setFormattingDuration(null);
+        resetTimer();
+        startTimer();
         post('/format', {
             onSuccess: () => {
-                setStatusMessage('Log formatting complete');
-                // Clear status message after 3 seconds
+                const duration = stopTimer();
+                setFormattingDuration(duration);
+                setStatusMessage(`Log formatting complete in ${(duration / 1000).toFixed(2)}s`);
                 setTimeout(() => setStatusMessage(''), 3000);
             },
-            onError: () => {
-                setStatusMessage('Error formatting log');
+            onError: (errors) => {
+                stopTimer();
+                setFormattingDuration(null);
+                const errorMessage = errors.raw_log || errors.llm_model || 'Error formatting log';
+                setStatusMessage(errorMessage);
                 setTimeout(() => setStatusMessage(''), 3000);
             },
         });
@@ -727,21 +737,31 @@ export default function FormatterPage({
                                             </div>
 
                                             <div className="mt-auto flex flex-col gap-3">
-                                                <div className="flex items-center justify-between">
-                                                    <span className="text-xs font-bold text-muted-foreground">
-                                                        Model: {preferences.llmModel}
-                                                    </span>
+                                                <div className="flex flex-col gap-2">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-xs font-bold text-muted-foreground">
+                                                            Model: {preferences.llmModel}
+                                                        </span>
+                                                        {formattingDuration !== null && !processing && (
+                                                            <span className="text-xs text-emerald-600 dark:text-emerald-400">
+                                                                ✓ Completed in {(formattingDuration / 1000).toFixed(2)}s
+                                                            </span>
+                                                        )}
+                                                        {timerRunning && processing && (
+                                                            <span className="text-xs text-muted-foreground">
+                                                                {(elapsedTime / 1000).toFixed(2)}s
+                                                            </span>
+                                                        )}
+                                                    </div>
                                                     <Button
                                                         id={formatButtonId}
-                                                        data-testid={
-                                                            formatButtonTestId
-                                                        }
+                                                        data-testid={formatButtonTestId}
                                                         type="submit"
                                                         disabled={
                                                             processing ||
                                                             !data.raw_log.trim()
                                                         }
-                                                        className="rounded-md"
+                                                        className="w-full rounded-md"
                                                         aria-label={
                                                             processing
                                                                 ? 'Processing log format request'
