@@ -533,6 +533,16 @@ interface HistorySidebarProps {
 - **Metadata**: Log type badge, field count, timestamp
 - **Actions**: Load, Save/Unsave, Copy, Delete
 
+#### Layout Optimizations (October 22, 2025)
+
+The history entry cards have been optimized for space efficiency:
+
+- **Reduced padding**: Changed from `p-4` to `p-3` for more compact display
+- **Tighter gaps**: Decreased spacing between cards from `gap-3` to `gap-2`
+- **Optimized header**: Streamlined spacing and margins in card headers
+- **Improved metadata layout**: Better use of vertical space for timestamp and field count
+- **More visible entries**: Space optimizations allow more entries to be visible without scrolling
+
 #### Action Buttons
 
 ```typescript

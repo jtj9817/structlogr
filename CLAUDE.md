@@ -106,7 +106,8 @@ Cookies `appearance` and `sidebar_state` are not encrypted (see `bootstrap/app.p
 - `resources/js/pages/` - Inertia pages
   - `auth/` - Auth pages (login, register, etc.)
   - `settings/` - Settings pages
-  - `dashboard.tsx`, `welcome.tsx`
+  - `FormatterPage.tsx` - Main formatter page (at `/`)
+  - `welcome.tsx` - Landing page
 
 **Layouts:**
 - `resources/js/layouts/app-layout.tsx` - Main authenticated layout

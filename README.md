@@ -293,8 +293,8 @@ structlogr/
 │       ├── pages/                  # Inertia pages
 │       │   ├── auth/               # Authentication pages
 │       │   ├── settings/           # Settings pages
-│       │   ├── FormatterPage.tsx   # Log formatter page
-│       │   └── dashboard.tsx
+│       │   ├── FormatterPage.tsx   # Log formatter page (at /)
+│       │   └── welcome.tsx         # Landing page
 │       ├── routes/                 # Wayfinder route helpers
 │       └── types/                  # TypeScript types
 ├── routes/

@@ -488,8 +488,7 @@ resources/js/
 │   │   ├── password.tsx        # Password change
 │   │   ├── profile.tsx         # Profile editing
 │   │   └── two-factor.tsx      # 2FA management
-│   ├── dashboard.tsx           # User dashboard
-│   ├── FormatterPage.tsx       # Log formatter (main feature)
+│   ├── FormatterPage.tsx       # Log formatter (main feature at /)
 │   └── welcome.tsx             # Landing page
 ├── routes/                     # Wayfinder route helpers
 │   ├── appearance/index.ts
@@ -889,7 +888,7 @@ Laravel session storage (database driver).
 2. Backend sends verification email
 3. User clicks verification link
 4. Backend verifies signed URL and marks email verified
-5. User redirected to dashboard
+5. User redirected to `/` (FormatterPage)
 
 **Protected Routes**: Apply `verified` middleware to routes requiring verified email
 
@@ -1185,13 +1184,12 @@ class LogFormatterService {
 
 ### Planned Features
 
-1. **Log History**: Browse previously formatted logs
+1. **Log History**: Browse previously formatted logs (IMPLEMENTED)
 2. **Batch Processing**: Upload log files for batch formatting
-3. **Export Options**: Download formatted logs (JSON, CSV)
+3. **Export Options**: Download formatted logs (JSON, CSV) (IMPLEMENTED)
 4. **User Preferences**: Save favorite LLM providers
 5. **API Access**: RESTful API for programmatic access
 6. **Webhooks**: Real-time log processing via webhooks
-7. **Log Monitoring**: Dashboard for log analytics
 
 ### Scalability Considerations
 
