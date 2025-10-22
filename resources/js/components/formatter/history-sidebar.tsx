@@ -60,8 +60,8 @@ export function HistorySidebar({
     };
 
     const EmptyState = ({ message }: { message: string }) => (
-        <div className="flex h-full flex-col items-center justify-center gap-3 px-6 py-12 text-center">
-            <History className="h-12 w-12 text-muted-foreground/60" />
+        <div className="flex h-full flex-col items-center justify-center gap-2 px-6 py-8 text-center">
+            <History className="h-10 w-10 text-muted-foreground/60" />
             <p className="text-sm text-muted-foreground">{message}</p>
         </div>
     );
@@ -76,25 +76,28 @@ export function HistorySidebar({
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
             <SheetContent
+                id="history-sidebar"
                 side="right"
-                className="flex w-full max-w-lg flex-col gap-6 px-4 py-6 sm:px-6 lg:max-w-xl"
+                className="flex w-full max-w-lg flex-col gap-6 px-4 py-6 sm:px-6 lg:max-w-2xl"
             >
                 <SheetHeader className="text-left">
-                    <SheetTitle className="text-xl font-semibold">
+                    <SheetTitle id="history-sidebar-title" className="text-xl font-semibold">
                         History
                     </SheetTitle>
                 </SheetHeader>
 
                 <Tabs
+                    id="history-tabs"
                     defaultValue="recent"
                     className="flex flex-1 flex-col gap-4 overflow-hidden"
                 >
-                    <TabsList className="grid grid-cols-2 gap-2 rounded-lg bg-muted p-1">
-                        <TabsTrigger value="recent">Recent</TabsTrigger>
-                        <TabsTrigger value="saved">Saved</TabsTrigger>
+                    <TabsList id="history-tabs-list" className="grid grid-cols-2 gap-2 rounded-lg bg-muted p-1">
+                        <TabsTrigger id="history-tab-recent" value="recent">Recent</TabsTrigger>
+                        <TabsTrigger id="history-tab-saved" value="saved">Saved</TabsTrigger>
                     </TabsList>
 
                     <TabsContent
+                        id="history-recent-content"
                         value="recent"
                         className="flex flex-1 flex-col overflow-hidden"
                     >
@@ -102,7 +105,7 @@ export function HistorySidebar({
                             {recentEntries.length === 0 ? (
                                 <EmptyState message={recentEmptyMessage} />
                             ) : (
-                                <div className="space-y-3 p-4">
+                                <div className="space-y-2 p-3">
                                     {recentEntries.map((entry) => (
                                         <HistoryEntryCard
                                             key={entry.id}
@@ -127,12 +130,12 @@ export function HistorySidebar({
                         </ScrollArea>
                     </TabsContent>
 
-                    <TabsContent value="saved" className="flex flex-1 flex-col overflow-hidden">
+                    <TabsContent id="history-saved-content" value="saved" className="flex flex-1 flex-col overflow-hidden">
                         <ScrollArea className="h-full min-h-0 rounded-lg border border-border/40 bg-background/80 pr-4">
                             {savedEntries.length === 0 ? (
                                 <EmptyState message={savedEmptyMessage} />
                             ) : (
-                                <div className="space-y-3 p-4">
+                                <div className="space-y-2 p-3">
                                     {savedEntries.map((entry) => (
                                         <HistoryEntryCard
                                             key={entry.id}
@@ -160,6 +163,7 @@ export function HistorySidebar({
 
                 <div className="flex flex-col gap-2 border-t border-border/40 pt-4 sm:flex-row sm:items-center">
                     <Button
+                        id="history-export-button"
                         variant="outline"
                         size="sm"
                         onClick={onExportHistory}
@@ -170,6 +174,7 @@ export function HistorySidebar({
                         Export
                     </Button>
                     <Button
+                        id="history-clear-button"
                         variant="outline"
                         size="sm"
                         onClick={handleClearHistory}

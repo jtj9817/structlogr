@@ -1,13 +1,8 @@
 import { Button } from '@/components/ui/button';
-import {
-    Card,
-    CardContent,
-    CardFooter,
-    CardHeader,
-} from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { useClipboard } from '@/hooks/use-clipboard';
 import type { HistoryEntry } from '@/types/history';
-import { Clock, FileText, Star, Trash2 } from 'lucide-react';
+import { Clock, Copy, FileText, Star, Trash2 } from 'lucide-react';
 
 interface HistoryEntryCardProps {
     entry: HistoryEntry;
@@ -48,72 +43,87 @@ export function HistoryEntryCard({
         : 'log entry';
 
     return (
-        <Card className="group transition-shadow hover:shadow-md">
-            <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                        <Clock className="h-4 w-4" />
-                        {formatDate(entry.createdAt)}
+        <Card
+            id={`history-entry-${entry.id}`}
+            className="group cursor-pointer p-3 transition-all hover:shadow-md hover:scale-[1.01] active:scale-[0.99]"
+            onClick={(e) => {
+                if (disabled) return;
+                const target = e.target as HTMLElement;
+                if (!target.closest('button')) {
+                    onLoad();
+                }
+            }}
+        >
+            <div className="flex items-start gap-2">
+                <FileText className="mt-0.5 h-4 w-4 flex-shrink-0 text-muted-foreground" />
+                
+                <div className="min-w-0 flex-1">
+                    <p
+                        id={`history-entry-headline-${entry.id}`}
+                        className="truncate text-sm font-medium text-foreground"
+                    >
+                        {headline}
+                    </p>
+                    <div
+                        id={`history-entry-metadata-${entry.id}`}
+                        className="mt-0.5 flex flex-wrap items-center gap-1 text-xs text-muted-foreground"
+                    >
+                        <Clock className="h-3 w-3" />
+                        <span>{formatDate(entry.createdAt)}</span>
+                        <span className="text-muted-foreground/50">•</span>
+                        <span className="uppercase tracking-wide">{logTypeLabel}</span>
+                        <span className="text-muted-foreground/50">•</span>
+                        <span>{entry.fieldCount ?? 0} fields</span>
                     </div>
+                </div>
+
+                <div className="flex items-center gap-1">
                     <Button
+                        id={`history-entry-star-${entry.id}`}
                         variant="ghost"
                         size="sm"
-                        onClick={onToggleSave}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onToggleSave();
+                        }}
                         className="h-8 w-8 p-0"
                         disabled={disabled}
+                        aria-label={entry.isSaved ? 'Unsave entry' : 'Save entry'}
                     >
                         <Star
                             className={`h-4 w-4 ${entry.isSaved ? 'fill-yellow-400 text-yellow-400' : 'text-gray-400'}`}
                         />
                     </Button>
-                </div>
-            </CardHeader>
-
-            <CardContent className="pb-2">
-                <div className="flex items-start gap-2">
-                    <FileText className="mt-0.5 h-4 w-4 flex-shrink-0 text-muted-foreground" />
-                    <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium text-foreground">
-                            {headline}
-                        </p>
-                        <p className="mt-1 text-xs tracking-wide text-muted-foreground uppercase">
-                            {logTypeLabel} • {entry.fieldCount ?? 0} fields
-                        </p>
-                    </div>
-                </div>
-            </CardContent>
-
-            <CardFooter className="pt-2">
-                <div className="flex w-full gap-2">
                     <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={onLoad}
-                        disabled={disabled}
-                        className="flex-1"
-                    >
-                        Load
-                    </Button>
-                    <Button
+                        id={`history-entry-copy-${entry.id}`}
                         variant="ghost"
                         size="sm"
-                        onClick={handleCopy}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleCopy();
+                        }}
+                        className="h-8 w-8 p-0"
                         disabled={disabled}
-                        className="px-3"
+                        aria-label="Copy entry"
                     >
-                        Copy
+                        <Copy className="h-4 w-4" />
                     </Button>
                     <Button
+                        id={`history-entry-delete-${entry.id}`}
                         variant="ghost"
                         size="sm"
-                        onClick={onDelete}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onDelete();
+                        }}
+                        className="h-8 w-8 p-0 text-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/20"
                         disabled={disabled}
-                        className="px-3 text-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/20"
+                        aria-label="Delete entry"
                     >
                         <Trash2 className="h-4 w-4" />
                     </Button>
                 </div>
-            </CardFooter>
+            </div>
         </Card>
     );
 }
