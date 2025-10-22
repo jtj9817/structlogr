@@ -115,7 +115,8 @@ class LogFormatterService
                     'model' => $llmModel,
                     'attempt' => $attempt,
                     'detected_log_type' => $structured['detected_log_type'] ?? 'unknown',
-                    'sections_count' => count($structured['sections'] ?? []),
+                    'failed_tests_count' => count($structured['failed_tests'] ?? []),
+                    'passed_tests_count' => count($structured['passed_tests'] ?? []),
                 ]);
 
                 return $structured;
