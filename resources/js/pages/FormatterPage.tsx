@@ -195,6 +195,13 @@ export default function FormatterPage({
     const formatButtonId = 'formatter-format-button';
     const formatButtonTestId = 'test-formatter-format';
 
+    const modelDisplayId = 'formatter-model-display';
+    const modelLabelId = 'formatter-model-label';
+    const sampleLogsContainerId = 'formatter-sample-logs-container';
+    const textareaContainerRelativeId = 'formatter-textarea-container-relative';
+    const buttonsContainerId = 'formatter-buttons-container';
+    const modelTimerContainerId = 'formatter-model-timer-container';
+
     const headerId = 'app-header';
     const mainNavId = 'main-navigation';
     const mainContentId = 'main-content';
@@ -220,7 +227,6 @@ export default function FormatterPage({
     const sampleLogsOptionDefaultId = 'sample-logs-option-default';
     const textareaWrapperId = 'textarea-wrapper';
     const statsCounterId = 'stats-counter';
-    const modelInfoId = 'model-info';
     const formattingTimerId = 'formatting-timer';
     const formattingCompletedId = 'formatting-completed';
     const outputPreviewDescId = 'output-preview-description';
@@ -248,6 +254,7 @@ export default function FormatterPage({
     const outputCardContentId = 'output-card-content';
     const errorAlertId = 'error-alert';
     const formatterDescriptionId = 'formatter-description';
+    const readyStatusId = 'formatter-ready-status';
     const [historyOpen, setHistoryOpen] = useState(false);
     const [preferencesOpen, setPreferencesOpen] = useState(false);
     const [settingsOpen, setSettingsOpen] = useState(false);
@@ -697,7 +704,7 @@ export default function FormatterPage({
                                             aria-label="Log formatting form"
                                         >
                                             {/* Sample Logs Dropdown */}
-                                            <div className="space-y-2">
+                                            <div id={sampleLogsContainerId} className="space-y-2">
                                                 <label
                                                     id={sampleLogsLabelId}
                                                     htmlFor={sampleLogsSelectId}
@@ -736,7 +743,7 @@ export default function FormatterPage({
 
                                             {/* Textarea with Clear Button */}
                                             <div id={textareaWrapperId} className="flex min-h-0 flex-1 flex-col gap-3">
-                                                <div className="relative flex min-h-0 flex-1">
+                                                <div id={textareaContainerRelativeId} className="relative flex min-h-0 flex-1">
                                                     <Textarea
                                                         ref={textareaRef}
                                                         id={rawLogTextareaId}
@@ -778,7 +785,7 @@ export default function FormatterPage({
                                                         characters •{' '}
                                                         {getLineCount()} lines
                                                     </span>
-                                                    <span>
+                                                    <span id={readyStatusId}>
                                                         {getCharacterCount() > 0
                                                             ? '✓ Ready to format'
                                                             : 'Enter log text to format'}
@@ -801,11 +808,11 @@ export default function FormatterPage({
                                                 )}
                                             </div>
 
-                                            <div className="mt-auto flex flex-col gap-3">
+                                            <div id={buttonsContainerId} className="mt-auto flex flex-col gap-3">
                                                 <div className="flex flex-col gap-2">
-                                                    <div id={modelInfoId} className="flex items-center justify-between">
-                                                        <span className="text-xs font-bold text-muted-foreground">
-                                                            Model: {preferences.llmModel}
+                                                    <div id={modelTimerContainerId} className="flex items-center justify-between">
+                                                        <span id={modelLabelId} className="text-xs font-bold text-muted-foreground">
+                                                            Model: <span id={modelDisplayId}>{preferences.llmModel}</span>
                                                         </span>
                                                         {formattingDuration !== null && !processing && (
                                                             <span id={formattingCompletedId} className="text-xs text-emerald-600 dark:text-emerald-400">
