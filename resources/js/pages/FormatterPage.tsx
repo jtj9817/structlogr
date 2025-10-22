@@ -214,6 +214,40 @@ export default function FormatterPage({
     const inputCardId = 'input-card';
     const outputCardId = 'output-card';
     const footerId = 'app-footer';
+    const heroSectionId = 'hero-section';
+    const formatterSectionId = 'formatter-section';
+    const sampleLogsLabelId = 'sample-logs-label';
+    const sampleLogsOptionDefaultId = 'sample-logs-option-default';
+    const textareaWrapperId = 'textarea-wrapper';
+    const statsCounterId = 'stats-counter';
+    const modelInfoId = 'model-info';
+    const formattingTimerId = 'formatting-timer';
+    const formattingCompletedId = 'formatting-completed';
+    const outputPreviewDescId = 'output-preview-description';
+    const outputToolbarId = 'output-toolbar';
+    const outputContentWrapperId = 'output-content-wrapper';
+    const copyOutputButtonId = 'copy-output-button';
+    const viewFullOutputButtonId = 'view-full-output-button';
+    const footerTextId = 'footer-text';
+    const processingStatusId = 'processing-status';
+    const outputModalId = 'output-modal';
+    const outputModalTitleId = 'output-modal-title';
+    const outputModalDescId = 'output-modal-description';
+    const outputModalScrollAreaId = 'output-modal-scroll-area';
+    const outputModalPreId = 'output-modal-pre';
+    const outputModalEmptyId = 'output-modal-empty';
+    const outputModalFooterId = 'output-modal-footer';
+    const outputModalCloseButtonId = 'output-modal-close-button';
+    const outputModalCopyButtonId = 'output-modal-copy-button';
+    const inputCardHeaderId = 'input-card-header';
+    const inputCardTitleId = 'input-card-title';
+    const inputCardContentId = 'input-card-content';
+    const outputCardHeaderId = 'output-card-header';
+    const outputCardTitleId = 'output-card-title';
+    const outputCardSubtitleId = 'output-card-subtitle';
+    const outputCardContentId = 'output-card-content';
+    const errorAlertId = 'error-alert';
+    const formatterDescriptionId = 'formatter-description';
     const [historyOpen, setHistoryOpen] = useState(false);
     const [preferencesOpen, setPreferencesOpen] = useState(false);
     const [settingsOpen, setSettingsOpen] = useState(false);
@@ -498,6 +532,7 @@ export default function FormatterPage({
         if (processing) {
             return (
                 <div
+                    id={processingStatusId}
                     className="flex min-h-[200px] items-center justify-center gap-3 py-12"
                     role="status"
                     aria-live="polite"
@@ -622,10 +657,12 @@ export default function FormatterPage({
                         {statusMessage}
                     </div>
 
-                    <HeroSection />
+                    <div id={heroSectionId}>
+                        <HeroSection />
+                    </div>
 
                     <section
-                        id="formatter"
+                        id={formatterSectionId}
                         ref={formRef}
                         className="container mx-auto flex min-h-[90vh] flex-col px-4 py-8 sm:px-6 lg:px-8"
                         aria-labelledby={formatterHeadingId}
@@ -638,7 +675,7 @@ export default function FormatterPage({
                                 >
                                     Log Formatter
                                 </h2>
-                                <p className="text-lg leading-relaxed text-muted-foreground">
+                                <p id={formatterDescriptionId} className="text-lg leading-relaxed text-muted-foreground">
                                     Transform raw log text into structured JSON
                                     with a single request.
                                 </p>
@@ -649,10 +686,10 @@ export default function FormatterPage({
                                     id={inputCardId}
                                     className="flex h-full flex-col shadow-sm transition-shadow hover:shadow-md"
                                 >
-                                    <CardHeader>
-                                        <CardTitle>Raw Log Input</CardTitle>
+                                    <CardHeader id={inputCardHeaderId}>
+                                        <CardTitle id={inputCardTitleId}>Raw Log Input</CardTitle>
                                     </CardHeader>
-                                    <CardContent className="flex flex-1 flex-col gap-6 overflow-hidden">
+                                    <CardContent id={inputCardContentId} className="flex flex-1 flex-col gap-6 overflow-hidden">
                                         <form
                                             id={formId}
                                             onSubmit={submit}
@@ -662,6 +699,7 @@ export default function FormatterPage({
                                             {/* Sample Logs Dropdown */}
                                             <div className="space-y-2">
                                                 <label
+                                                    id={sampleLogsLabelId}
                                                     htmlFor={sampleLogsSelectId}
                                                     className="text-sm font-medium"
                                                 >
@@ -681,7 +719,7 @@ export default function FormatterPage({
                                                     defaultValue=""
                                                     aria-label="Select a sample log to load"
                                                 >
-                                                    <option value="">
+                                                    <option id={sampleLogsOptionDefaultId} value="">
                                                         Select a sample log
                                                         type...
                                                     </option>
@@ -697,7 +735,7 @@ export default function FormatterPage({
                                             </div>
 
                                             {/* Textarea with Clear Button */}
-                                            <div className="flex min-h-0 flex-1 flex-col gap-3">
+                                            <div id={textareaWrapperId} className="flex min-h-0 flex-1 flex-col gap-3">
                                                 <div className="relative flex min-h-0 flex-1">
                                                     <Textarea
                                                         ref={textareaRef}
@@ -734,8 +772,8 @@ export default function FormatterPage({
                                                 </div>
 
                                                 {/* Character and Line Counter */}
-                                                <div id={characterCounterId} className="flex justify-between text-xs text-muted-foreground">
-                                                    <span id={lineCounterId}>
+                                                <div id={statsCounterId} className="flex justify-between text-xs text-muted-foreground">
+                                                    <span id={characterCounterId}>
                                                         {getCharacterCount()}{' '}
                                                         characters •{' '}
                                                         {getLineCount()} lines
@@ -749,6 +787,7 @@ export default function FormatterPage({
 
                                                 {errors.raw_log && (
                                                     <div
+                                                        id={errorAlertId}
                                                         role="alert"
                                                         aria-live="assertive"
                                                         className="mt-2"
@@ -764,17 +803,17 @@ export default function FormatterPage({
 
                                             <div className="mt-auto flex flex-col gap-3">
                                                 <div className="flex flex-col gap-2">
-                                                    <div className="flex items-center justify-between">
+                                                    <div id={modelInfoId} className="flex items-center justify-between">
                                                         <span className="text-xs font-bold text-muted-foreground">
                                                             Model: {preferences.llmModel}
                                                         </span>
                                                         {formattingDuration !== null && !processing && (
-                                                            <span className="text-xs text-emerald-600 dark:text-emerald-400">
+                                                            <span id={formattingCompletedId} className="text-xs text-emerald-600 dark:text-emerald-400">
                                                                 ✓ Completed in {(formattingDuration / 1000).toFixed(2)}s
                                                             </span>
                                                         )}
                                                         {timerRunning && processing && (
-                                                            <span className="text-xs text-muted-foreground">
+                                                            <span id={formattingTimerId} className="text-xs text-muted-foreground">
                                                                 {(elapsedTime / 1000).toFixed(2)}s
                                                             </span>
                                                         )}
@@ -813,17 +852,18 @@ export default function FormatterPage({
                                             'animate-in fade-in slide-in-from-right-4',
                                     )}
                                 >
-                                    <CardHeader className="flex flex-col gap-2 text-left">
+                                    <CardHeader id={outputCardHeaderId} className="flex flex-col gap-2 text-left">
                                         <div>
-                                            <CardTitle>Converted Log</CardTitle>
-                                            <p className="text-sm text-muted-foreground">
+                                            <CardTitle id={outputCardTitleId}>Converted Log</CardTitle>
+                                            <p id={outputCardSubtitleId} className="text-sm text-muted-foreground">
                                                 Structured output preview
                                             </p>
                                         </div>
                                     </CardHeader>
-                                    <CardContent className="flex flex-1 flex-col gap-4 overflow-hidden">
+                                    <CardContent id={outputCardContentId} className="flex flex-1 flex-col gap-4 overflow-hidden">
                                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                             <p
+                                                id={outputPreviewDescId}
                                                 className="text-sm text-muted-foreground"
                                                 aria-live="polite"
                                             >
@@ -838,8 +878,9 @@ export default function FormatterPage({
                                             aria-busy={processing}
                                             className="flex-1 min-h-0 overflow-auto rounded-lg border border-border/40 bg-background/80 text-sm leading-6"
                                         >
-                                            <div className="sticky top-0 z-10 flex justify-end gap-2 bg-background/95 px-4 py-3 shadow-sm backdrop-blur">
+                                            <div id={outputToolbarId} className="sticky top-0 z-10 flex justify-end gap-2 bg-background/95 px-4 py-3 shadow-sm backdrop-blur">
                                                 <Button
+                                                    id={copyOutputButtonId}
                                                     type="button"
                                                     variant={
                                                         copyStatus === 'error'
@@ -871,6 +912,7 @@ export default function FormatterPage({
                                                     )}
                                                 </Button>
                                                 <Button
+                                                    id={viewFullOutputButtonId}
                                                     type="button"
                                                     variant="outline"
                                                     size="sm"
@@ -885,7 +927,7 @@ export default function FormatterPage({
                                                     View Full Output
                                                 </Button>
                                             </div>
-                                            <div className="px-4 pb-4">
+                                            <div id={outputContentWrapperId} className="px-4 pb-4">
                                                 {renderOutputContent()}
                                             </div>
                                         </div>
@@ -898,7 +940,7 @@ export default function FormatterPage({
 
                 <footer id={footerId} className="border-t py-6">
                     <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-                        <p>Powered by Laravel + React + Prism</p>
+                        <p id={footerTextId}>Powered by Laravel + React + Prism</p>
                     </div>
                 </footer>
             </div>
@@ -946,31 +988,33 @@ export default function FormatterPage({
                 open={isOutputModalOpen}
                 onOpenChange={setOutputModalOpen}
             >
-                <DialogContent className="max-w-3xl">
+                <DialogContent id={outputModalId} className="max-w-3xl">
                     <DialogHeader>
-                        <DialogTitle>Formatted JSON Output</DialogTitle>
-                        <DialogDescription>
+                        <DialogTitle id={outputModalTitleId}>Formatted JSON Output</DialogTitle>
+                        <DialogDescription id={outputModalDescId}>
                             Review the full transformed log and copy it for your
                             workflow.
                         </DialogDescription>
                     </DialogHeader>
-                    <ScrollArea className="max-h-[70vh] rounded-md border border-border/40">
+                    <ScrollArea id={outputModalScrollAreaId} className="max-h-[70vh] rounded-md border border-border/40">
                         {formattedOutput ? (
                             <pre
+                                id={outputModalPreId}
                                 className="whitespace-pre-wrap p-4 text-sm leading-6"
                                 dangerouslySetInnerHTML={{
                                     __html: highlightedOutput,
                                 }}
                             />
                         ) : (
-                            <div className="p-4 text-sm text-muted-foreground">
+                            <div id={outputModalEmptyId} className="p-4 text-sm text-muted-foreground">
                                 No formatted output is available yet. Run the
                                 formatter to generate a preview.
                             </div>
                         )}
                     </ScrollArea>
-                    <DialogFooter className="gap-2">
+                    <DialogFooter id={outputModalFooterId} className="gap-2">
                         <Button
+                            id={outputModalCloseButtonId}
                             type="button"
                             variant="outline"
                             onClick={() => setOutputModalOpen(false)}
@@ -978,6 +1022,7 @@ export default function FormatterPage({
                             Close
                         </Button>
                         <Button
+                            id={outputModalCopyButtonId}
                             type="button"
                             variant={
                                 copyStatus === 'error' ? 'destructive' : 'default'
