@@ -92,8 +92,8 @@ class LogFormatterService
                 $structured = $response->structured;
 
                 \Log::debug('Structured output extracted', [
-                    'has_data' => !empty($structured),
-                    'keys' => !empty($structured) ? array_keys($structured) : [],
+                    'has_data' => ! empty($structured),
+                    'keys' => ! empty($structured) ? array_keys($structured) : [],
                 ]);
 
                 if (empty($structured)) {
@@ -145,7 +145,7 @@ class LogFormatterService
                 }
 
                 $backoffSeconds = pow(2, $attempt);
-                \Log::info("Retrying after backoff", ['backoff_seconds' => $backoffSeconds]);
+                \Log::info('Retrying after backoff', ['backoff_seconds' => $backoffSeconds]);
                 sleep($backoffSeconds);
 
             } catch (\Exception $e) {
@@ -168,7 +168,7 @@ class LogFormatterService
                 }
 
                 $backoffSeconds = pow(2, $attempt);
-                \Log::info("Retrying after backoff", ['backoff_seconds' => $backoffSeconds]);
+                \Log::info('Retrying after backoff', ['backoff_seconds' => $backoffSeconds]);
                 sleep($backoffSeconds);
             }
         }
@@ -292,7 +292,7 @@ PROMPT;
     private function configureGLM($builder, ObjectSchema $schema, string $model): void
     {
         $openRouterModel = $this->mapGLMModelId($model);
-        
+
         \Log::debug('Configuring GLM provider', [
             'provider' => 'OpenRouter',
             'internal_alias' => $model,
@@ -721,6 +721,7 @@ PROMPT;
         }
 
         \Log::debug('Preferences applied successfully');
+
         return $formattedLog;
     }
 
