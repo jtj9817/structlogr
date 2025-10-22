@@ -105,6 +105,27 @@ class LogFormatterService
                 $this->validateStructuredOutput($structured);
                 \Log::info('Structured output validated successfully');
 
+                $title = $structured['title'] ?? null;
+                if (! $title || strlen($title) < 5) {
+                    $summary = data_get($structured, 'results_summary.test_suite');
+                    if (! $summary) {
+                        $logType = data_get($structured, 'detected_log_type', 'unknown');
+                        $status = data_get($structured, 'results_summary.status', 'INFO');
+                        $summary = ucfirst($logType).' - '.$status;
+                    }
+
+                    if ($summary && strlen($summary) > 0) {
+                        $title = Str::limit($summary, 47, '...');
+                    } else {
+                        $title = 'Untitled Log Entry';
+                    }
+                    \Log::warning('LogFormatterService: Missing or invalid title, using fallback', [
+                        'provided_title' => $structured['title'] ?? null,
+                        'fallback_used' => $title,
+                    ]);
+                }
+                $structured['title'] = $title;
+
                 if ($preferences) {
                     \Log::info('Applying preferences to formatted log', ['preferences' => $preferences]);
                     $structured = $this->applyPreferences($structured, $preferences);
@@ -194,14 +215,16 @@ class LogFormatterService
         }
 
         $detectedType = data_get($formattedLog, 'detected_log_type');
+        $title = data_get($formattedLog, 'title');
         $fieldCount = is_array($formattedLog) ? count($formattedLog) : 0;
 
         return FormattedLog::create([
             'user_id' => $user->id,
             'raw_log' => $rawLog,
             'formatted_log' => $formattedLog,
-            'summary' => Str::limit($summary, 255),
             'detected_log_type' => $detectedType,
+            'title' => $title,
+            'summary' => Str::limit($summary, 255),
             'field_count' => $fieldCount,
         ]);
     }
@@ -350,6 +373,12 @@ PROMPT;
                     'type' => 'string',
                     'enum' => ['test_runner', 'application_error', 'http_access', 'build_pipeline', 'database', 'security_event', 'system_metrics', 'general'],
                 ],
+                'title' => [
+                    'type' => 'string',
+                    'description' => 'A concise, descriptive title for this log entry (5-50 characters). Should capture the key action or event. Examples: "Failed Login Attempt", "Database Connection Error", "User Registration Completed"',
+                    'minLength' => 5,
+                    'maxLength' => 50,
+                ],
                 'results_summary' => [
                     'type' => 'object',
                     'properties' => [
@@ -449,7 +478,7 @@ PROMPT;
                     ],
                 ],
             ],
-            'required' => ['detected_log_type', 'results_summary'],
+            'required' => ['detected_log_type', 'title', 'results_summary'],
             'additionalProperties' => false,
         ];
     }
@@ -462,6 +491,10 @@ PROMPT;
                 'detected_log_type' => [
                     'type' => 'STRING',
                     'enum' => ['test_runner', 'application_error', 'http_access', 'build_pipeline', 'database', 'security_event', 'system_metrics', 'general'],
+                ],
+                'title' => [
+                    'type' => 'STRING',
+                    'description' => 'A concise, descriptive title for this log entry (5-50 characters). Should capture the key action or event. Examples: "Failed Login Attempt", "Database Connection Error", "User Registration Completed"',
                 ],
                 'results_summary' => [
                     'type' => 'OBJECT',
@@ -562,8 +595,8 @@ PROMPT;
                     ],
                 ],
             ],
-            'required' => ['detected_log_type', 'results_summary'],
-            'propertyOrdering' => ['detected_log_type', 'results_summary', 'failed_tests', 'passed_tests', 'errors', 'http_requests', 'build_steps'],
+            'required' => ['detected_log_type', 'title', 'results_summary'],
+            'propertyOrdering' => ['detected_log_type', 'title', 'results_summary', 'failed_tests', 'passed_tests', 'errors', 'http_requests', 'build_steps'],
         ];
     }
 
@@ -577,6 +610,13 @@ PROMPT;
                     'detected_log_type',
                     'Category of the log',
                     ['test_runner', 'application_error', 'http_access', 'build_pipeline', 'database', 'security_event', 'system_metrics', 'general']
+                ),
+                new StringSchema(
+                    'title',
+                    'A concise, descriptive title for this log entry (5-50 characters). Should capture the key action or event. Examples: "Failed Login Attempt", "Database Connection Error", "User Registration Completed"',
+                    false,
+                    5,
+                    50
                 ),
                 new ObjectSchema(
                     'results_summary',
@@ -694,7 +734,7 @@ PROMPT;
                     true
                 ),
             ],
-            ['detected_log_type', 'results_summary'],
+            ['detected_log_type', 'title', 'results_summary'],
             true
         );
     }

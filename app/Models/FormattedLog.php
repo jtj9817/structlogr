@@ -14,8 +14,9 @@ class FormattedLog extends Model
         'user_id',
         'raw_log',
         'formatted_log',
-        'summary',
         'detected_log_type',
+        'title',
+        'summary',
         'field_count',
         'is_saved',
     ];
