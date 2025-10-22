@@ -2,6 +2,7 @@ import type { FormattingPreferences } from '@/types/preferences';
 import { useEffect, useState } from 'react';
 
 const PREFERENCES_KEY = 'formatting-preferences';
+const PREFERENCES_CHANGE_EVENT = 'preferences-changed';
 
 const defaultPreferences: FormattingPreferences = {
     includeMetadata: true,
@@ -15,6 +16,7 @@ const defaultPreferences: FormattingPreferences = {
 export function usePreferences() {
     const [preferences, setPreferences] =
         useState<FormattingPreferences>(defaultPreferences);
+    const [isInitialized, setIsInitialized] = useState(false);
 
     // Load preferences from localStorage on mount
     useEffect(() => {
@@ -26,17 +28,50 @@ export function usePreferences() {
             }
         } catch (error) {
             console.error('Failed to load preferences:', error);
+        } finally {
+            setIsInitialized(true);
         }
     }, []);
 
-    // Save preferences to localStorage whenever they change
+    // Listen for preference changes from other components
     useEffect(() => {
+        const handlePreferencesChange = () => {
+            try {
+                const stored = localStorage.getItem(PREFERENCES_KEY);
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    const newPreferences = { ...defaultPreferences, ...parsed };
+                    
+                    // Only update if preferences actually changed to prevent infinite loops
+                    if (JSON.stringify(newPreferences) !== JSON.stringify(preferences)) {
+                        setPreferences(newPreferences);
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to load preferences on change:', error);
+            }
+        };
+
+        window.addEventListener(PREFERENCES_CHANGE_EVENT, handlePreferencesChange);
+
+        return () => {
+            window.removeEventListener(PREFERENCES_CHANGE_EVENT, handlePreferencesChange);
+        };
+    }, [preferences]);
+
+    // Save preferences to localStorage whenever they change (skip initial load)
+    useEffect(() => {
+        if (!isInitialized) {
+            return;
+        }
+
         try {
             localStorage.setItem(PREFERENCES_KEY, JSON.stringify(preferences));
+            window.dispatchEvent(new Event(PREFERENCES_CHANGE_EVENT));
         } catch (error) {
             console.error('Failed to save preferences:', error);
         }
-    }, [preferences]);
+    }, [preferences, isInitialized]);
 
     const updatePreference = <K extends keyof FormattingPreferences>(
         key: K,
