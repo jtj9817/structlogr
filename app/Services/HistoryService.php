@@ -25,6 +25,7 @@ class HistoryService
         $transform = fn (FormattedLog $entry) => [
             'id' => $entry->id,
             'summary' => $entry->summary,
+            'title' => $entry->title,
             'preview' => Str::of($entry->raw_log ?? '')
                 ->replace(["\r\n", "\r", "\n"], ' ')
                 ->squish()

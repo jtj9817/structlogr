@@ -105,6 +105,7 @@ class LogFormatterService
                 $this->validateStructuredOutput($structured);
                 \Log::info('Structured output validated successfully');
 
+                // Extract title for database storage
                 $title = $structured['title'] ?? null;
                 if (! $title || strlen($title) < 5) {
                     $summary = data_get($structured, 'results_summary.test_suite');
@@ -124,7 +125,9 @@ class LogFormatterService
                         'fallback_used' => $title,
                     ]);
                 }
-                $structured['title'] = $title;
+
+                // Remove title from structured output (will be stored in dedicated column)
+                unset($structured['title']);
 
                 if ($preferences) {
                     \Log::info('Applying preferences to formatted log', ['preferences' => $preferences]);
@@ -138,9 +141,13 @@ class LogFormatterService
                     'detected_log_type' => $structured['detected_log_type'] ?? 'unknown',
                     'failed_tests_count' => count($structured['failed_tests'] ?? []),
                     'passed_tests_count' => count($structured['passed_tests'] ?? []),
+                    'title' => $title,
                 ]);
 
-                return $structured;
+                return [
+                    'structured' => $structured,
+                    'title' => $title,
+                ];
 
             } catch (PrismException $e) {
                 $attempt++;
@@ -201,7 +208,7 @@ class LogFormatterService
         throw new \Exception('Unexpected error: exceeded retry loop');
     }
 
-    public function saveLog(string $rawLog, array $formattedLog, ?User $user = null): ?FormattedLog
+    public function saveLog(string $rawLog, array $formattedLog, string $title, ?User $user = null): ?FormattedLog
     {
         if (! $user) {
             return null;
@@ -215,7 +222,6 @@ class LogFormatterService
         }
 
         $detectedType = data_get($formattedLog, 'detected_log_type');
-        $title = data_get($formattedLog, 'title');
         $fieldCount = is_array($formattedLog) ? count($formattedLog) : 0;
 
         return FormattedLog::create([

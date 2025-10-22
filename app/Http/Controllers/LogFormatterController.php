@@ -38,12 +38,12 @@ class LogFormatterController extends Controller
         $preferences = $validated['preferences'] ?? null;
 
         try {
-            $formattedLog = $logFormatterService->format($rawLog, $llmModel, $preferences);
-            $logFormatterService->saveLog($rawLog, $formattedLog, $request->user());
+            $result = $logFormatterService->format($rawLog, $llmModel, $preferences);
+            $logFormatterService->saveLog($rawLog, $result['structured'], $result['title'], $request->user());
 
             return redirect()
                 ->route('formatter.show')
-                ->with('formattedLog', $formattedLog)
+                ->with('formattedLog', $result['structured'])
                 ->with('success', 'Log formatted successfully!');
         } catch (\InvalidArgumentException $e) {
             return back()->withErrors([
