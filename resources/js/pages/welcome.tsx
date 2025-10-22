@@ -1,4 +1,5 @@
-import { dashboard, login, register } from '@/routes';
+import { login, register } from '@/routes';
+import formatter from '@/routes/formatter';
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 
@@ -20,10 +21,10 @@ export default function Welcome() {
                     <nav className="flex items-center gap-4">
                         {auth.user ? (
                             <Link
-                                href={dashboard()}
+                                href={formatter.show()}
                                 className="rounded-full border border-[#285669] px-4 py-1.5 text-[#c6bfbb] transition hover:bg-[#012c3c]"
                             >
-                                Dashboard
+                                Log Formatter
                             </Link>
                         ) : (
                             <>
