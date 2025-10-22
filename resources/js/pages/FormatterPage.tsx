@@ -730,19 +730,6 @@ export default function FormatterPage({
                         aria-labelledby={formatterHeadingId}
                     >
                         <div className="mx-auto flex h-full max-w-6xl flex-1 flex-col gap-8">
-                            <div className="space-y-4 text-center">
-                                <h2
-                                    id={formatterHeadingId}
-                                    className="text-3xl leading-tight font-bold lg:text-4xl"
-                                >
-                                    Log Formatter
-                                </h2>
-                                <p id={formatterDescriptionId} className="text-lg leading-relaxed text-muted-foreground">
-                                    Transform raw log text into structured JSON
-                                    with a single request.
-                                </p>
-                            </div>
-
                             <div className="grid min-h-0 flex-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
                                 <Card
                                     id={inputCardId}
