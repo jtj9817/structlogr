@@ -185,6 +185,7 @@ export default function FormatterPage({
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const outputRef = useRef<HTMLPreElement>(null);
     const copyResetTimeoutRef = useRef<number | undefined>(undefined);
+    const inputCopyResetTimeoutRef = useRef<number | undefined>(undefined);
 
     const sampleLogsSelectId = 'formatter-sample-logs-select';
     const sampleLogsTestId = 'test-formatter-sample-logs';
@@ -244,6 +245,17 @@ export default function FormatterPage({
     const outputModalFooterId = 'output-modal-footer';
     const outputModalCloseButtonId = 'output-modal-close-button';
     const outputModalCopyButtonId = 'output-modal-copy-button';
+    const inputToolbarId = 'input-toolbar';
+    const viewFullInputButtonId = 'view-full-input-button';
+    const inputModalId = 'input-modal';
+    const inputModalTitleId = 'input-modal-title';
+    const inputModalDescId = 'input-modal-description';
+    const inputModalScrollAreaId = 'input-modal-scroll-area';
+    const inputModalPreId = 'input-modal-pre';
+    const inputModalEmptyId = 'input-modal-empty';
+    const inputModalFooterId = 'input-modal-footer';
+    const inputModalCloseButtonId = 'input-modal-close-button';
+    const inputModalCopyButtonId = 'input-modal-copy-button';
     const inputCardHeaderId = 'input-card-header';
     const inputCardTitleId = 'input-card-title';
     const inputCardContentId = 'input-card-content';
@@ -263,7 +275,11 @@ export default function FormatterPage({
     const [displayLog, setDisplayLog] = useState(formattedLog);
     const [outputAnimating, setOutputAnimating] = useState(false);
     const [isOutputModalOpen, setOutputModalOpen] = useState(false);
+    const [isInputModalOpen, setInputModalOpen] = useState(false);
     const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'error'>(
+        'idle',
+    );
+    const [inputCopyStatus, setInputCopyStatus] = useState<'idle' | 'copied' | 'error'>(
         'idle',
     );
     const { elapsedTime, isRunning: timerRunning, start: startTimer, stop: stopTimer, reset: resetTimer } = useFormattingTimer();
@@ -343,6 +359,33 @@ export default function FormatterPage({
         }
     }, [formattedOutput]);
 
+    const handleCopyInput = useCallback(async () => {
+        if (!data.raw_log) {
+            return;
+        }
+
+        try {
+            if (typeof navigator === 'undefined' || !navigator.clipboard) {
+                throw new Error('Clipboard API unavailable');
+            }
+
+            if (inputCopyResetTimeoutRef.current) {
+                window.clearTimeout(inputCopyResetTimeoutRef.current);
+            }
+
+            await navigator.clipboard.writeText(data.raw_log);
+            setInputCopyStatus('copied');
+        } catch (error) {
+            console.error('Unable to copy input text', error);
+            setInputCopyStatus('error');
+        } finally {
+            inputCopyResetTimeoutRef.current = window.setTimeout(() => {
+                setInputCopyStatus('idle');
+                inputCopyResetTimeoutRef.current = undefined;
+            }, 2000);
+        }
+    }, [data.raw_log]);
+
     useEffect(() => {
         setDisplayLog(formattedLog);
     }, [formattedLog]);
@@ -373,6 +416,9 @@ export default function FormatterPage({
             if (copyResetTimeoutRef.current) {
                 window.clearTimeout(copyResetTimeoutRef.current);
             }
+            if (inputCopyResetTimeoutRef.current) {
+                window.clearTimeout(inputCopyResetTimeoutRef.current);
+            }
         };
     }, []);
 
@@ -385,6 +431,16 @@ export default function FormatterPage({
             }
         }
     }, [isOutputModalOpen]);
+
+    useEffect(() => {
+        if (!isInputModalOpen) {
+            setInputCopyStatus('idle');
+            if (inputCopyResetTimeoutRef.current) {
+                window.clearTimeout(inputCopyResetTimeoutRef.current);
+                inputCopyResetTimeoutRef.current = undefined;
+            }
+        }
+    }, [isInputModalOpen]);
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -740,6 +796,23 @@ export default function FormatterPage({
                                                 </select>
                                             </div>
 
+                                            {/* Input Toolbar */}
+                                            <div id={inputToolbarId} className="flex justify-end">
+                                                <Button
+                                                    id={viewFullInputButtonId}
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => setInputModalOpen(true)}
+                                                    disabled={!data.raw_log.trim()}
+                                                    className="inline-flex items-center gap-2"
+                                                    aria-label="Open full input text in a modal dialog"
+                                                >
+                                                    <Maximize2 className="h-4 w-4" />
+                                                    View Full Input
+                                                </Button>
+                                            </div>
+
                                             {/* Textarea with Clear Button */}
                                             <div id={textareaWrapperId} className="flex min-h-0 flex-1 flex-col gap-3">
                                                 <div id={textareaContainerRelativeId} className="relative flex min-h-0 flex-1">
@@ -989,6 +1062,72 @@ export default function FormatterPage({
                 open={shortcutsOpen}
                 onOpenChange={setShortcutsOpen}
             />
+
+            <Dialog
+                open={isInputModalOpen}
+                onOpenChange={setInputModalOpen}
+            >
+                <DialogContent id={inputModalId} className="max-w-3xl">
+                    <DialogHeader>
+                        <DialogTitle id={inputModalTitleId}>Raw Log Input</DialogTitle>
+                        <DialogDescription id={inputModalDescId}>
+                            Review the full raw log text and copy it if needed.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <ScrollArea id={inputModalScrollAreaId} className="max-h-[70vh] rounded-md border border-border/40">
+                        {data.raw_log.trim() ? (
+                            <pre
+                                id={inputModalPreId}
+                                className="whitespace-pre-wrap p-4 text-sm leading-6"
+                            >
+                                {data.raw_log}
+                            </pre>
+                        ) : (
+                            <div id={inputModalEmptyId} className="p-4 text-sm text-muted-foreground">
+                                No input text is available yet. Enter log text to
+                                view it here.
+                            </div>
+                        )}
+                    </ScrollArea>
+                    <DialogFooter id={inputModalFooterId} className="gap-2">
+                        <Button
+                            id={inputModalCloseButtonId}
+                            type="button"
+                            variant="outline"
+                            onClick={() => setInputModalOpen(false)}
+                        >
+                            Close
+                        </Button>
+                        <Button
+                            id={inputModalCopyButtonId}
+                            type="button"
+                            variant={
+                                inputCopyStatus === 'error' ? 'destructive' : 'default'
+                            }
+                            onClick={handleCopyInput}
+                            disabled={!data.raw_log.trim()}
+                            aria-live="polite"
+                        >
+                            {inputCopyStatus === 'copied' ? (
+                                <>
+                                    <Check className="mr-2 h-4 w-4" />
+                                    Copied!
+                                </>
+                            ) : inputCopyStatus === 'error' ? (
+                                <>
+                                    <ClipboardCopy className="mr-2 h-4 w-4" />
+                                    Copy Failed
+                                </>
+                            ) : (
+                                <>
+                                    <ClipboardCopy className="mr-2 h-4 w-4" />
+                                    Copy to Clipboard
+                                </>
+                            )}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             <Dialog
                 open={isOutputModalOpen}
