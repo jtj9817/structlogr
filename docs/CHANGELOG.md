@@ -5,6 +5,177 @@ All notable changes to StructLogr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [October 22, 2025] - UI Refinements, Schema Simplification & Routing Cleanup
+
+### Added
+
+#### Documentation
+- **History Title Field Implementation Plan** (`docs/history-title-field-implementation.md`)
+  - Comprehensive 4-phase implementation guide for adding title field to formatted logs
+  - Database schema updates with migration strategy
+  - LLM schema modifications for title generation
+  - Frontend integration plan for History panel display
+  - 864-line detailed implementation document
+
+#### UI/UX Enhancements
+- **Full input view modal** with copy functionality
+  - View complete raw log input in modal dialog
+  - Copy-to-clipboard button for raw input
+  - Improved readability for long log entries
+  - Modal-based display with horizontal scroll support
+
+### Changed
+
+#### Frontend Improvements
+- **History panel layout optimized for space efficiency**
+  - Reduced card padding from `p-4` to `p-3`
+  - Decreased gap between cards from `gap-3` to `gap-2`
+  - Optimized header spacing and margins
+  - Improved timestamp and metadata layout
+  - More entries visible without scrolling
+- **Settings panel simplified**
+  - Removed 163 lines of advanced features
+  - Streamlined single-column layout
+  - Cleaner, more focused user experience
+- **Modal dialog improvements**
+  - Enhanced horizontal scrolling for wide content
+  - Improved mobile responsiveness
+  - Better width management on different screen sizes
+  - Fixed overflow handling in dialog content
+- **FormatterPage refinements**
+  - Removed redundant header elements
+  - Fixed output card resizing issues
+  - Replaced inline height styles with Tailwind classes
+  - Improved layout consistency
+
+#### Backend Updates
+- **LogFormatterService schema simplification**
+  - Streamlined schema structure (577 lines refactored)
+  - Simplified summary generation logic
+  - Updated success logging to reflect new schema
+  - Improved schema conversion for different LLM providers
+- **OpenRouter model identifier updates**
+  - Updated GLM model identifiers for accuracy
+  - Updated Kimi/Moonshot model references
+  - Better model selection and configuration
+- **Error handling simplification**
+  - Reduced redundant error handling in LogFormatterController
+  - Cleaner exception propagation
+  - Improved error response consistency
+
+#### Application Structure
+- **Dashboard page removed completely**
+  - Deleted `resources/js/pages/dashboard.tsx`
+  - Removed dashboard routes from `routes/web.php`
+  - Deleted `tests/Feature/DashboardTest.php`
+  - Simplified application navigation
+- **Authentication flow updated**
+  - All auth redirects now point to `/` (FormatterPage)
+  - Login redirect: `/` instead of `/dashboard`
+  - Registration redirect: `/` instead of `/dashboard`
+  - Email verification redirect: `/` instead of `/dashboard`
+  - Home redirect updated in Fortify config
+- **Routing cleanup**
+  - Main route (`/`) serves FormatterPage directly
+  - Removed dashboard-related routes
+  - Simplified route structure in `routes/web.php`
+  - Updated app sidebar navigation links
+- **Welcome page routing**
+  - Updated to use formatter route instead of dashboard
+  - Removed references to non-existent routes
+  - Cleaner navigation flow for guests
+
+### Fixed
+
+#### Critical Bug Fixes
+- **URL redirect bug after log formatting**
+  - Fixed incorrect redirect in LogFormatterController
+  - Updated Wayfinder route references
+  - Corrected formatter route type definitions
+  - Prevents unwanted navigation after successful formatting
+- **Vertical scrolling in History panel**
+  - Changed `overflow-y-scroll` to `overflow-y-auto`
+  - Improved scrollbar appearance on different browsers
+  - Better UX for short history lists
+- **Output card content-based resizing**
+  - Fixed card height to prevent dynamic resizing
+  - Consistent layout regardless of output length
+  - Improved visual stability during formatting
+
+#### Code Quality
+- **Linter fixes across codebase**
+  - Fixed ESLint violations in HistoryController actions
+  - Corrected import formatting in route files
+  - Removed unused imports from web.php
+  - Code style consistency improvements
+- **Logging statement formatting**
+  - Fixed spacing in LogFormatterService log statements
+  - Corrected string formatting for better readability
+  - Consistent log message structure
+
+### Technical Details
+
+#### Removed Files
+```
+resources/js/pages/dashboard.tsx (36 lines)
+tests/Feature/DashboardTest.php (15 lines)
+resources/js/routes/index.ts (74 lines) - consolidated into specific route files
+```
+
+#### Updated Route Structure
+**Before:**
+```php
+Route::get('/dashboard', function () {
+    return Inertia::render('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+```
+
+**After:**
+```php
+Route::get('/', [LogFormatterController::class, 'show'])->name('formatter.show');
+```
+
+#### Authentication Redirects Updated
+- `AuthenticatedSessionController`: `return redirect()->intended('/')` 
+- `RegisteredUserController`: `return redirect('/')`
+- `EmailVerificationPromptController`: `return redirect()->intended('/')`
+- `VerifyEmailController`: `return redirect()->intended('/')`
+- `EmailVerificationNotificationController`: `return back()`
+- `config/fortify.php`: `'home' => '/'`
+
+#### Component File Changes
+- `resources/js/components/app-sidebar.tsx`: Updated navigation links
+- `resources/js/components/formatter/history-entry-card.tsx`: Layout optimizations
+- `resources/js/components/formatter/history-sidebar.tsx`: Spacing improvements
+- `resources/js/components/settings-panel.tsx`: Advanced features removed
+- `resources/js/components/ui/dialog.tsx`: Mobile responsiveness fixes
+- `resources/js/pages/FormatterPage.tsx`: Multiple refinements and modal additions
+- `resources/js/pages/welcome.tsx`: Route reference updates
+
+#### Schema Refactoring Details
+- Simplified LLM prompt structure
+- Improved schema validation logic
+- Enhanced provider-specific schema conversion
+- Better handling of nullable fields
+- Optimized response parsing
+
+### Developer Experience
+
+- **Cleaner application structure** with dashboard removal
+- **Simplified routing** reduces cognitive overhead
+- **Better code organization** with consolidated route files
+- **Improved maintainability** through reduced complexity
+- **Enhanced documentation** with implementation plan for title field
+
+### Performance
+
+- **Faster navigation** with one less route to maintain
+- **Reduced bundle size** from removed dashboard and route files
+- **Improved history panel rendering** with optimized layouts
+- **Better modal performance** with proper overflow handling
+
+---
+
 ## [October 21, 2025] - Logging System, LLM Provider Expansion & Bug Fixes
 
 ### Added
