@@ -1054,7 +1054,7 @@ export default function FormatterPage({
                 open={isInputModalOpen}
                 onOpenChange={setInputModalOpen}
             >
-                <DialogContent id={inputModalId} className="max-w-3xl">
+                <DialogContent id={inputModalId} className="max-w-[min(80vw,1200px)] w-full">
                     <DialogHeader>
                         <DialogTitle id={inputModalTitleId}>Raw Log Input</DialogTitle>
                         <DialogDescription id={inputModalDescId}>
@@ -1062,19 +1062,21 @@ export default function FormatterPage({
                         </DialogDescription>
                     </DialogHeader>
                     <ScrollArea id={inputModalScrollAreaId} className="max-h-[70vh] rounded-md border border-border/40">
-                        {data.raw_log.trim() ? (
-                            <pre
-                                id={inputModalPreId}
-                                className="whitespace-pre-wrap p-4 text-sm leading-6"
-                            >
-                                {data.raw_log}
-                            </pre>
-                        ) : (
-                            <div id={inputModalEmptyId} className="p-4 text-sm text-muted-foreground">
-                                No input text is available yet. Enter log text to
-                                view it here.
-                            </div>
-                        )}
+                        <div className="overflow-x-auto">
+                            {data.raw_log.trim() ? (
+                                <pre
+                                    id={inputModalPreId}
+                                    className="whitespace-pre p-4 text-sm leading-6"
+                                >
+                                    {data.raw_log}
+                                </pre>
+                            ) : (
+                                <div id={inputModalEmptyId} className="p-4 text-sm text-muted-foreground">
+                                    No input text is available yet. Enter log text to
+                                    view it here.
+                                </div>
+                            )}
+                        </div>
                     </ScrollArea>
                     <DialogFooter id={inputModalFooterId} className="gap-2">
                         <Button
@@ -1120,7 +1122,7 @@ export default function FormatterPage({
                 open={isOutputModalOpen}
                 onOpenChange={setOutputModalOpen}
             >
-                <DialogContent id={outputModalId} className="max-w-3xl">
+                <DialogContent id={outputModalId} className="max-w-[min(80vw,1200px)] w-full">
                     <DialogHeader>
                         <DialogTitle id={outputModalTitleId}>Formatted JSON Output</DialogTitle>
                         <DialogDescription id={outputModalDescId}>
@@ -1129,20 +1131,22 @@ export default function FormatterPage({
                         </DialogDescription>
                     </DialogHeader>
                     <ScrollArea id={outputModalScrollAreaId} className="max-h-[70vh] rounded-md border border-border/40">
-                        {formattedOutput ? (
-                            <pre
-                                id={outputModalPreId}
-                                className="whitespace-pre-wrap p-4 text-sm leading-6"
-                                dangerouslySetInnerHTML={{
-                                    __html: highlightedOutput,
-                                }}
-                            />
-                        ) : (
-                            <div id={outputModalEmptyId} className="p-4 text-sm text-muted-foreground">
-                                No formatted output is available yet. Run the
-                                formatter to generate a preview.
-                            </div>
-                        )}
+                        <div className="overflow-x-auto">
+                            {formattedOutput ? (
+                                <pre
+                                    id={outputModalPreId}
+                                    className="whitespace-pre p-4 text-sm leading-6"
+                                    dangerouslySetInnerHTML={{
+                                        __html: highlightedOutput,
+                                    }}
+                                />
+                            ) : (
+                                <div id={outputModalEmptyId} className="p-4 text-sm text-muted-foreground">
+                                    No formatted output is available yet. Run the
+                                    formatter to generate a preview.
+                                </div>
+                            )}
+                        </div>
                     </ScrollArea>
                     <DialogFooter id={outputModalFooterId} className="gap-2">
                         <Button
