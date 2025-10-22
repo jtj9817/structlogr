@@ -27,15 +27,15 @@ export function useFormattingTimer(): UseFormattingTimerResult {
     }, []);
 
     const start = useCallback(() => {
-        if (isRunning) {
-            return;
+        if (animationFrameRef.current !== null) {
+            cancelAnimationFrame(animationFrameRef.current);
         }
 
         startTimeRef.current = performance.now();
         setIsRunning(true);
         setElapsedTime(0);
         animationFrameRef.current = requestAnimationFrame(updateElapsedTime);
-    }, [isRunning, updateElapsedTime]);
+    }, [updateElapsedTime]);
 
     const stop = useCallback((): number => {
         setIsRunning(false);
