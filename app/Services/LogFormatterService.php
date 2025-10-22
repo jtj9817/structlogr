@@ -54,8 +54,8 @@ class LogFormatterService
                     'deepseek-chat' => $this->configureDeepseek($prismBuilder),
                     'gemini-2.5-flash' => $this->configureGemini($prismBuilder, $schema),
                     'kimi-k2-turbo-preview' => $this->configureMoonshot($prismBuilder, $schema),
-                    'GLM-4.5-Air' => $this->configureGLM($prismBuilder, $schema, 'zhipuai/glm-4.5-air'),
-                    'GLM-4.6' => $this->configureGLM($prismBuilder, $schema, 'zhipuai/glm-4.6'),
+                    'GLM-4.5-Air' => $this->configureGLM($prismBuilder, $schema, 'z-ai/glm-4.5-air'),
+                    'GLM-4.6' => $this->configureGLM($prismBuilder, $schema, 'z-ai/glm-4.6'),
                     default => throw new \InvalidArgumentException("Unsupported LLM model: {$llmModel}"),
                 };
 
@@ -263,11 +263,11 @@ PROMPT;
     {
         \Log::debug('Configuring Moonshot provider', [
             'provider' => 'OpenRouter',
-            'model' => 'moonshot/kimi-k2-turbo-preview',
+            'model' => 'moonshotai/kimi-k2',
             'response_format' => 'json_schema',
         ]);
 
-        $builder->using(Provider::OpenRouter, 'moonshot/kimi-k2-turbo-preview')
+        $builder->using(Provider::OpenRouter, 'moonshotai/kimi-k2')
             ->withProviderOptions([
                 'response_format' => [
                     'type' => 'json_schema',
@@ -281,15 +281,18 @@ PROMPT;
 
     private function configureGLM($builder, ObjectSchema $schema, string $model): void
     {
+        $openRouterModel = $this->mapGLMModelId($model);
+        
         \Log::debug('Configuring GLM provider', [
             'provider' => 'OpenRouter',
-            'model' => $model,
+            'internal_alias' => $model,
+            'openrouter_model' => $openRouterModel,
             'response_format' => 'json_schema',
             'strict' => true,
             'thinking' => 'disabled',
         ]);
 
-        $builder->using(Provider::OpenRouter, $model)
+        $builder->using(Provider::OpenRouter, $openRouterModel)
             ->withProviderOptions([
                 'response_format' => [
                     'type' => 'json_schema',
@@ -755,5 +758,14 @@ PROMPT;
         }
 
         return $data;
+    }
+
+    private function mapGLMModelId(string $model): string
+    {
+        return match ($model) {
+            'zhipuai/glm-4.5-air', 'z-ai/glm-4.5-air' => 'z-ai/glm-4.5-air',
+            'zhipuai/glm-4.6', 'z-ai/glm-4.6' => 'z-ai/glm-4.6',
+            default => $model,
+        };
     }
 }
