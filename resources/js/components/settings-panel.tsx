@@ -55,53 +55,53 @@ export function SettingsPanel({ open, onOpenChange }: SettingsPanelProps) {
 
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
-            <SheetContent className="flex w-full flex-col overflow-y-auto sm:max-w-[720px]">
-                <SheetHeader>
-                    <SheetTitle className="flex items-center gap-2">
+            <SheetContent className="flex w-full flex-col overflow-y-auto p-6 sm:max-w-[640px]">
+                <SheetHeader className="border-b border-gray-200 pb-4 dark:border-gray-700">
+                    <SheetTitle className="flex items-center gap-2.5 text-xl">
                         <Settings className="h-5 w-5" />
                         Settings
                     </SheetTitle>
                 </SheetHeader>
 
-                <Tabs defaultValue="output" className="mt-6">
-                    <TabsList className="h-auto w-full flex-wrap gap-2">
+                <Tabs defaultValue="output" className="mt-8">
+                    <TabsList className="h-auto w-full gap-2 overflow-x-auto">
                         <TabsTrigger
                             value="output"
-                            className="flex-1 min-w-[140px] sm:flex-none"
+                            className="flex-1 min-w-[120px] px-6 py-2.5"
                         >
                             Output
                         </TabsTrigger>
                         <TabsTrigger
                             value="privacy"
-                            className="flex-1 min-w-[140px] sm:flex-none"
+                            className="flex-1 min-w-[120px] px-6 py-2.5"
                         >
                             Privacy
                         </TabsTrigger>
                         <TabsTrigger
                             value="display"
-                            className="flex-1 min-w-[140px] sm:flex-none"
+                            className="flex-1 min-w-[120px] px-6 py-2.5"
                         >
                             Display
                         </TabsTrigger>
                         <TabsTrigger
                             value="advanced"
-                            className="flex-1 min-w-[140px] sm:flex-none"
+                            className="flex-1 min-w-[120px] px-6 py-2.5"
                         >
                             Advanced
                         </TabsTrigger>
                     </TabsList>
 
-                    <TabsContent value="output" className="mt-6">
-                        <div className="flex flex-col gap-6">
-                            <h3 className="text-lg font-medium">
+                    <TabsContent value="output" className="mt-8">
+                        <div className="flex flex-col gap-8">
+                            <h3 className="text-lg font-semibold">
                                 Output Format
                             </h3>
 
-                            <div className="grid gap-4 lg:grid-cols-2">
+                            <div className="flex flex-col gap-6">
                                 {/* Default Output Format */}
-                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-4 dark:border-gray-700">
-                                    <div className="flex flex-col gap-2">
-                                        <Label htmlFor="output-format">
+                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-5 shadow-sm transition-colors hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600">
+                                    <div className="flex flex-col gap-2.5">
+                                        <Label htmlFor="output-format" className="font-medium">
                                             Default Output Format
                                         </Label>
                                         <Select
@@ -138,12 +138,12 @@ export function SettingsPanel({ open, onOpenChange }: SettingsPanelProps) {
                                 </section>
 
                                 {/* JSON Indentation */}
-                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-4 dark:border-gray-700">
+                                <section className="flex flex-col gap-4 rounded-lg border border-gray-200 p-5 shadow-sm transition-colors hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600">
                                     <Label className="font-medium">
                                         JSON Indentation
                                     </Label>
                                     <RadioGroup
-                                        className="grid gap-3 sm:grid-cols-3"
+                                        className="flex flex-wrap gap-4"
                                         value={settings.jsonIndentation.toString()}
                                         onValueChange={(value: string) => {
                                             if (value === 'tab') {
@@ -190,11 +190,11 @@ export function SettingsPanel({ open, onOpenChange }: SettingsPanelProps) {
                                 </section>
                             </div>
 
-                            <div className="grid gap-4 lg:grid-cols-2">
+                            <div className="flex flex-col gap-6">
                                 {/* Auto-copy Results */}
-                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-4 dark:border-gray-700 sm:flex-row sm:items-center sm:justify-between">
-                                    <div className="space-y-0.5">
-                                        <Label htmlFor="auto-copy">
+                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-5 shadow-sm transition-colors hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600 sm:flex-row sm:items-center sm:justify-between">
+                                    <div className="space-y-1.5">
+                                        <Label htmlFor="auto-copy" className="font-medium">
                                             Auto-copy Results
                                         </Label>
                                         <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -215,9 +215,9 @@ export function SettingsPanel({ open, onOpenChange }: SettingsPanelProps) {
                                 </section>
 
                                 {/* Show Line Numbers */}
-                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-4 dark:border-gray-700 sm:flex-row sm:items-center sm:justify-between">
-                                    <div className="space-y-0.5">
-                                        <Label htmlFor="show-line-numbers">
+                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-5 shadow-sm transition-colors hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600 sm:flex-row sm:items-center sm:justify-between">
+                                    <div className="space-y-1.5">
+                                        <Label htmlFor="show-line-numbers" className="font-medium">
                                             Show Line Numbers
                                         </Label>
                                         <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -239,17 +239,17 @@ export function SettingsPanel({ open, onOpenChange }: SettingsPanelProps) {
                         </div>
                     </TabsContent>
 
-                    <TabsContent value="privacy" className="mt-6">
-                        <div className="flex flex-col gap-6">
-                            <h3 className="text-lg font-medium">
+                    <TabsContent value="privacy" className="mt-8">
+                        <div className="flex flex-col gap-8">
+                            <h3 className="text-lg font-semibold">
                                 Privacy Settings
                             </h3>
 
-                            <div className="grid gap-4 lg:grid-cols-2">
+                            <div className="flex flex-col gap-6">
                                 {/* Save to History */}
-                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-4 dark:border-gray-700 sm:flex-row sm:items-center sm:justify-between">
-                                    <div className="space-y-0.5">
-                                        <Label htmlFor="save-history">
+                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-5 shadow-sm transition-colors hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600 sm:flex-row sm:items-center sm:justify-between">
+                                    <div className="space-y-1.5">
+                                        <Label htmlFor="save-history" className="font-medium">
                                             Save to History
                                         </Label>
                                         <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -270,9 +270,9 @@ export function SettingsPanel({ open, onOpenChange }: SettingsPanelProps) {
                                 </section>
 
                                 {/* Anonymous Analytics */}
-                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-4 dark:border-gray-700 sm:flex-row sm:items-center sm:justify-between">
-                                    <div className="space-y-0.5">
-                                        <Label htmlFor="analytics">
+                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-5 shadow-sm transition-colors hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600 sm:flex-row sm:items-center sm:justify-between">
+                                    <div className="space-y-1.5">
+                                        <Label htmlFor="analytics" className="font-medium">
                                             Anonymous Usage Analytics
                                         </Label>
                                         <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -293,9 +293,9 @@ export function SettingsPanel({ open, onOpenChange }: SettingsPanelProps) {
                                 </section>
 
                                 {/* Don't Store Sensitive Data */}
-                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-4 dark:border-gray-700 sm:flex-row sm:items-center sm:justify-between">
-                                    <div className="space-y-0.5">
-                                        <Label htmlFor="avoid-sensitive">
+                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-5 shadow-sm transition-colors hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600 sm:flex-row sm:items-center sm:justify-between">
+                                    <div className="space-y-1.5">
+                                        <Label htmlFor="avoid-sensitive" className="font-medium">
                                             Avoid Storing Sensitive Data
                                         </Label>
                                         <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -315,7 +315,7 @@ export function SettingsPanel({ open, onOpenChange }: SettingsPanelProps) {
                                     />
                                 </section>
 
-                                <section className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-900 dark:bg-blue-950/30 lg:col-span-2">
+                                <section className="rounded-lg border border-blue-200 bg-blue-50 p-5 dark:border-blue-900 dark:bg-blue-950/30">
                                     <h4 className="mb-2 font-medium text-blue-900 dark:text-blue-100">
                                         Privacy Notice
                                     </h4>
@@ -330,18 +330,18 @@ export function SettingsPanel({ open, onOpenChange }: SettingsPanelProps) {
                         </div>
                     </TabsContent>
 
-                    <TabsContent value="display" className="mt-6">
-                        <div className="flex flex-col gap-6">
-                            <h3 className="text-lg font-medium">
+                    <TabsContent value="display" className="mt-8">
+                        <div className="flex flex-col gap-8">
+                            <h3 className="text-lg font-semibold">
                                 Display Preferences
                             </h3>
 
-                            <div className="grid gap-4 lg:grid-cols-2">
+                            <div className="flex flex-col gap-6">
                                 {/* Theme */}
-                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-4 dark:border-gray-700 lg:col-span-2">
+                                <section className="flex flex-col gap-4 rounded-lg border border-gray-200 p-5 shadow-sm transition-colors hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600">
                                     <Label className="font-medium">Theme</Label>
                                     <RadioGroup
-                                        className="grid gap-3 sm:grid-cols-3"
+                                        className="flex flex-wrap gap-4"
                                         value={appearance}
                                         onValueChange={(
                                             value: 'light' | 'dark' | 'system',
@@ -393,9 +393,9 @@ export function SettingsPanel({ open, onOpenChange }: SettingsPanelProps) {
                                 </section>
 
                                 {/* Font Size */}
-                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-4 dark:border-gray-700">
-                                    <div className="flex flex-col gap-2">
-                                        <Label htmlFor="font-size">
+                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-5 shadow-sm transition-colors hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600">
+                                    <div className="flex flex-col gap-2.5">
+                                        <Label htmlFor="font-size" className="font-medium">
                                             Font Size
                                         </Label>
                                         <Select
@@ -432,9 +432,9 @@ export function SettingsPanel({ open, onOpenChange }: SettingsPanelProps) {
                                 </section>
 
                                 {/* Reduce Animations */}
-                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-4 dark:border-gray-700 sm:flex-row sm:items-center sm:justify-between">
-                                    <div className="space-y-0.5">
-                                        <Label htmlFor="reduce-animations">
+                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-5 shadow-sm transition-colors hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600 sm:flex-row sm:items-center sm:justify-between">
+                                    <div className="space-y-1.5">
+                                        <Label htmlFor="reduce-animations" className="font-medium">
                                             Reduce Animations
                                         </Label>
                                         <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -457,17 +457,17 @@ export function SettingsPanel({ open, onOpenChange }: SettingsPanelProps) {
                         </div>
                     </TabsContent>
 
-                    <TabsContent value="advanced" className="mt-6">
-                        <div className="flex flex-col gap-6">
-                            <h3 className="text-lg font-medium">
+                    <TabsContent value="advanced" className="mt-8">
+                        <div className="flex flex-col gap-8">
+                            <h3 className="text-lg font-semibold">
                                 Advanced Configuration
                             </h3>
 
-                            <div className="grid gap-4 lg:grid-cols-2">
+                            <div className="flex flex-col gap-6">
                                 {/* Custom API Endpoint */}
-                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-4 dark:border-gray-700">
-                                    <div className="flex flex-col gap-2">
-                                        <Label htmlFor="custom-endpoint">
+                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-5 shadow-sm transition-colors hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600">
+                                    <div className="flex flex-col gap-2.5">
+                                        <Label htmlFor="custom-endpoint" className="font-medium">
                                             Custom API Endpoint
                                         </Label>
                                         <Input
@@ -498,9 +498,9 @@ export function SettingsPanel({ open, onOpenChange }: SettingsPanelProps) {
                                 </section>
 
                                 {/* API Key */}
-                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-4 dark:border-gray-700">
-                                    <div className="flex flex-col gap-2">
-                                        <Label htmlFor="api-key">API Key</Label>
+                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-5 shadow-sm transition-colors hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600">
+                                    <div className="flex flex-col gap-2.5">
+                                        <Label htmlFor="api-key" className="font-medium">API Key</Label>
                                         <Input
                                             id="api-key"
                                             type="password"
@@ -521,9 +521,9 @@ export function SettingsPanel({ open, onOpenChange }: SettingsPanelProps) {
                                 </section>
 
                                 {/* Timeout Duration */}
-                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-4 dark:border-gray-700 lg:col-span-2">
-                                    <div className="flex flex-col gap-2">
-                                        <Label htmlFor="timeout">
+                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-5 shadow-sm transition-colors hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600">
+                                    <div className="flex flex-col gap-2.5">
+                                        <Label htmlFor="timeout" className="font-medium">
                                             Timeout Duration (seconds)
                                         </Label>
                                         <Input
@@ -551,7 +551,7 @@ export function SettingsPanel({ open, onOpenChange }: SettingsPanelProps) {
                                     </p>
                                 </section>
 
-                                <section className="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950/30 lg:col-span-2">
+                                <section className="rounded-lg border border-amber-200 bg-amber-50 p-5 dark:border-amber-900 dark:bg-amber-950/30">
                                     <h4 className="mb-2 font-medium text-amber-900 dark:text-amber-100">
                                         Advanced Settings
                                     </h4>
@@ -568,18 +568,18 @@ export function SettingsPanel({ open, onOpenChange }: SettingsPanelProps) {
                 </Tabs>
 
                 {/* Actions */}
-                <div className="mt-6 flex flex-col gap-3 border-t border-gray-200 pt-6 dark:border-gray-700 sm:flex-row sm:items-center sm:justify-between">
+                <div className="mt-8 flex flex-col gap-4 border-t border-gray-200 pt-8 dark:border-gray-700 sm:flex-row sm:items-center sm:justify-between">
                     <Button
                         variant="outline"
                         onClick={handleReset}
-                        className="flex items-center gap-2"
+                        className="flex items-center justify-center gap-2"
                     >
                         <RotateCcw className="h-4 w-4" />
                         Reset to Defaults
                     </Button>
                     <Button
                         onClick={handleSave}
-                        className="flex items-center gap-2"
+                        className="flex items-center justify-center gap-2"
                     >
                         <Save className="h-4 w-4" />
                         Save Settings
