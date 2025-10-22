@@ -37,7 +37,7 @@ export function HistoryEntryCard({
         await copy(payload);
     };
 
-    const headline = entry.summary ?? entry.preview;
+    const headline = entry.title ?? entry.summary ?? entry.preview;
     const logTypeLabel = entry.detectedLogType
         ? entry.detectedLogType.replace(/_/g, ' ')
         : 'log entry';
