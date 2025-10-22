@@ -185,7 +185,13 @@ class LogFormatterService
             return null;
         }
 
-        $summary = data_get($formattedLog, 'summary.headline');
+        $summary = data_get($formattedLog, 'results_summary.test_suite');
+        if (! $summary) {
+            $logType = data_get($formattedLog, 'detected_log_type', 'unknown');
+            $status = data_get($formattedLog, 'results_summary.status', 'INFO');
+            $summary = ucfirst($logType).' - '.$status;
+        }
+
         $detectedType = data_get($formattedLog, 'detected_log_type');
         $fieldCount = is_array($formattedLog) ? count($formattedLog) : 0;
 
@@ -193,7 +199,7 @@ class LogFormatterService
             'user_id' => $user->id,
             'raw_log' => $rawLog,
             'formatted_log' => $formattedLog,
-            'summary' => $summary ? Str::limit($summary, 255) : Str::limit(trim($rawLog), 255),
+            'summary' => Str::limit($summary, 255),
             'detected_log_type' => $detectedType,
             'field_count' => $fieldCount,
         ]);
@@ -202,23 +208,26 @@ class LogFormatterService
     private function getSystemPrompt(string $llmModel): string
     {
         $basePrompt = <<<'PROMPT'
-You are StructLogr, an AI assistant that converts raw, multi-line log text into normalized JSON that helps developers debug quickly.
+You are StructLogr, an AI that converts raw logs into concise, structured JSON for fast debugging.
 
-Rules you must follow:
-1. Always return strictly valid JSON that conforms to the provided schema. Do not include Markdown, prose, or code fences.
-2. Detect the dominant log category. Choose the closest match; if uncertain, use "general".
-3. Build a concise summary capturing overall status, the primary subject, and key takeaways. When the log lacks data for a field, return null or an empty array as appropriate.
-4. Capture important entities (tests, services, hosts, jobs, request IDs, etc.) exactly as they appear in the log.
-5. Record quantitative metrics when counts, totals, or durations are mentioned. Omit a metric if no trustworthy value is present.
-6. Populate sections with structured data tailored to the log content:
-   - For test output, add section_type "test_results" with detailed test information.
-   - For application errors or stack traces, prefer section_type "errors" or "exceptions".
-   - For HTTP or access logs, use section_type "http_requests".
-   - For build or CI logs, use section_type "build_steps".
-   - For security or audit logs, use section_type "security_events".
-   - Create multiple sections if the log includes mixed information.
-7. Preserve multi-line strings such as stack traces verbatim.
-8. Never invent information that does not exist in the log. If uncertain, leave values null or omit optional entries instead of guessing.
+Rules:
+1. Return ONLY valid JSON matching the provided schema. No markdown, prose, or code fences.
+2. Detect the dominant log category: test_runner, application_error, http_access, build_pipeline, database, security_event, system_metrics, or general.
+3. Build a minimal results_summary with status, counts, duration, and timestamp. Use null for missing data.
+4. For test logs:
+   - Populate failed_tests array with test_case, status, duration, and failure_details embedded
+   - failure_details should have: failure_type, message, location, test_file_location
+   - Do NOT create separate error sections - embed errors in each failed test
+   - Optionally include passed_tests array if relevant
+5. For application errors:
+   - Use errors array with error_type, message, file, line, stack_trace
+6. For HTTP logs:
+   - Use http_requests array with method, path, status_code, duration, ip
+7. For build logs:
+   - Use build_steps array with step_name, status, duration, error_message
+8. Keep output flat - avoid deep nesting. Embed related info together.
+9. Never invent data not in the log. Use null for missing optional fields.
+10. Preserve exact error messages and stack traces verbatim.
 PROMPT;
 
         if ($llmModel === 'deepseek-chat') {
@@ -316,29 +325,19 @@ PROMPT;
         }
         \Log::debug('Validation passed: detected_log_type', ['value' => $data['detected_log_type']]);
 
-        if (! isset($data['summary']) || ! is_array($data['summary'])) {
-            \Log::error('Validation failed: Missing or invalid summary');
-            throw new \Exception('Missing or invalid required field: summary');
+        if (! isset($data['results_summary']) || ! is_array($data['results_summary'])) {
+            \Log::error('Validation failed: Missing or invalid results_summary');
+            throw new \Exception('Missing or invalid required field: results_summary');
         }
-        \Log::debug('Validation passed: summary exists');
+        \Log::debug('Validation passed: results_summary exists');
 
-        if (! isset($data['summary']['status']) || ! isset($data['summary']['headline'])) {
-            \Log::error('Validation failed: Missing summary.status or summary.headline', [
-                'has_status' => isset($data['summary']['status']),
-                'has_headline' => isset($data['summary']['headline']),
-            ]);
-            throw new \Exception('Missing required summary fields: status or headline');
+        if (! isset($data['results_summary']['status'])) {
+            \Log::error('Validation failed: Missing results_summary.status');
+            throw new \Exception('Missing required field: results_summary.status');
         }
-        \Log::debug('Validation passed: summary.status and summary.headline', [
-            'status' => $data['summary']['status'],
-            'headline' => substr($data['summary']['headline'], 0, 100),
+        \Log::debug('Validation passed: results_summary.status', [
+            'status' => $data['results_summary']['status'],
         ]);
-
-        if (! isset($data['sections']) || ! is_array($data['sections'])) {
-            \Log::error('Validation failed: Missing or invalid sections');
-            throw new \Exception('Missing or invalid required field: sections');
-        }
-        \Log::debug('Validation passed: sections', ['count' => count($data['sections'])]);
     }
 
     private function convertSchemaToJsonSchema(ObjectSchema $schema): array
@@ -348,69 +347,108 @@ PROMPT;
             'properties' => [
                 'detected_log_type' => [
                     'type' => 'string',
-                    'enum' => ['application_error', 'test_runner', 'build_pipeline', 'http_access', 'database', 'security_event', 'system_metrics', 'general'],
+                    'enum' => ['test_runner', 'application_error', 'http_access', 'build_pipeline', 'database', 'security_event', 'system_metrics', 'general'],
                 ],
-                'summary' => [
+                'results_summary' => [
                     'type' => 'object',
                     'properties' => [
-                        'status' => [
-                            'type' => 'string',
-                            'enum' => ['PASS', 'FAIL', 'ERROR', 'WARN', 'INFO', 'DEBUG', 'TRACE'],
-                        ],
-                        'headline' => ['type' => 'string'],
-                        'primary_subject' => ['type' => 'string'],
-                        'key_points' => ['type' => 'array', 'items' => ['type' => 'string']],
+                        'status' => ['type' => 'string', 'enum' => ['PASS', 'FAIL', 'ERROR', 'WARN', 'INFO']],
+                        'test_suite' => ['type' => 'string'],
+                        'total' => ['type' => 'number'],
+                        'passed' => ['type' => 'number'],
+                        'failed' => ['type' => 'number'],
+                        'assertions' => ['type' => 'number'],
                         'duration' => ['type' => 'string'],
                         'timestamp' => ['type' => 'string'],
                     ],
-                    'required' => ['status', 'headline', 'primary_subject', 'key_points', 'duration', 'timestamp'],
+                    'required' => ['status'],
                     'additionalProperties' => false,
                 ],
-                'entities' => [
+                'failed_tests' => [
                     'type' => 'array',
                     'items' => [
                         'type' => 'object',
                         'properties' => [
-                            'type' => ['type' => 'string'],
-                            'identifier' => ['type' => 'string'],
-                            'details' => ['type' => 'string'],
-                        ],
-                        'required' => ['type', 'identifier', 'details'],
-                        'additionalProperties' => false,
-                    ],
-                ],
-                'metrics' => [
-                    'type' => 'array',
-                    'items' => [
-                        'type' => 'object',
-                        'properties' => [
-                            'name' => ['type' => 'string'],
-                            'value' => ['type' => 'number'],
-                            'unit' => ['type' => 'string'],
-                            'description' => ['type' => 'string'],
-                        ],
-                        'required' => ['name', 'value', 'unit', 'description'],
-                        'additionalProperties' => false,
-                    ],
-                ],
-                'sections' => [
-                    'type' => 'array',
-                    'items' => [
-                        'type' => 'object',
-                        'properties' => [
-                            'section_type' => [
-                                'type' => 'string',
-                                'enum' => ['test_results', 'errors', 'exceptions', 'http_requests', 'build_steps', 'security_events', 'database_queries', 'performance_metrics', 'other'],
+                            'test_case' => ['type' => 'string'],
+                            'status' => ['type' => 'string'],
+                            'duration' => ['type' => 'string'],
+                            'failure_details' => [
+                                'type' => 'object',
+                                'properties' => [
+                                    'failure_type' => ['type' => 'string'],
+                                    'message' => ['type' => 'string'],
+                                    'location' => ['type' => 'string'],
+                                    'test_file_location' => ['type' => 'string'],
+                                ],
+                                'required' => ['failure_type', 'message'],
+                                'additionalProperties' => false,
                             ],
-                            'title' => ['type' => 'string'],
-                            'description' => ['type' => 'string'],
                         ],
-                        'required' => ['section_type', 'title', 'description'],
-                        'additionalProperties' => true,
+                        'required' => ['test_case', 'status'],
+                        'additionalProperties' => false,
+                    ],
+                ],
+                'passed_tests' => [
+                    'type' => 'array',
+                    'items' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'test_case' => ['type' => 'string'],
+                            'status' => ['type' => 'string'],
+                            'duration' => ['type' => 'string'],
+                        ],
+                        'required' => ['test_case', 'status'],
+                        'additionalProperties' => false,
+                    ],
+                ],
+                'errors' => [
+                    'type' => 'array',
+                    'items' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'error_type' => ['type' => 'string'],
+                            'message' => ['type' => 'string'],
+                            'file' => ['type' => 'string'],
+                            'line' => ['type' => 'number'],
+                            'stack_trace' => ['type' => 'string'],
+                            'timestamp' => ['type' => 'string'],
+                        ],
+                        'required' => ['error_type', 'message'],
+                        'additionalProperties' => false,
+                    ],
+                ],
+                'http_requests' => [
+                    'type' => 'array',
+                    'items' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'method' => ['type' => 'string'],
+                            'path' => ['type' => 'string'],
+                            'status_code' => ['type' => 'number'],
+                            'duration' => ['type' => 'string'],
+                            'timestamp' => ['type' => 'string'],
+                            'ip' => ['type' => 'string'],
+                        ],
+                        'required' => ['method', 'path', 'status_code'],
+                        'additionalProperties' => false,
+                    ],
+                ],
+                'build_steps' => [
+                    'type' => 'array',
+                    'items' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'step_name' => ['type' => 'string'],
+                            'status' => ['type' => 'string'],
+                            'duration' => ['type' => 'string'],
+                            'error_message' => ['type' => 'string'],
+                        ],
+                        'required' => ['step_name', 'status'],
+                        'additionalProperties' => false,
                     ],
                 ],
             ],
-            'required' => ['detected_log_type', 'summary', 'entities', 'metrics', 'sections'],
+            'required' => ['detected_log_type', 'results_summary'],
             'additionalProperties' => false,
         ];
     }
@@ -422,70 +460,109 @@ PROMPT;
             'properties' => [
                 'detected_log_type' => [
                     'type' => 'STRING',
-                    'enum' => ['application_error', 'test_runner', 'build_pipeline', 'http_access', 'database', 'security_event', 'system_metrics', 'general'],
+                    'enum' => ['test_runner', 'application_error', 'http_access', 'build_pipeline', 'database', 'security_event', 'system_metrics', 'general'],
                 ],
-                'summary' => [
+                'results_summary' => [
                     'type' => 'OBJECT',
                     'properties' => [
-                        'status' => [
-                            'type' => 'STRING',
-                            'enum' => ['PASS', 'FAIL', 'ERROR', 'WARN', 'INFO', 'DEBUG', 'TRACE'],
-                        ],
-                        'headline' => ['type' => 'STRING'],
-                        'primary_subject' => ['type' => 'STRING', 'nullable' => true],
-                        'key_points' => ['type' => 'ARRAY', 'items' => ['type' => 'STRING']],
+                        'status' => ['type' => 'STRING', 'enum' => ['PASS', 'FAIL', 'ERROR', 'WARN', 'INFO']],
+                        'test_suite' => ['type' => 'STRING', 'nullable' => true],
+                        'total' => ['type' => 'NUMBER', 'nullable' => true],
+                        'passed' => ['type' => 'NUMBER', 'nullable' => true],
+                        'failed' => ['type' => 'NUMBER', 'nullable' => true],
+                        'assertions' => ['type' => 'NUMBER', 'nullable' => true],
                         'duration' => ['type' => 'STRING', 'nullable' => true],
                         'timestamp' => ['type' => 'STRING', 'nullable' => true],
                     ],
-                    'required' => ['status', 'headline'],
-                    'propertyOrdering' => ['status', 'headline', 'primary_subject', 'key_points', 'duration', 'timestamp'],
+                    'required' => ['status'],
+                    'propertyOrdering' => ['status', 'test_suite', 'total', 'passed', 'failed', 'assertions', 'duration', 'timestamp'],
                 ],
-                'entities' => [
+                'failed_tests' => [
                     'type' => 'ARRAY',
                     'items' => [
                         'type' => 'OBJECT',
                         'properties' => [
-                            'type' => ['type' => 'STRING'],
-                            'identifier' => ['type' => 'STRING'],
-                            'details' => ['type' => 'STRING', 'nullable' => true],
-                        ],
-                        'required' => ['type', 'identifier'],
-                        'propertyOrdering' => ['type', 'identifier', 'details'],
-                    ],
-                ],
-                'metrics' => [
-                    'type' => 'ARRAY',
-                    'items' => [
-                        'type' => 'OBJECT',
-                        'properties' => [
-                            'name' => ['type' => 'STRING'],
-                            'value' => ['type' => 'NUMBER', 'nullable' => true],
-                            'unit' => ['type' => 'STRING', 'nullable' => true],
-                            'description' => ['type' => 'STRING', 'nullable' => true],
-                        ],
-                        'required' => ['name'],
-                        'propertyOrdering' => ['name', 'value', 'unit', 'description'],
-                    ],
-                ],
-                'sections' => [
-                    'type' => 'ARRAY',
-                    'items' => [
-                        'type' => 'OBJECT',
-                        'properties' => [
-                            'section_type' => [
-                                'type' => 'STRING',
-                                'enum' => ['test_results', 'errors', 'exceptions', 'http_requests', 'build_steps', 'security_events', 'database_queries', 'performance_metrics', 'other'],
+                            'test_case' => ['type' => 'STRING'],
+                            'status' => ['type' => 'STRING'],
+                            'duration' => ['type' => 'STRING', 'nullable' => true],
+                            'failure_details' => [
+                                'type' => 'OBJECT',
+                                'properties' => [
+                                    'failure_type' => ['type' => 'STRING'],
+                                    'message' => ['type' => 'STRING'],
+                                    'location' => ['type' => 'STRING', 'nullable' => true],
+                                    'test_file_location' => ['type' => 'STRING', 'nullable' => true],
+                                ],
+                                'required' => ['failure_type', 'message'],
+                                'propertyOrdering' => ['failure_type', 'message', 'location', 'test_file_location'],
                             ],
-                            'title' => ['type' => 'STRING', 'nullable' => true],
-                            'description' => ['type' => 'STRING', 'nullable' => true],
                         ],
-                        'required' => ['section_type'],
-                        'propertyOrdering' => ['section_type', 'title', 'description'],
+                        'required' => ['test_case', 'status'],
+                        'propertyOrdering' => ['test_case', 'status', 'duration', 'failure_details'],
+                    ],
+                ],
+                'passed_tests' => [
+                    'type' => 'ARRAY',
+                    'items' => [
+                        'type' => 'OBJECT',
+                        'properties' => [
+                            'test_case' => ['type' => 'STRING'],
+                            'status' => ['type' => 'STRING'],
+                            'duration' => ['type' => 'STRING', 'nullable' => true],
+                        ],
+                        'required' => ['test_case', 'status'],
+                        'propertyOrdering' => ['test_case', 'status', 'duration'],
+                    ],
+                ],
+                'errors' => [
+                    'type' => 'ARRAY',
+                    'items' => [
+                        'type' => 'OBJECT',
+                        'properties' => [
+                            'error_type' => ['type' => 'STRING'],
+                            'message' => ['type' => 'STRING'],
+                            'file' => ['type' => 'STRING', 'nullable' => true],
+                            'line' => ['type' => 'NUMBER', 'nullable' => true],
+                            'stack_trace' => ['type' => 'STRING', 'nullable' => true],
+                            'timestamp' => ['type' => 'STRING', 'nullable' => true],
+                        ],
+                        'required' => ['error_type', 'message'],
+                        'propertyOrdering' => ['error_type', 'message', 'file', 'line', 'stack_trace', 'timestamp'],
+                    ],
+                ],
+                'http_requests' => [
+                    'type' => 'ARRAY',
+                    'items' => [
+                        'type' => 'OBJECT',
+                        'properties' => [
+                            'method' => ['type' => 'STRING'],
+                            'path' => ['type' => 'STRING'],
+                            'status_code' => ['type' => 'NUMBER'],
+                            'duration' => ['type' => 'STRING', 'nullable' => true],
+                            'timestamp' => ['type' => 'STRING', 'nullable' => true],
+                            'ip' => ['type' => 'STRING', 'nullable' => true],
+                        ],
+                        'required' => ['method', 'path', 'status_code'],
+                        'propertyOrdering' => ['method', 'path', 'status_code', 'duration', 'timestamp', 'ip'],
+                    ],
+                ],
+                'build_steps' => [
+                    'type' => 'ARRAY',
+                    'items' => [
+                        'type' => 'OBJECT',
+                        'properties' => [
+                            'step_name' => ['type' => 'STRING'],
+                            'status' => ['type' => 'STRING'],
+                            'duration' => ['type' => 'STRING', 'nullable' => true],
+                            'error_message' => ['type' => 'STRING', 'nullable' => true],
+                        ],
+                        'required' => ['step_name', 'status'],
+                        'propertyOrdering' => ['step_name', 'status', 'duration', 'error_message'],
                     ],
                 ],
             ],
-            'required' => ['detected_log_type', 'summary', 'sections'],
-            'propertyOrdering' => ['detected_log_type', 'summary', 'entities', 'metrics', 'sections'],
+            'required' => ['detected_log_type', 'results_summary'],
+            'propertyOrdering' => ['detected_log_type', 'results_summary', 'failed_tests', 'passed_tests', 'errors', 'http_requests', 'build_steps'],
         ];
     }
 
@@ -493,165 +570,130 @@ PROMPT;
     {
         return new ObjectSchema(
             'formatted_log',
-            'Normalized representation of a parsed log with contextual sections',
+            'Concise normalized log output optimized for readability',
             [
                 new EnumSchema(
                     'detected_log_type',
-                    'High-level category of the log',
-                    ['application_error', 'test_runner', 'build_pipeline', 'http_access', 'database', 'security_event', 'system_metrics', 'general']
+                    'Category of the log',
+                    ['test_runner', 'application_error', 'http_access', 'build_pipeline', 'database', 'security_event', 'system_metrics', 'general']
                 ),
                 new ObjectSchema(
-                    'summary',
-                    'High-level summary data describing the overall outcome of the log',
+                    'results_summary',
+                    'High-level metrics and status',
                     [
-                        new EnumSchema(
-                            'status',
-                            'Overall status or severity',
-                            ['PASS', 'FAIL', 'ERROR', 'WARN', 'INFO', 'DEBUG', 'TRACE']
-                        ),
-                        new StringSchema('headline', 'Single-sentence headline that captures the main insight from the log'),
-                        new StringSchema('primary_subject', 'Primary subject entity (e.g., job name, test suite, service name)', true),
-                        new ArraySchema(
-                            'key_points',
-                            'Ordered list of key findings or highlights extracted from the log',
-                            new StringSchema('key_point', 'Key insight derived from the log'),
-                            true
-                        ),
-                        new StringSchema('duration', 'Total runtime or duration expressed as it appears in the log', true),
-                        new StringSchema('timestamp', 'Primary timestamp associated with the log', true),
+                        new EnumSchema('status', 'Overall status', ['PASS', 'FAIL', 'ERROR', 'WARN', 'INFO']),
+                        new StringSchema('test_suite', 'Test suite or source identifier', true),
+                        new NumberSchema('total', 'Total count', true),
+                        new NumberSchema('passed', 'Passed count', true),
+                        new NumberSchema('failed', 'Failed count', true),
+                        new NumberSchema('assertions', 'Assertions count', true),
+                        new StringSchema('duration', 'Total duration with unit', true),
+                        new StringSchema('timestamp', 'Primary timestamp', true),
                     ],
-                    ['status', 'headline'],
+                    ['status'],
                     true
                 ),
                 new ArraySchema(
-                    'entities',
-                    'Primary entities referenced in the log (tests, services, hosts, jobs, request IDs, etc.)',
+                    'failed_tests',
+                    'Failed test cases with embedded failure details',
                     new ObjectSchema(
-                        'entity',
-                        'Entity referenced within the log',
+                        'failed_test',
+                        'Individual failed test',
                         [
-                            new StringSchema('type', 'Type of entity such as test_suite, test_case, service, host, job, request_id'),
-                            new StringSchema('identifier', 'Identifier or name of the entity as it appears in the log'),
-                            new StringSchema('details', 'Additional context about the entity', true),
+                            new StringSchema('test_case', 'Test name'),
+                            new StringSchema('status', 'Test status'),
+                            new StringSchema('duration', 'Test duration with unit', true),
+                            new ObjectSchema(
+                                'failure_details',
+                                'Structured failure information',
+                                [
+                                    new StringSchema('failure_type', 'Exception or error type'),
+                                    new StringSchema('message', 'Error message'),
+                                    new StringSchema('location', 'Primary error location', true),
+                                    new StringSchema('test_file_location', 'Test file location', true),
+                                ],
+                                ['failure_type', 'message'],
+                                true
+                            ),
                         ],
-                        ['type', 'identifier'],
+                        ['test_case', 'status'],
                         true
                     ),
                     true
                 ),
                 new ArraySchema(
-                    'metrics',
-                    'Quantitative metrics extracted from the log',
+                    'passed_tests',
+                    'Passed test cases',
                     new ObjectSchema(
-                        'metric',
-                        'Single metric value extracted from the log',
+                        'passed_test',
+                        'Individual passed test',
                         [
-                            new StringSchema('name', 'Metric name such as failed, passed, total, error_rate'),
-                            new NumberSchema('value', 'Numeric value of the metric', true),
-                            new StringSchema('unit', 'Unit of measurement if applicable (e.g., tests, seconds, ms)', true),
-                            new StringSchema('description', 'Description of what this metric represents', true),
+                            new StringSchema('test_case', 'Test name'),
+                            new StringSchema('status', 'Test status'),
+                            new StringSchema('duration', 'Test duration with unit', true),
                         ],
-                        ['name'],
+                        ['test_case', 'status'],
                         true
                     ),
                     true
                 ),
                 new ArraySchema(
-                    'sections',
-                    'Structured sections containing detailed data extracted from the log',
+                    'errors',
+                    'Application errors and exceptions',
                     new ObjectSchema(
-                        'section',
-                        'Structured section for a particular aspect of the log',
+                        'error',
+                        'Error or exception details',
                         [
-                            new EnumSchema(
-                                'section_type',
-                                'Machine-friendly type identifier',
-                                ['test_results', 'errors', 'exceptions', 'http_requests', 'build_steps', 'security_events', 'database_queries', 'performance_metrics', 'other']
-                            ),
-                            new StringSchema('title', 'Human-friendly title for this section', true),
-                            new StringSchema('description', 'Short explanation of what this section contains', true),
-                            new ArraySchema(
-                                'items',
-                                'Individual items captured in this section when applicable',
-                                new ObjectSchema(
-                                    'section_item',
-                                    'Item within a section (structure may vary by section_type)',
-                                    [
-                                        new StringSchema('name', 'Primary identifier for the item', true),
-                                        new StringSchema('status', 'Status or severity for the item, if applicable', true),
-                                        new StringSchema('category', 'Category label for the item', true),
-                                        new StringSchema('timestamp', 'Timestamp for the item if present', true),
-                                        new StringSchema('duration', 'Duration associated with the item', true),
-                                        new ArraySchema(
-                                            'details',
-                                            'Additional key-value details for this item represented as labeled entries',
-                                            new ObjectSchema(
-                                                'detail_entry',
-                                                'Describes a single key/value detail captured for the item',
-                                                [
-                                                    new StringSchema('key', 'Name of the detail field or attribute'),
-                                                    new StringSchema('value', 'String representation of the field value', true),
-                                                    new NumberSchema('value_number', 'Numeric representation of the value when applicable', true),
-                                                    new ArraySchema(
-                                                        'value_list',
-                                                        'List representation when the value contains multiple items',
-                                                        new StringSchema('value_item', 'Individual value contained in the list'),
-                                                        true
-                                                    ),
-                                                ],
-                                                ['key'],
-                                                true
-                                            ),
-                                            true
-                                        ),
-                                    ],
-                                    [],
-                                    true,
-                                    true
-                                ),
-                                true
-                            ),
-                            new ArraySchema(
-                                'data',
-                                'Section-specific structured data entries (key/value groups or nested items)',
-                                new ObjectSchema(
-                                    'data_entry',
-                                    'Structured data entry associated with the section',
-                                    [
-                                        new StringSchema('key', 'Identifier or label for this data entry'),
-                                        new StringSchema('value', 'String representation of the entry value', true),
-                                        new NumberSchema('value_number', 'Numeric representation when available', true),
-                                        new ArraySchema(
-                                            'items',
-                                            'Optional nested items that break down this data entry further',
-                                            new ObjectSchema(
-                                                'data_item',
-                                                'Nested item contained within a section data entry',
-                                                [
-                                                    new StringSchema('key', 'Key or label for the nested item', true),
-                                                    new StringSchema('value', 'String value for the nested item', true),
-                                                    new NumberSchema('value_number', 'Numeric value when applicable', true),
-                                                ],
-                                                [],
-                                                true,
-                                                true
-                                            ),
-                                            true
-                                        ),
-                                    ],
-                                    ['key'],
-                                    true
-                                ),
-                                true
-                            ),
+                            new StringSchema('error_type', 'Exception class or error type'),
+                            new StringSchema('message', 'Error message'),
+                            new StringSchema('file', 'File path', true),
+                            new NumberSchema('line', 'Line number', true),
+                            new StringSchema('stack_trace', 'Stack trace', true),
+                            new StringSchema('timestamp', 'When error occurred', true),
                         ],
-                        ['section_type'],
-                        true,
+                        ['error_type', 'message'],
                         true
-                    )
+                    ),
+                    true
+                ),
+                new ArraySchema(
+                    'http_requests',
+                    'HTTP request logs',
+                    new ObjectSchema(
+                        'request',
+                        'HTTP request entry',
+                        [
+                            new StringSchema('method', 'HTTP method'),
+                            new StringSchema('path', 'Request path'),
+                            new NumberSchema('status_code', 'Response status code'),
+                            new StringSchema('duration', 'Request duration', true),
+                            new StringSchema('timestamp', 'Request timestamp', true),
+                            new StringSchema('ip', 'Client IP', true),
+                        ],
+                        ['method', 'path', 'status_code'],
+                        true
+                    ),
+                    true
+                ),
+                new ArraySchema(
+                    'build_steps',
+                    'Build or CI pipeline steps',
+                    new ObjectSchema(
+                        'step',
+                        'Build step',
+                        [
+                            new StringSchema('step_name', 'Step name'),
+                            new StringSchema('status', 'Step status'),
+                            new StringSchema('duration', 'Step duration', true),
+                            new StringSchema('error_message', 'Error if failed', true),
+                        ],
+                        ['step_name', 'status'],
+                        true
+                    ),
+                    true
                 ),
             ],
-            ['detected_log_type', 'summary', 'sections'],
+            ['detected_log_type', 'results_summary'],
             true
         );
     }
@@ -683,23 +725,34 @@ PROMPT;
 
     private function transformTimestamps(array $data, string $format, string $timezone): array
     {
-        if (isset($data['summary']['timestamp']) && ! empty($data['summary']['timestamp'])) {
-            $data['summary']['timestamp'] = $this->formatTimestamp(
-                $data['summary']['timestamp'],
+        if (isset($data['results_summary']['timestamp']) && ! empty($data['results_summary']['timestamp'])) {
+            $data['results_summary']['timestamp'] = $this->formatTimestamp(
+                $data['results_summary']['timestamp'],
                 $format,
                 $timezone
             );
         }
 
-        if (isset($data['sections']) && is_array($data['sections'])) {
-            foreach ($data['sections'] as $sectionIdx => $section) {
-                if (isset($section['items']) && is_array($section['items'])) {
-                    foreach ($section['items'] as $itemIdx => $item) {
-                        if (isset($item['timestamp']) && ! empty($item['timestamp'])) {
-                            $data['sections'][$sectionIdx]['items'][$itemIdx]['timestamp'] =
-                                $this->formatTimestamp($item['timestamp'], $format, $timezone);
-                        }
-                    }
+        if (isset($data['errors']) && is_array($data['errors'])) {
+            foreach ($data['errors'] as $idx => $error) {
+                if (isset($error['timestamp']) && ! empty($error['timestamp'])) {
+                    $data['errors'][$idx]['timestamp'] = $this->formatTimestamp(
+                        $error['timestamp'],
+                        $format,
+                        $timezone
+                    );
+                }
+            }
+        }
+
+        if (isset($data['http_requests']) && is_array($data['http_requests'])) {
+            foreach ($data['http_requests'] as $idx => $request) {
+                if (isset($request['timestamp']) && ! empty($request['timestamp'])) {
+                    $data['http_requests'][$idx]['timestamp'] = $this->formatTimestamp(
+                        $request['timestamp'],
+                        $format,
+                        $timezone
+                    );
                 }
             }
         }
@@ -733,26 +786,34 @@ PROMPT;
 
     private function normalizeLogLevels(array $data): array
     {
-        if (isset($data['summary']['status'])) {
-            $data['summary']['status'] = strtoupper($data['summary']['status']);
+        if (isset($data['results_summary']['status'])) {
+            $data['results_summary']['status'] = strtoupper($data['results_summary']['status']);
 
-            if ($data['summary']['status'] === 'WARN') {
-                $data['summary']['status'] = 'WARNING';
+            if ($data['results_summary']['status'] === 'WARN') {
+                $data['results_summary']['status'] = 'WARNING';
             }
         }
 
-        if (isset($data['sections']) && is_array($data['sections'])) {
-            foreach ($data['sections'] as $sectionIdx => $section) {
-                if (isset($section['items']) && is_array($section['items'])) {
-                    foreach ($section['items'] as $itemIdx => $item) {
-                        if (isset($item['status'])) {
-                            $normalized = strtoupper($item['status']);
-                            if ($normalized === 'WARN') {
-                                $normalized = 'WARNING';
-                            }
-                            $data['sections'][$sectionIdx]['items'][$itemIdx]['status'] = $normalized;
-                        }
+        if (isset($data['failed_tests']) && is_array($data['failed_tests'])) {
+            foreach ($data['failed_tests'] as $idx => $test) {
+                if (isset($test['status'])) {
+                    $normalized = strtoupper($test['status']);
+                    if ($normalized === 'WARN') {
+                        $normalized = 'WARNING';
                     }
+                    $data['failed_tests'][$idx]['status'] = $normalized;
+                }
+            }
+        }
+
+        if (isset($data['passed_tests']) && is_array($data['passed_tests'])) {
+            foreach ($data['passed_tests'] as $idx => $test) {
+                if (isset($test['status'])) {
+                    $normalized = strtoupper($test['status']);
+                    if ($normalized === 'WARN') {
+                        $normalized = 'WARNING';
+                    }
+                    $data['passed_tests'][$idx]['status'] = $normalized;
                 }
             }
         }
