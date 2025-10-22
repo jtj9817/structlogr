@@ -16,7 +16,7 @@ import {
 import { Toggle } from '@/components/ui/toggle';
 import { usePreferences } from '@/hooks/use-preferences';
 import type { LLMModel } from '@/types/preferences';
-import { Settings } from 'lucide-react';
+import { Check, Settings, X } from 'lucide-react';
 
 interface FormattingPreferencesProps {
     open: boolean;
@@ -52,8 +52,8 @@ export function FormattingPreferences({
 
                 <div className="space-y-6 py-4">
                     {/* Include Metadata */}
-                    <div className="flex items-center justify-between">
-                        <div className="space-y-0.5">
+                    <div className="flex items-center justify-between gap-4">
+                        <div className="flex-1 space-y-0.5">
                             <Label htmlFor="include-metadata">
                                 Include Metadata
                             </Label>
@@ -63,16 +63,25 @@ export function FormattingPreferences({
                         </div>
                         <Toggle
                             id="include-metadata"
+                            variant="outline"
                             pressed={preferences.includeMetadata}
                             onPressedChange={(pressed) =>
                                 updatePreference('includeMetadata', pressed)
                             }
-                        />
+                            aria-label="Toggle include metadata"
+                            className="w-12"
+                        >
+                            {preferences.includeMetadata ? (
+                                <Check className="h-4 w-4" />
+                            ) : (
+                                <X className="h-4 w-4" />
+                            )}
+                        </Toggle>
                     </div>
 
                     {/* Parse Timestamps */}
-                    <div className="flex items-center justify-between">
-                        <div className="space-y-0.5">
+                    <div className="flex items-center justify-between gap-4">
+                        <div className="flex-1 space-y-0.5">
                             <Label htmlFor="parse-timestamps">
                                 Parse Timestamps
                             </Label>
@@ -82,16 +91,25 @@ export function FormattingPreferences({
                         </div>
                         <Toggle
                             id="parse-timestamps"
+                            variant="outline"
                             pressed={preferences.parseTimestamps}
                             onPressedChange={(pressed) =>
                                 updatePreference('parseTimestamps', pressed)
                             }
-                        />
+                            aria-label="Toggle parse timestamps"
+                            className="w-12"
+                        >
+                            {preferences.parseTimestamps ? (
+                                <Check className="h-4 w-4" />
+                            ) : (
+                                <X className="h-4 w-4" />
+                            )}
+                        </Toggle>
                     </div>
 
                     {/* Normalize Log Levels */}
-                    <div className="flex items-center justify-between">
-                        <div className="space-y-0.5">
+                    <div className="flex items-center justify-between gap-4">
+                        <div className="flex-1 space-y-0.5">
                             <Label htmlFor="normalize-levels">
                                 Normalize Log Levels
                             </Label>
@@ -101,11 +119,20 @@ export function FormattingPreferences({
                         </div>
                         <Toggle
                             id="normalize-levels"
+                            variant="outline"
                             pressed={preferences.normalizeLogLevels}
                             onPressedChange={(pressed) =>
                                 updatePreference('normalizeLogLevels', pressed)
                             }
-                        />
+                            aria-label="Toggle normalize log levels"
+                            className="w-12"
+                        >
+                            {preferences.normalizeLogLevels ? (
+                                <Check className="h-4 w-4" />
+                            ) : (
+                                <X className="h-4 w-4" />
+                            )}
+                        </Toggle>
                     </div>
 
                     {/* Timezone */}
