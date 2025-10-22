@@ -726,29 +726,34 @@ export default function FormatterPage({
                                                 )}
                                             </div>
 
-                                            <div className="mt-auto flex justify-end">
-                                                <Button
-                                                    id={formatButtonId}
-                                                    data-testid={
-                                                        formatButtonTestId
-                                                    }
-                                                    type="submit"
-                                                    disabled={
-                                                        processing ||
-                                                        !data.raw_log.trim()
-                                                    }
-                                                    className="rounded-md"
-                                                    aria-label={
-                                                        processing
-                                                            ? 'Processing log format request'
-                                                            : 'Format log with AI'
-                                                    }
-                                                >
-                                                    {processing && (
-                                                        <Spinner className="mr-2" />
-                                                    )}
-                                                    Format Log
-                                                </Button>
+                                            <div className="mt-auto flex flex-col gap-3">
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-xs font-bold text-muted-foreground">
+                                                        Model: {preferences.llmModel}
+                                                    </span>
+                                                    <Button
+                                                        id={formatButtonId}
+                                                        data-testid={
+                                                            formatButtonTestId
+                                                        }
+                                                        type="submit"
+                                                        disabled={
+                                                            processing ||
+                                                            !data.raw_log.trim()
+                                                        }
+                                                        className="rounded-md"
+                                                        aria-label={
+                                                            processing
+                                                                ? 'Processing log format request'
+                                                                : 'Format log with AI'
+                                                        }
+                                                    >
+                                                        {processing && (
+                                                            <Spinner className="mr-2" />
+                                                        )}
+                                                        Format Log
+                                                    </Button>
+                                                </div>
                                             </div>
                                         </form>
                                     </CardContent>
