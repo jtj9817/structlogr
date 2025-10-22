@@ -3,7 +3,6 @@
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\LogFormatterController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::get('/', [LogFormatterController::class, 'show'])->name('formatter.show');
 Route::post('/format', [LogFormatterController::class, 'format'])->name('formatter.format');
