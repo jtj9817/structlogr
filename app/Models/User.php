@@ -23,6 +23,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'preferences',
     ];
 
     /**
@@ -48,11 +49,45 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
+            'preferences' => 'array',
         ];
     }
 
     public function formattedLogs(): HasMany
     {
         return $this->hasMany(FormattedLog::class);
+    }
+
+    public function getPreferencesAttribute($value): array
+    {
+        $defaults = [
+            'outputFormat' => 'json',
+            'jsonIndentation' => 2,
+            'autoCopyResults' => false,
+            'showLineNumbers' => true,
+            'saveToHistory' => true,
+            'anonymousAnalytics' => true,
+            'avoidSensitiveStorage' => false,
+            'fontSize' => 'medium',
+            'reduceAnimations' => false,
+            'customApiEndpoint' => '',
+            'apiKey' => '',
+            'timeoutSeconds' => 30,
+        ];
+
+        if (is_null($value) || $value === '') {
+            return $defaults;
+        }
+
+        $preferences = is_string($value) ? json_decode($value, true) : $value;
+
+        return array_merge($defaults, $preferences ?? []);
+    }
+
+    public function setPreferencesAttribute($value): void
+    {
+        $this->attributes['preferences'] = is_array($value)
+            ? json_encode($value)
+            : $value;
     }
 }
