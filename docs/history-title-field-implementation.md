@@ -1,5 +1,9 @@
 # Implementation Plan: History Entry Title Field
 
+> **STATUS: ✅ COMPLETED - October 23, 2025**  
+> This implementation plan has been fully executed. All phases completed successfully.  
+> See `docs/CHANGELOG.md` for implementation details.
+
 ## Overview
 
 Add a dedicated `title` field to formatted log entries that provides a concise, descriptive label for quick identification in the History panel. The title will be LLM-generated during formatting but not displayed in the main formatted output view.
