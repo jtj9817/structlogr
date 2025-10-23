@@ -19,11 +19,17 @@ import {
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { useFormattingTimer } from '@/hooks/use-formatting-timer';
 import { useHistory } from '@/hooks/use-history';
 import {
     commonShortcuts,
     useKeyboardShortcuts,
+    getShortcutDisplay,
 } from '@/hooks/use-keyboard-shortcuts';
 import { usePreferences } from '@/hooks/use-preferences';
 import { cn } from '@/lib/utils';
@@ -760,18 +766,25 @@ export default function FormatterPage({
                                                         aria-label="Raw log input"
                                                     />
                                                     {data.raw_log && (
-                                                        <button
-                                                            id={clearButtonId}
-                                                            type="button"
-                                                            onClick={
-                                                                handleClearInput
-                                                            }
-                                                            className="focus-ring absolute top-3 right-3 rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
-                                                            aria-label="Clear input"
-                                                            tabIndex={0}
-                                                        >
-                                                            ×
-                                                        </button>
+                                                        <Tooltip>
+                                                            <TooltipTrigger asChild>
+                                                                <button
+                                                                    id={clearButtonId}
+                                                                    type="button"
+                                                                    onClick={
+                                                                        handleClearInput
+                                                                    }
+                                                                    className="focus-ring absolute top-3 right-3 rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                                                                    aria-label="Clear input"
+                                                                    tabIndex={0}
+                                                                >
+                                                                    ×
+                                                                </button>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent>
+                                                                <p>Clear input ({getShortcutDisplay(commonShortcuts.clear)})</p>
+                                                            </TooltipContent>
+                                                        </Tooltip>
                                                     )}
                                                 </div>
 
@@ -824,26 +837,33 @@ export default function FormatterPage({
                                                             </span>
                                                         )}
                                                     </div>
-                                                    <Button
-                                                        id={formatButtonId}
-                                                        data-testid={formatButtonTestId}
-                                                        type="submit"
-                                                        disabled={
-                                                            processing ||
-                                                            !data.raw_log.trim()
-                                                        }
-                                                        className="w-full rounded-md"
-                                                        aria-label={
-                                                            processing
-                                                                ? 'Processing log format request'
-                                                                : 'Format log with AI'
-                                                        }
-                                                    >
-                                                        {processing && (
-                                                            <Spinner className="mr-2" />
-                                                        )}
-                                                        Format Log
-                                                    </Button>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <Button
+                                                                id={formatButtonId}
+                                                                data-testid={formatButtonTestId}
+                                                                type="submit"
+                                                                disabled={
+                                                                    processing ||
+                                                                    !data.raw_log.trim()
+                                                                }
+                                                                className="w-full rounded-md"
+                                                                aria-label={
+                                                                    processing
+                                                                        ? 'Processing log format request'
+                                                                        : 'Format log with AI'
+                                                                }
+                                                            >
+                                                                {processing && (
+                                                                    <Spinner className="mr-2" />
+                                                                )}
+                                                                Format Log
+                                                            </Button>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            <p>Format log ({getShortcutDisplay(commonShortcuts.submit)})</p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
                                                 </div>
                                             </div>
                                         </form>

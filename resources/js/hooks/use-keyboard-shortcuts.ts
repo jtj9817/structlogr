@@ -88,6 +88,26 @@ export const getModifierKey = (isMac: boolean): string => {
     return isMac ? 'Cmd' : 'Ctrl';
 };
 
+export const getShortcutDisplay = (
+    shortcut: Pick<ShortcutDefinition, 'key' | 'ctrlKey' | 'metaKey' | 'shiftKey' | 'altKey'>,
+): string => {
+    const isMac = typeof window !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(window.navigator.platform);
+    const keys: string[] = [];
+    
+    if (shortcut.ctrlKey || shortcut.metaKey) {
+        keys.push(getModifierKey(isMac));
+    }
+    if (shortcut.altKey) {
+        keys.push('Alt');
+    }
+    if (shortcut.shiftKey) {
+        keys.push('Shift');
+    }
+    keys.push(getKeyDisplayName(shortcut.key));
+    
+    return keys.join('+');
+};
+
 export const shortcutDefinitions: ShortcutDefinition[] = [
     { ...commonShortcuts.submit, description: 'Submit form' },
     { ...commonShortcuts.clear, description: 'Clear input' },
