@@ -74,7 +74,7 @@ export const commonShortcuts = {
     selectAll: { key: 'a', ctrlKey: true, description: 'Select all' },
 };
 
-export const getKeyDisplayName = (key: string, isMac: boolean): string => {
+export const getKeyDisplayName = (key: string): string => {
     const keyMap: Record<string, string> = {
         'Enter': 'Enter',
         'Escape': 'Esc',

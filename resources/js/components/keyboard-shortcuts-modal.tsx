@@ -56,7 +56,7 @@ export default function KeyboardShortcutsModal({
             if (shortcut.shiftKey) {
                 keys.push('Shift');
             }
-            keys.push(getKeyDisplayName(shortcut.key, isMac));
+            keys.push(getKeyDisplayName(shortcut.key));
             
             return {
                 keys,

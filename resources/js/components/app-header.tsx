@@ -107,21 +107,6 @@ export function AppHeader({
         return path;
     }, [page.url]);
 
-    const isItemActive = (item: NavItem) => {
-        const href = typeof item.href === 'string' ? item.href : item.href.url;
-        if (href.startsWith('http')) {
-            return false;
-        }
-        if (href.startsWith('/#')) {
-            return currentPath === '/' && page.url.includes(href.split('#')[1]);
-        }
-        const normalizedHref = href.replace(/#.*$/, '');
-        return currentPath === normalizedHref;
-    };
-
-    const resolveLinkHref = (item: NavItem) =>
-        typeof item.href === 'string' ? item.href : item.href.url;
-
     const stringUserProp = (prop: string) => {
         if (!user) return null;
         const value = (user as Record<string, unknown>)[prop];
