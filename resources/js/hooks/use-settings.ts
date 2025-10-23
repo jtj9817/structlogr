@@ -1,25 +1,17 @@
+import { router, usePage } from '@inertiajs/react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import type {
+    FontSize,
+    JsonIndentation,
+    OutputFormat,
+    UserPreferences,
+} from '@/types';
 
 const STORAGE_KEY = 'structlogr:user-preferences';
 
-export type OutputFormat = 'json' | 'table' | 'cards';
-export type JsonIndentation = 2 | 4 | 'tab';
-export type FontSize = 'small' | 'medium' | 'large';
+export type { FontSize, JsonIndentation, OutputFormat };
 
-export interface Settings {
-    outputFormat: OutputFormat;
-    jsonIndentation: JsonIndentation;
-    autoCopyResults: boolean;
-    showLineNumbers: boolean;
-    saveToHistory: boolean;
-    anonymousAnalytics: boolean;
-    avoidSensitiveStorage: boolean;
-    fontSize: FontSize;
-    reduceAnimations: boolean;
-    customApiEndpoint: string;
-    apiKey: string;
-    timeoutSeconds: number;
-}
+export interface Settings extends UserPreferences {}
 
 const defaultSettings: Settings = {
     outputFormat: 'json',
@@ -119,41 +111,97 @@ const sanitizeSettings = (value: unknown): Settings => {
 };
 
 export function useSettings() {
-    const [settings, setSettings] = useState<Settings>({ ...defaultSettings });
+    const { auth } = usePage<{
+        auth: { user: { preferences: UserPreferences } | null };
+    }>().props;
 
-    useEffect(() => {
+    const [settings, setSettings] = useState<Settings>(() => {
+        if (auth.user?.preferences) {
+            return sanitizeSettings(auth.user.preferences);
+        }
+
         try {
             const raw = localStorage.getItem(STORAGE_KEY);
-            if (!raw) return;
+            if (!raw) return { ...defaultSettings };
 
             const parsed = JSON.parse(raw);
-            setSettings(sanitizeSettings(parsed));
+            return sanitizeSettings(parsed);
         } catch (error) {
             console.warn('Failed to load user settings', error);
+            return { ...defaultSettings };
         }
-    }, []);
+    });
 
     useEffect(() => {
-        try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-        } catch (error) {
-            console.warn('Failed to persist user settings', error);
+        if (auth.user?.preferences) {
+            setSettings(sanitizeSettings(auth.user.preferences));
         }
-    }, [settings]);
+    }, [auth.user?.preferences]);
+
+    useEffect(() => {
+        if (!auth.user) {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+            } catch (error) {
+                console.warn('Failed to persist user settings', error);
+            }
+        }
+    }, [settings, auth.user]);
 
     const updateSetting = useCallback(
         <Key extends keyof Settings>(key: Key, value: Settings[Key]) => {
-            setSettings((prev) => ({
-                ...prev,
-                [key]: value,
-            }));
+            const newSettings = { ...settings, [key]: value };
+            setSettings(newSettings);
+
+            if (auth.user) {
+                router.patch(
+                    '/settings/preferences',
+                    {
+                        preferences: newSettings,
+                    },
+                    {
+                        preserveState: true,
+                        preserveScroll: true,
+                        only: ['auth'],
+                    },
+                );
+            } else {
+                try {
+                    localStorage.setItem(
+                        STORAGE_KEY,
+                        JSON.stringify(newSettings),
+                    );
+                } catch (error) {
+                    console.warn('Failed to persist user settings', error);
+                }
+            }
         },
-        [],
+        [settings, auth.user],
     );
 
     const resetSettings = useCallback(() => {
         setSettings({ ...defaultSettings });
-    }, []);
+
+        if (auth.user) {
+            router.patch(
+                '/settings/preferences',
+                {
+                    preferences: defaultSettings,
+                },
+                {
+                    preserveState: true,
+                    preserveScroll: true,
+                    only: ['auth'],
+                },
+            );
+        } else {
+            try {
+                localStorage.removeItem(STORAGE_KEY);
+            } catch (error) {
+                console.warn('Failed to clear user settings', error);
+            }
+        }
+    }, [auth.user]);
 
     const derived = useMemo(
         () => ({
