@@ -1,6 +1,25 @@
 import { InertiaLinkProps } from '@inertiajs/react';
 import { LucideIcon } from 'lucide-react';
 
+export type OutputFormat = 'json' | 'table' | 'cards';
+export type JsonIndentation = 2 | 4 | 'tab';
+export type FontSize = 'small' | 'medium' | 'large';
+
+export interface UserPreferences {
+    outputFormat: OutputFormat;
+    jsonIndentation: JsonIndentation;
+    autoCopyResults: boolean;
+    showLineNumbers: boolean;
+    saveToHistory: boolean;
+    anonymousAnalytics: boolean;
+    avoidSensitiveStorage: boolean;
+    fontSize: FontSize;
+    reduceAnimations: boolean;
+    customApiEndpoint: string;
+    apiKey: string;
+    timeoutSeconds: number;
+}
+
 export interface Auth {
     user: User | null;
 }
@@ -55,5 +74,6 @@ export interface User {
     two_factor_enabled?: boolean;
     created_at: string;
     updated_at: string;
-    [key: string]: unknown; // This allows for additional properties...
+    preferences: UserPreferences;
+    [key: string]: unknown;
 }
