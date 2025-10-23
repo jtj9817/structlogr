@@ -102,11 +102,6 @@ export function AppHeader({
     const getInitials = useInitials();
     const isScrolled = useScrollShadow();
 
-    const currentPath = useMemo(() => {
-        const [path] = page.url.split('?');
-        return path;
-    }, [page.url]);
-
     const stringUserProp = (prop: string) => {
         if (!user) return null;
         const value = (user as Record<string, unknown>)[prop];
