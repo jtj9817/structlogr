@@ -202,16 +202,6 @@ export function AppHeader({
         </div>
     );
 
-    const desktopUpgradeButton = showUpgrade ? (
-        <Button
-            id="desktop-upgrade-button"
-            size="sm"
-            asChild
-            className="hidden bg-blue-600 text-white hover:bg-blue-700 md:inline-flex"
-        >
-            <Link href={upgradeHref}>Upgrade</Link>
-        </Button>
-    ) : null;
 
     const desktopCreditsBadge = credits ? (
         <Link
@@ -310,7 +300,7 @@ export function AppHeader({
             <header
                 id="app-header"
                 className={cn(
-                    'sticky top-0 z-50 border-b border-border/80 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/80 dark:bg-neutral-950/80',
+                    'sticky top-0 z-50 border-b border-[#928477]/40 bg-[#C6BFBB]/95 backdrop-blur supports-[backdrop-filter]:bg-[#C6BFBB]/95 dark:border-[#285669]/40 dark:bg-[#061417]/95',
                     isScrolled && 'shadow-md',
                 )}
             >
@@ -333,44 +323,8 @@ export function AppHeader({
                         <AppLogo />
                     </Link>
 
-                    <nav id="primary-nav" aria-label="Primary navigation" className="hidden flex-1 items-center justify-center gap-1 lg:flex">
-                        {primaryNavItems.map((item) => {
-                            const href = resolveLinkHref(item);
-                            const active = isItemActive(item);
-                            const itemId = `nav-${item.title.toLowerCase().replace(/\s+/g, '-')}`;
-                            return item.external ? (
-                                <a
-                                    key={item.title}
-                                    id={itemId}
-                                    href={href}
-                                    className={cn(
-                                        'inline-flex items-center rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition hover:text-foreground',
-                                    )}
-                                >
-                                    {item.title}
-                                </a>
-                            ) : (
-                                <Link
-                                    key={item.title}
-                                    id={itemId}
-                                    href={href}
-                                    prefetch
-                                    className={cn(
-                                        'inline-flex items-center rounded-md px-3 py-2 text-sm font-medium transition',
-                                        active
-                                            ? 'bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900'
-                                            : 'text-muted-foreground hover:bg-neutral-100 hover:text-foreground dark:hover:bg-neutral-800/60',
-                                    )}
-                                >
-                                    {item.title}
-                                </Link>
-                            );
-                        })}
-                    </nav>
-
                     <div id="header-actions" className="ml-auto flex items-center gap-2">
                         {desktopCreditsBadge}
-                        {desktopUpgradeButton}
                         <AppearanceToggleDropdown id="desktop-appearance-toggle" className="hidden sm:block" />
                         {onShortcutsOpen && (
                             <TooltipProvider delayDuration={0}>
