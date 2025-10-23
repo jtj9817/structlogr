@@ -70,8 +70,6 @@ export const commonShortcuts = {
     help: { key: '/', ctrlKey: true, description: 'Show keyboard shortcuts' },
     focusInput: { key: 'i', altKey: true, description: 'Focus input field' },
     focusOutput: { key: 'o', altKey: true, description: 'Focus output area' },
-    copy: { key: 'c', ctrlKey: true, description: 'Copy selection' },
-    selectAll: { key: 'a', ctrlKey: true, description: 'Select all' },
 };
 
 export const getKeyDisplayName = (key: string): string => {
