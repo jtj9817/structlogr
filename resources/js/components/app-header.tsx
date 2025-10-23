@@ -182,12 +182,13 @@ export function AppHeader({
     const upgradeHref = '/pricing';
 
     const desktopGuestCtas = (
-        <div className="hidden min-w-[210px] flex-col items-stretch gap-1 md:flex">
+        <div id="desktop-guest-ctas" className="hidden min-w-[210px] flex-col items-stretch gap-1 md:flex">
             <div className="flex items-center gap-2">
-                <Button variant="ghost" size="sm" asChild>
+                <Button id="desktop-login-button" variant="ghost" size="sm" asChild>
                     <Link href={login()}>Log in</Link>
                 </Button>
                 <Button
+                    id="desktop-register-button"
                     size="sm"
                     className="bg-blue-600 text-white hover:bg-blue-700"
                     asChild
@@ -203,6 +204,7 @@ export function AppHeader({
 
     const desktopUpgradeButton = showUpgrade ? (
         <Button
+            id="desktop-upgrade-button"
             size="sm"
             asChild
             className="hidden bg-blue-600 text-white hover:bg-blue-700 md:inline-flex"
@@ -213,6 +215,7 @@ export function AppHeader({
 
     const desktopCreditsBadge = credits ? (
         <Link
+            id="desktop-credits-badge"
             href={profileSettingsRoute()}
             className={cn(
                 'hidden items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium transition-colors md:inline-flex',
@@ -230,10 +233,10 @@ export function AppHeader({
     ) : null;
 
     const mobileUserSection = user ? (
-        <div className="flex items-center gap-3">
-            <Avatar className="size-10 rounded-lg">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg bg-neutral-200 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-100">
+        <div id="mobile-user-section" className="flex items-center gap-3">
+            <Avatar id="mobile-user-avatar" className="size-10 rounded-lg">
+                <AvatarImage id="mobile-user-avatar-image" src={user.avatar} alt={user.name} />
+                <AvatarFallback id="mobile-user-avatar-fallback" className="rounded-lg bg-neutral-200 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-100">
                     {getInitials(user.name)}
                 </AvatarFallback>
             </Avatar>
@@ -242,6 +245,7 @@ export function AppHeader({
                     {user.name}
                 </span>
                 <Link
+                    id="mobile-manage-account-link"
                     href={profileSettingsRoute()}
                     className="text-xs text-muted-foreground hover:text-foreground"
                 >
@@ -252,9 +256,10 @@ export function AppHeader({
     ) : null;
 
     const mobileCtaSection: ReactNode = user ? (
-        <div className="space-y-3">
+        <div id="mobile-cta-section" className="space-y-3">
             {showUpgrade && (
                 <Button
+                    id="mobile-upgrade-button"
                     className="w-full bg-blue-600 text-white hover:bg-blue-700"
                     asChild
                 >
@@ -263,6 +268,7 @@ export function AppHeader({
             )}
             {credits && (
                 <Link
+                    id="mobile-credits-badge"
                     href={profileSettingsRoute()}
                     className={cn(
                         'flex w-full items-center justify-between rounded-md border px-3 py-2 text-sm font-medium transition-colors',
@@ -278,14 +284,15 @@ export function AppHeader({
                     </span>
                 </Link>
             )}
-            <AppearanceToggleDropdown className="flex justify-start rounded-md border border-border/80 px-3" />
+            <AppearanceToggleDropdown id="mobile-appearance-toggle-auth" className="flex justify-start rounded-md border border-border/80 px-3" />
         </div>
     ) : (
-        <div className="space-y-2">
-            <Button variant="ghost" className="w-full justify-center" asChild>
+        <div id="mobile-guest-ctas" className="space-y-2">
+            <Button id="mobile-login-button" variant="ghost" className="w-full justify-center" asChild>
                 <Link href={login()}>Log in</Link>
             </Button>
             <Button
+                id="mobile-register-button"
                 className="w-full bg-blue-600 text-white hover:bg-blue-700"
                 asChild
             >
@@ -294,20 +301,21 @@ export function AppHeader({
             <p className="text-center text-xs text-muted-foreground">
                 or continue without account
             </p>
-            <AppearanceToggleDropdown className="flex justify-start rounded-md border border-border/80 px-3" />
+            <AppearanceToggleDropdown id="mobile-appearance-toggle-guest" className="flex justify-start rounded-md border border-border/80 px-3" />
         </div>
     );
 
     return (
         <>
             <header
+                id="app-header"
                 className={cn(
                     'sticky top-0 z-50 border-b border-border/80 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/80 dark:bg-neutral-950/80',
                     isScrolled && 'shadow-md',
                 )}
             >
-                <div className="mx-auto flex h-16 items-center gap-3 px-4 sm:px-6 md:max-w-7xl lg:px-8">
-                    <div className="flex items-center gap-2 lg:hidden">
+                <div id="app-header-container" className="mx-auto flex h-16 items-center gap-3 px-4 sm:px-6 md:max-w-7xl lg:px-8">
+                    <div id="mobile-nav-wrapper" className="flex items-center gap-2 lg:hidden">
                         <MobileNavigation
                             mainLinks={primaryNavItems}
                             secondaryLinks={resourceNavItems}
@@ -317,6 +325,7 @@ export function AppHeader({
                     </div>
 
                     <Link
+                        id="app-logo-link"
                         href={formatterHome()}
                         prefetch
                         className="flex items-center gap-2"
@@ -324,13 +333,15 @@ export function AppHeader({
                         <AppLogo />
                     </Link>
 
-                    <nav className="hidden flex-1 items-center justify-center gap-1 lg:flex">
+                    <nav id="primary-nav" aria-label="Primary navigation" className="hidden flex-1 items-center justify-center gap-1 lg:flex">
                         {primaryNavItems.map((item) => {
                             const href = resolveLinkHref(item);
                             const active = isItemActive(item);
+                            const itemId = `nav-${item.title.toLowerCase().replace(/\s+/g, '-')}`;
                             return item.external ? (
                                 <a
                                     key={item.title}
+                                    id={itemId}
                                     href={href}
                                     className={cn(
                                         'inline-flex items-center rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition hover:text-foreground',
@@ -341,6 +352,7 @@ export function AppHeader({
                             ) : (
                                 <Link
                                     key={item.title}
+                                    id={itemId}
                                     href={href}
                                     prefetch
                                     className={cn(
@@ -356,19 +368,21 @@ export function AppHeader({
                         })}
                     </nav>
 
-                    <div className="ml-auto flex items-center gap-2">
+                    <div id="header-actions" className="ml-auto flex items-center gap-2">
                         {desktopCreditsBadge}
                         {desktopUpgradeButton}
-                        <AppearanceToggleDropdown className="hidden sm:block" />
+                        <AppearanceToggleDropdown id="desktop-appearance-toggle" className="hidden sm:block" />
                         {onShortcutsOpen && (
                             <TooltipProvider delayDuration={0}>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <Button
+                                            id="shortcuts-button"
                                             variant="ghost"
                                             size="icon"
                                             className="hidden h-9 w-9 md:inline-flex"
                                             onClick={onShortcutsOpen}
+                                            aria-label="Open keyboard shortcuts"
                                         >
                                             <HelpCircle className="size-5 opacity-80" />
                                         </Button>
@@ -384,10 +398,12 @@ export function AppHeader({
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <Button
+                                            id="history-button"
                                             variant="ghost"
                                             size="icon"
                                             className="hidden h-9 w-9 md:inline-flex"
                                             onClick={onHistoryOpen}
+                                            aria-label="Open history"
                                         >
                                             <HistoryIcon className="size-5 opacity-80" />
                                         </Button>
@@ -403,10 +419,12 @@ export function AppHeader({
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <Button
+                                            id="help-button"
                                             variant="ghost"
                                             size="icon"
                                             className="hidden h-9 w-9 md:inline-flex"
                                             onClick={onHelpOpen}
+                                            aria-label="Open help"
                                         >
                                             <HelpCircle className="size-5 opacity-80" />
                                         </Button>
@@ -422,10 +440,12 @@ export function AppHeader({
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <Button
+                                            id="settings-button"
                                             variant="ghost"
                                             size="icon"
                                             className="hidden h-9 w-9 md:inline-flex"
                                             onClick={onSettingsOpen}
+                                            aria-label="Open settings"
                                         >
                                             <Settings className="size-5 opacity-80" />
                                         </Button>
@@ -437,9 +457,11 @@ export function AppHeader({
                             </TooltipProvider>
                         )}
                         <Button
+                            id="search-button"
                             variant="ghost"
                             size="icon"
                             className="hidden h-9 w-9 md:inline-flex"
+                            aria-label="Search"
                         >
                             <Search className="size-5 opacity-80" />
                         </Button>
@@ -447,15 +469,18 @@ export function AppHeader({
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button
+                                        id="user-menu-trigger"
                                         variant="ghost"
                                         className="flex h-10 items-center gap-2 rounded-full px-2 md:px-3"
+                                        aria-label="User menu"
                                     >
-                                        <Avatar className="size-9 rounded-full">
+                                        <Avatar id="desktop-user-avatar" className="size-9 rounded-full">
                                             <AvatarImage
+                                                id="desktop-user-avatar-image"
                                                 src={user.avatar}
                                                 alt={user.name}
                                             />
-                                            <AvatarFallback className="rounded-full bg-neutral-200 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-100">
+                                            <AvatarFallback id="desktop-user-avatar-fallback" className="rounded-full bg-neutral-200 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-100">
                                                 {getInitials(user.name)}
                                             </AvatarFallback>
                                         </Avatar>
@@ -465,6 +490,7 @@ export function AppHeader({
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent
+                                    id="user-menu-content"
                                     className="w-64"
                                     align="end"
                                 >
@@ -478,8 +504,8 @@ export function AppHeader({
                 </div>
             </header>
             {breadcrumbs.length > 1 && (
-                <div className="flex w-full border-b border-border/70">
-                    <div className="mx-auto flex h-12 w-full items-center justify-start px-4 text-neutral-500 sm:px-6 md:max-w-7xl lg:px-8">
+                <div id="breadcrumbs-wrapper" className="flex w-full border-b border-border/70">
+                    <div id="breadcrumbs-container" className="mx-auto flex h-12 w-full items-center justify-start px-4 text-neutral-500 sm:px-6 md:max-w-7xl lg:px-8">
                         <Breadcrumbs breadcrumbs={breadcrumbs} />
                     </div>
                 </div>
