@@ -6,28 +6,24 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Keyboard } from 'lucide-react';
-import { forwardRef } from 'react';
+import { forwardRef, useMemo } from 'react';
+import {
+    shortcutDefinitions,
+    getKeyDisplayName,
+    getModifierKey,
+} from '@/hooks/use-keyboard-shortcuts';
 
 interface KeyboardShortcutsModalProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
 }
 
-interface ShortcutItem {
-    keys: string[];
-    description: string;
-}
-
-const shortcuts: ShortcutItem[] = [
-    { keys: ['Ctrl', 'Enter'], description: 'Submit form' },
-    { keys: ['Ctrl', 'K'], description: 'Clear input' },
-    { keys: ['Esc'], description: 'Close modal/dialog' },
-    { keys: ['Ctrl', '/'], description: 'Show keyboard shortcuts' },
-    { keys: ['Alt', 'I'], description: 'Focus input field' },
-    { keys: ['Alt', 'O'], description: 'Focus output area' },
-    { keys: ['Ctrl', 'C'], description: 'Copy selection' },
-    { keys: ['Ctrl', 'A'], description: 'Select all' },
-];
+const useIsMac = () => {
+    return useMemo(() => {
+        if (typeof window === 'undefined') return false;
+        return /Mac|iPhone|iPad|iPod/.test(window.navigator.platform);
+    }, []);
+};
 
 const KeyBadge = forwardRef<HTMLSpanElement, { children: string }>(
     ({ children }, ref) => (
@@ -45,6 +41,30 @@ export default function KeyboardShortcutsModal({
     open,
     onOpenChange,
 }: KeyboardShortcutsModalProps) {
+    const isMac = useIsMac();
+
+    const displayShortcuts = useMemo(() => {
+        return shortcutDefinitions.map((shortcut) => {
+            const keys: string[] = [];
+            
+            if (shortcut.ctrlKey || shortcut.metaKey) {
+                keys.push(getModifierKey(isMac));
+            }
+            if (shortcut.altKey) {
+                keys.push('Alt');
+            }
+            if (shortcut.shiftKey) {
+                keys.push('Shift');
+            }
+            keys.push(getKeyDisplayName(shortcut.key, isMac));
+            
+            return {
+                keys,
+                description: shortcut.description,
+            };
+        });
+    }, [isMac]);
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-md">
@@ -60,7 +80,7 @@ export default function KeyboardShortcutsModal({
                 </DialogHeader>
 
                 <div className="space-y-3">
-                    {shortcuts.map((shortcut, index) => (
+                    {displayShortcuts.map((shortcut, index) => (
                         <div
                             key={index}
                             className="flex items-center justify-between rounded-lg border p-3"
@@ -89,7 +109,11 @@ export default function KeyboardShortcutsModal({
                 </div>
 
                 <div className="mt-4 text-xs text-muted-foreground">
-                    <p>Note: On Mac, use the Cmd key instead of Ctrl.</p>
+                    <p>
+                        {isMac
+                            ? 'Tip: Use Cmd key for shortcuts on Mac.'
+                            : 'Tip: Use Ctrl key for shortcuts on Windows/Linux.'}
+                    </p>
                 </div>
             </DialogContent>
         </Dialog>

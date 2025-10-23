@@ -64,3 +64,28 @@ export const commonShortcuts = {
     copy: { key: 'c', ctrlKey: true, description: 'Copy selection' },
     selectAll: { key: 'a', ctrlKey: true, description: 'Select all' },
 };
+
+export const getKeyDisplayName = (key: string, isMac: boolean): string => {
+    const keyMap: Record<string, string> = {
+        'Enter': 'Enter',
+        'Escape': 'Esc',
+        '/': '/',
+        'k': 'K',
+        'i': 'I',
+        'o': 'O',
+    };
+    return keyMap[key] || key.toUpperCase();
+};
+
+export const getModifierKey = (isMac: boolean): string => {
+    return isMac ? 'Cmd' : 'Ctrl';
+};
+
+export const shortcutDefinitions = [
+    { ...commonShortcuts.submit, description: 'Submit form' },
+    { ...commonShortcuts.clear, description: 'Clear input' },
+    { ...commonShortcuts.escape, description: 'Close modal/dialog' },
+    { ...commonShortcuts.help, description: 'Show keyboard shortcuts' },
+    { ...commonShortcuts.focusInput, description: 'Focus input field' },
+    { ...commonShortcuts.focusOutput, description: 'Focus output area' },
+] as const;
