@@ -301,14 +301,40 @@ Prism::structured()
 
 **Schema**:
 ```php
-$fillable = ['raw_log', 'formatted_log'];
-$casts = ['formatted_log' => 'array'];
+$fillable = [
+    'user_id',
+    'raw_log',
+    'formatted_log',
+    'detected_log_type',
+    'title',
+    'summary',
+    'field_count',
+    'is_saved',
+];
+$casts = [
+    'formatted_log' => 'array',
+    'is_saved' => 'boolean',
+];
+```
+
+**Relationships**:
+```php
+public function user(): BelongsTo
+{
+    return $this->belongsTo(User::class);
+}
 ```
 
 **Database Table**: `formatted_logs`
 - `id`: Primary key
+- `user_id`: Foreign key to users (nullable)
 - `raw_log`: TEXT - Original unstructured log
 - `formatted_log`: JSON - Structured output
+- `detected_log_type`: VARCHAR(255) - Log type classification
+- `title`: VARCHAR(255) - LLM-generated concise title
+- `summary`: TEXT - Detailed summary
+- `field_count`: INT - Number of extracted fields
+- `is_saved`: BOOLEAN - User-saved status
 - `timestamps`: created_at, updated_at
 
 #### User
@@ -415,27 +441,52 @@ resources/js/
 │   │   ├── alert.tsx
 │   │   ├── avatar.tsx
 │   │   ├── badge.tsx
+│   │   ├── breadcrumb.tsx
 │   │   ├── button.tsx
 │   │   ├── card.tsx
 │   │   ├── checkbox.tsx
+│   │   ├── collapsible.tsx
 │   │   ├── dialog.tsx
 │   │   ├── dropdown-menu.tsx
+│   │   ├── icon.tsx
+│   │   ├── info-tooltip.tsx
 │   │   ├── input.tsx
 │   │   ├── input-otp.tsx
 │   │   ├── label.tsx
+│   │   ├── navigation-menu.tsx
+│   │   ├── placeholder-pattern.tsx
+│   │   ├── radio-group.tsx
+│   │   ├── scroll-area.tsx
 │   │   ├── select.tsx
 │   │   ├── separator.tsx
 │   │   ├── sheet.tsx
 │   │   ├── sidebar.tsx
 │   │   ├── skeleton.tsx
+│   │   ├── slider.tsx
 │   │   ├── spinner.tsx
+│   │   ├── switch.tsx
+│   │   ├── tabs.tsx
 │   │   ├── textarea.tsx
 │   │   ├── toggle.tsx
 │   │   ├── toggle-group.tsx
 │   │   └── tooltip.tsx
+│   ├── animations/
+│   │   └── success-checkmark.tsx # Success animation
+│   ├── formatter/              # Formatter-specific components
+│   │   ├── empty-state.tsx     # Empty history state
+│   │   ├── format-tip.tsx      # Format tips
+│   │   ├── formatting-preferences.tsx # User preferences
+│   │   ├── help-modal.tsx      # Help modal
+│   │   ├── history-entry-card.tsx # History card
+│   │   ├── history-sidebar.tsx # History sidebar
+│   │   ├── onboarding-tour.tsx # Onboarding
+│   │   └── welcome-banner.tsx  # Welcome banner
+│   ├── illustrations/
+│   │   └── empty-log-illustration.tsx # Empty state illustration
 │   ├── alert-error.tsx         # Error alert component
 │   ├── app-content.tsx         # Main content wrapper
-│   ├── app-header.tsx          # Application header
+│   ├── app-footer.tsx          # Application footer
+│   ├── app-header.tsx          # Application header with user display
 │   ├── app-logo-icon.tsx       # Logo icon
 │   ├── app-logo.tsx            # Full logo
 │   ├── app-shell.tsx           # App shell layout
@@ -445,23 +496,43 @@ resources/js/
 │   ├── appearance-tabs.tsx     # Theme tabs
 │   ├── breadcrumbs.tsx         # Breadcrumb navigation
 │   ├── delete-user.tsx         # User deletion component
+│   ├── error-boundary.tsx      # Error boundary
 │   ├── heading-small.tsx       # Small heading
 │   ├── heading.tsx             # Page heading
+│   ├── hero-section.tsx        # Hero section
 │   ├── icon.tsx                # Icon wrapper
 │   ├── input-error.tsx         # Form input error
+│   ├── keyboard-shortcuts-modal.tsx # Keyboard shortcuts help
+│   ├── mobile-navigation.tsx   # Mobile nav
 │   ├── nav-footer.tsx          # Sidebar footer
 │   ├── nav-main.tsx            # Main navigation
 │   ├── nav-user.tsx            # User nav menu
+│   ├── newsletter-signup.tsx   # Newsletter
+│   ├── seasonal-effects.tsx    # Seasonal UI effects
+│   ├── settings-panel.tsx      # Settings panel
+│   ├── skip-navigation.tsx     # Skip to content link
+│   ├── status-indicator.tsx    # Status indicator
 │   ├── text-link.tsx           # Text link component
-│   ├── two-factor-recovery-codes.tsx
-│   └── two-factor-setup-modal.tsx
+│   ├── two-factor-recovery-codes.tsx # 2FA recovery codes
+│   ├── two-factor-setup-modal.tsx # 2FA setup
+│   ├── user-info.tsx           # User info display
+│   └── user-menu-content.tsx   # User menu
 ├── hooks/                      # Custom React hooks
 │   ├── use-appearance.tsx      # Theme management
 │   ├── use-clipboard.ts        # Clipboard operations
+│   ├── use-first-visit.ts      # First visit detection
+│   ├── use-formatting-timer.ts # Format request timer
+│   ├── use-history.ts          # History management
 │   ├── use-initials.tsx        # User initials
-│   ├── use-mobile-navigation.ts
+│   ├── use-keyboard-shortcuts.ts # Keyboard shortcuts
+│   ├── use-llm-model.ts        # LLM model selection
+│   ├── use-mobile-navigation.ts # Mobile navigation
 │   ├── use-mobile.tsx          # Mobile detection
-│   └── use-two-factor-auth.ts  # 2FA logic
+│   ├── use-preferences.ts      # User preferences
+│   ├── use-scroll-shadow.ts    # Scroll shadows
+│   ├── use-settings.ts         # Settings management
+│   ├── use-two-factor-auth.ts  # 2FA logic
+│   └── use-unique-id.tsx       # Unique ID generation
 ├── layouts/                    # Page layouts
 │   ├── app/
 │   │   ├── app-header-layout.tsx
@@ -493,6 +564,7 @@ resources/js/
 ├── routes/                     # Wayfinder route helpers
 │   ├── appearance/index.ts
 │   ├── formatter/index.ts
+│   ├── history/index.ts        # History routes
 │   ├── login/index.ts
 │   ├── password/
 │   │   ├── confirm/index.ts
@@ -506,6 +578,8 @@ resources/js/
 │   ├── verification/index.ts
 │   └── index.ts                # Root route exports
 ├── types/                      # TypeScript type definitions
+│   ├── history.ts              # History types
+│   ├── preferences.ts          # Preferences types
 │   ├── index.d.ts              # Global types
 │   └── vite-env.d.ts
 ├── wayfinder/                  # Wayfinder generated code
@@ -618,16 +692,38 @@ Located in `resources/js/components/ui/`, built with Radix UI:
 
 **Shell Components**:
 - `app-shell.tsx`: Main application shell
-- `app-header.tsx`: Top navigation bar
+- `app-header.tsx`: Top navigation bar with user display and accessibility IDs
 - `app-sidebar.tsx`: Sidebar navigation with sections
 - `app-content.tsx`: Main content area
+- `app-footer.tsx`: Application footer
+
+**Formatter Components** (`components/formatter/`):
+- `history-sidebar.tsx`: History panel with recent and saved tabs
+- `history-entry-card.tsx`: Individual history entry card with title display
+- `empty-state.tsx`: Empty history state with illustration
+- `formatting-preferences.tsx`: User formatting preferences panel
+- `help-modal.tsx`: Help and documentation modal
+- `format-tip.tsx`: Format tips and suggestions
+- `welcome-banner.tsx`: Welcome banner for new users
+- `onboarding-tour.tsx`: Interactive onboarding tour
 
 **Utility Components**:
 - `input-error.tsx`: Form validation error display
 - `alert-error.tsx`: Error alert with icon
+- `keyboard-shortcuts-modal.tsx`: Dynamic keyboard shortcuts help (NEW - October 2025)
 - `two-factor-setup-modal.tsx`: 2FA setup wizard
 - `two-factor-recovery-codes.tsx`: 2FA recovery code display
 - `appearance-dropdown.tsx`: Theme switcher
+- `skip-navigation.tsx`: Skip to main content link for accessibility
+- `status-indicator.tsx`: Status indicator component
+- `user-info.tsx`: User information display
+- `user-menu-content.tsx`: User dropdown menu content
+
+**Animation Components** (`components/animations/`):
+- `success-checkmark.tsx`: Success animation for completed actions
+
+**Illustration Components** (`components/illustrations/`):
+- `empty-log-illustration.tsx`: SVG illustration for empty states
 
 ### Layouts
 
@@ -749,6 +845,98 @@ const availableModels = [
 ];
 ```
 
+#### useKeyboardShortcuts
+
+**Location**: `resources/js/hooks/use-keyboard-shortcuts.ts`
+
+**Purpose**: Centralized keyboard shortcut management with platform-aware key combinations
+
+**Features**:
+- Cross-platform keyboard shortcut handling (Cmd on Mac, Ctrl elsewhere)
+- Centralized shortcut registry with type safety
+- Dynamic shortcut documentation generation
+- Integration with keyboard shortcuts modal
+- Tooltips for action buttons
+
+**API**:
+```typescript
+const { shortcuts, getShortcuts } = useKeyboardShortcuts({
+    onFormat: () => handleFormat(),
+    onClear: () => handleClear(),
+    onToggleHistory: () => toggleHistory(),
+});
+```
+
+**Shortcut Registry**:
+```typescript
+const shortcuts = [
+  { key: 'Ctrl+Enter', action: 'Format log', callback: onFormat },
+  { key: 'Ctrl+K', action: 'Toggle history', callback: onToggleHistory },
+  { key: 'Ctrl+L', action: 'Clear input', callback: onClear },
+  { key: '?', action: 'Show shortcuts', callback: showHelp },
+];
+```
+
+#### useHistory
+
+**Location**: `resources/js/hooks/use-history.ts`
+
+**Purpose**: History management for formatted logs
+
+**Features**:
+- Fetch user's history entries (recent and saved)
+- Load specific history entry
+- Delete history entries
+- Toggle saved status
+- Clear all history
+- Export history as JSON
+- Real-time updates
+
+**API**:
+```typescript
+const {
+    history,
+    isLoading,
+    loadEntry,
+    deleteEntry,
+    toggleSave,
+    clearAll,
+    exportHistory,
+} = useHistory();
+```
+
+**History Entry Type**:
+```typescript
+interface HistoryEntry {
+    id: number;
+    createdAt: string;
+    detectedLogType?: string;
+    title?: string;
+    summary?: string;
+    preview: string;
+    fieldCount?: number;
+    isSaved: boolean;
+}
+```
+
+#### usePreferences
+
+**Location**: `resources/js/hooks/use-preferences.ts`
+
+**Purpose**: Manage user formatting preferences
+
+**Features**:
+- Timestamp format preferences
+- Log level normalization
+- Timezone conversion
+- Auto-format toggle
+- Preference persistence
+
+**API**:
+```typescript
+const { preferences, updatePreferences } = usePreferences();
+```
+
 ### Routing
 
 #### Laravel Wayfinder Integration
@@ -805,21 +993,58 @@ CREATE TABLE users (
 ```sql
 CREATE TABLE formatted_logs (
     id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT UNSIGNED NULL,
     raw_log TEXT NOT NULL,
     formatted_log JSON NOT NULL,
+    detected_log_type VARCHAR(255) NULL,
+    title VARCHAR(255) NULL,
+    summary TEXT NULL,
+    field_count INT NULL,
+    is_saved BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP NULL,
-    updated_at TIMESTAMP NULL
+    updated_at TIMESTAMP NULL,
+    INDEX idx_user_id (user_id),
+    INDEX idx_title (title),
+    INDEX idx_is_saved (is_saved),
+    INDEX idx_created_at (created_at),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 ```
+
+**Key Columns**:
+- `user_id`: Foreign key to users table (null for guest users)
+- `raw_log`: Original unstructured log text
+- `formatted_log`: Structured JSON output from LLM
+- `detected_log_type`: High-level log classification (e.g., "application_error", "http_access")
+- `title`: Concise 5-50 character LLM-generated title for quick identification (NEW in October 2025)
+- `summary`: Detailed text summary of log entry
+- `field_count`: Number of fields extracted from log
+- `is_saved`: User-saved status for quick access
 
 **Formatted Log JSON Structure**:
 ```json
 {
-    "timestamp": "2024-10-15 14:23:45",
-    "level": "ERROR",
-    "message": "Database connection failed",
-    "source": "Database",
-    "metadata": "{\"timeout\":\"30s\"}"
+    "detected_log_type": "application_error",
+    "summary": {
+        "status": "error",
+        "headline": "Database connection failed",
+        "key_points": ["Connection timeout", "30s threshold exceeded"]
+    },
+    "entities": [
+        { "type": "service", "identifier": "Database", "details": "MySQL 8.0" }
+    ],
+    "metrics": [
+        { "name": "timeout", "value": 30, "unit": "seconds" }
+    ],
+    "sections": [
+        {
+            "section_type": "error_details",
+            "data": {
+                "error_code": "CONN_TIMEOUT",
+                "timestamp": "2024-10-15 14:23:45"
+            }
+        }
+    ]
 }
 ```
 

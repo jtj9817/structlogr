@@ -147,6 +147,9 @@ Authenticated users can:
 - `Ctrl+Enter` or `Cmd+Enter`: Format log
 - `Ctrl+K` or `Cmd+K`: Toggle history sidebar
 - `Ctrl+L` or `Cmd+L`: Clear input
+- `?`: Show keyboard shortcuts help
+
+**Tip**: Action buttons display keyboard shortcuts in tooltips. Press `?` to view all available shortcuts in the help modal.
 
 Example input:
 ```

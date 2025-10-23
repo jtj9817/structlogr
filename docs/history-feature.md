@@ -31,7 +31,8 @@ The History feature allows authenticated users to:
 - **User-specific**: Each user has their own isolated history
 - **Automatic tracking**: All formatted logs are saved automatically
 - **Saved/Recent separation**: Organize entries into two categories
-- **Rich metadata**: Store summaries, log types, and field counts
+- **Rich metadata**: Store summaries, log types, field counts, and LLM-generated titles
+- **LLM-generated titles**: Concise 5-50 character titles for quick identification (NEW - October 2025)
 - **Export capability**: Download complete history for external analysis
 - **Soft deletes**: Support for data recovery if needed
 
@@ -89,8 +90,9 @@ The History system follows a layered architecture:
 │  │  - user_id (FK)                    │ │
 │  │  - raw_log (TEXT)                  │ │
 │  │  - formatted_log (JSON)            │ │
-│  │  - summary (VARCHAR)               │ │
 │  │  - detected_log_type (VARCHAR)     │ │
+│  │  - title (VARCHAR)                 │ │
+│  │  - summary (TEXT)                  │ │
 │  │  - field_count (INT)               │ │
 │  │  - is_saved (BOOLEAN)              │ │
 │  │  - timestamps                      │ │
@@ -570,8 +572,9 @@ CREATE TABLE formatted_logs (
     user_id BIGINT UNSIGNED NULL,
     raw_log TEXT NOT NULL,
     formatted_log JSON NOT NULL,
-    summary VARCHAR(255) NULL,
-    detected_log_type VARCHAR(128) NULL,
+    detected_log_type VARCHAR(255) NULL,
+    title VARCHAR(255) NULL,
+    summary TEXT NULL,
     field_count INT UNSIGNED DEFAULT 0,
     is_saved BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP NULL,
@@ -579,6 +582,10 @@ CREATE TABLE formatted_logs (
     deleted_at TIMESTAMP NULL,
     
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_user_id (user_id),
+    INDEX idx_title (title),
+    INDEX idx_is_saved (is_saved),
+    INDEX idx_created_at (created_at),
     INDEX (user_id, created_at)
 );
 ```
@@ -588,8 +595,9 @@ CREATE TABLE formatted_logs (
 - **user_id**: Foreign key to users table (nullable for guest logs)
 - **raw_log**: Original unformatted log text
 - **formatted_log**: JSON structured output from LLM
-- **summary**: Generated headline for quick identification
 - **detected_log_type**: Classification (e.g., "application_error", "http_access")
+- **title**: LLM-generated concise title (5-50 characters) for quick identification (NEW - October 2025)
+- **summary**: Detailed text summary of log entry
 - **field_count**: Number of fields extracted (for UI indicators)
 - **is_saved**: Boolean flag for saved entries
 - **deleted_at**: Soft delete timestamp
@@ -597,6 +605,7 @@ CREATE TABLE formatted_logs (
 #### Indexes
 
 - **Primary**: `id` (auto-increment)
+- **Single Indexes**: `user_id`, `title`, `is_saved`, `created_at` for efficient queries
 - **Composite**: `(user_id, created_at)` for efficient history queries
 
 ---
@@ -640,6 +649,7 @@ Route::middleware('auth')->group(function () {
     "recent": [
       {
         "id": 123,
+        "title": "Database Connection Timeout",
         "summary": "Database connection failed",
         "preview": "2024-10-15 14:23:45 [ERROR] Database connection failed - timeout after 30s",
         "createdAt": "2025-10-21T12:34:56Z",
@@ -691,19 +701,26 @@ Route::middleware('auth')->group(function () {
 │  [Recent]  [Saved]                  │
 ├─────────────────────────────────────┤
 │  ┌───────────────────────────────┐  │
-│  │ 📋 Database connection failed │  │
-│  │ 2024-10-15 14:23:45 [ERROR]  │  │
+│  │ 📋 Database Connection Timeout│  │  ← LLM-generated title
+│  │ 2024-10-15 14:23:45          │  │
 │  │ application_error • 5 fields │  │
-│  │ [Load] [Save] [Copy] [Delete]│  │
+│  │ [★] [📋] [🗑️]                │  │
 │  └───────────────────────────────┘  │
 │  ┌───────────────────────────────┐  │
-│  │ 🔧 Authentication successful  │  │
+│  │ 🔧 User Login Successful      │  │  ← LLM-generated title
+│  │ 2024-10-15 14:20:12          │  │
 │  │ ...                           │  │
 │  └───────────────────────────────┘  │
 ├─────────────────────────────────────┤
 │  [Export] [Clear All]               │
 └─────────────────────────────────────┘
 ```
+
+**Title Display (NEW - October 2025)**:
+- Primary headline shows LLM-generated title (5-50 characters)
+- Concise, descriptive labels for quick identification
+- Fallback to summary or preview for legacy entries (null titles)
+- Improves scannability and entry differentiation
 
 ### Entry Actions
 
