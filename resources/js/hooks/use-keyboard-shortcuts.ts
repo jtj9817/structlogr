@@ -10,6 +10,15 @@ interface KeyboardShortcut {
     description: string;
 }
 
+export type ShortcutDefinition = {
+    key: string;
+    description: string;
+    ctrlKey?: boolean;
+    metaKey?: boolean;
+    shiftKey?: boolean;
+    altKey?: boolean;
+};
+
 interface KeyboardShortcutsOptions {
     enabled?: boolean;
     preventDefault?: boolean;
@@ -81,11 +90,11 @@ export const getModifierKey = (isMac: boolean): string => {
     return isMac ? 'Cmd' : 'Ctrl';
 };
 
-export const shortcutDefinitions = [
+export const shortcutDefinitions: ShortcutDefinition[] = [
     { ...commonShortcuts.submit, description: 'Submit form' },
     { ...commonShortcuts.clear, description: 'Clear input' },
     { ...commonShortcuts.escape, description: 'Close modal/dialog' },
     { ...commonShortcuts.help, description: 'Show keyboard shortcuts' },
     { ...commonShortcuts.focusInput, description: 'Focus input field' },
     { ...commonShortcuts.focusOutput, description: 'Focus output area' },
-] as const;
+];
