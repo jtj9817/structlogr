@@ -182,6 +182,7 @@ export default function FormatterPage({
     const formRef = useRef<HTMLElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const outputRef = useRef<HTMLPreElement>(null);
+    const errorRef = useRef<HTMLDivElement>(null);
     const copyResetTimeoutRef = useRef<number | undefined>(undefined);
     const inputCopyResetTimeoutRef = useRef<number | undefined>(undefined);
 
@@ -445,6 +446,7 @@ export default function FormatterPage({
                 setFormattingDuration(duration);
                 setStatusMessage(`Log formatting complete in ${(duration / 1000).toFixed(2)}s`);
                 setTimeout(() => setStatusMessage(''), 3000);
+                setTimeout(() => outputRef.current?.focus(), 100);
             },
             onError: (errors) => {
                 stopTimer();
@@ -452,6 +454,7 @@ export default function FormatterPage({
                 const errorMessage = errors.raw_log || errors.llm_model || 'Error formatting log';
                 setStatusMessage(errorMessage);
                 setTimeout(() => setStatusMessage(''), 3000);
+                setTimeout(() => errorRef.current?.focus(), 100);
             },
         });
     };
@@ -788,10 +791,12 @@ export default function FormatterPage({
 
                                                 {errors.raw_log && (
                                                     <div
+                                                        ref={errorRef}
                                                         id={errorAlertId}
                                                         role="alert"
                                                         aria-live="assertive"
                                                         className="mt-2"
+                                                        tabIndex={-1}
                                                     >
                                                         <InputError
                                                             message={
