@@ -86,6 +86,12 @@ class User extends Authenticatable
 
     public function setPreferencesAttribute($value): void
     {
+        if ($value === '' || $value === null) {
+            $this->attributes['preferences'] = null;
+
+            return;
+        }
+
         $this->attributes['preferences'] = is_array($value)
             ? json_encode($value)
             : $value;
