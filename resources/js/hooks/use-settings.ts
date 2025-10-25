@@ -11,7 +11,7 @@ const STORAGE_KEY = 'structlogr:user-preferences';
 
 export type { FontSize, JsonIndentation, OutputFormat };
 
-export interface Settings extends UserPreferences {}
+export type Settings = UserPreferences;
 
 const defaultSettings: Settings = {
     outputFormat: 'json',
