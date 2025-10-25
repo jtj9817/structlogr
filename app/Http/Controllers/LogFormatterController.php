@@ -42,7 +42,7 @@ class LogFormatterController extends Controller
             $logFormatterService->saveLog($rawLog, $result['structured'], $result['title'], $request->user());
 
             return redirect()
-                ->route('formatter.show')
+                ->route('home')
                 ->with('formattedLog', $result['structured'])
                 ->with('success', 'Log formatted successfully!');
         } catch (\InvalidArgumentException $e) {

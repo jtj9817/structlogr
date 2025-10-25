@@ -47,6 +47,6 @@ class RegisteredUserController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('formatter.show', absolute: false));
+        return redirect()->intended(route('home', absolute: false));
     }
 }

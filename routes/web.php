@@ -4,7 +4,7 @@ use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\LogFormatterController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [LogFormatterController::class, 'show'])->name('formatter.show');
+Route::get('/', [LogFormatterController::class, 'show'])->name('home');
 Route::post('/format', [LogFormatterController::class, 'format'])->name('formatter.format');
 
 Route::middleware('auth')->prefix('history')->name('history.')->group(function () {
