@@ -157,7 +157,10 @@ export function useSettings() {
                 router.patch(
                     '/settings/preferences',
                     {
-                        preferences: newSettings,
+                        preferences: newSettings as unknown as Record<
+                            string,
+                            string | number | boolean
+                        >,
                     },
                     {
                         preserveState: true,
@@ -186,7 +189,10 @@ export function useSettings() {
             router.patch(
                 '/settings/preferences',
                 {
-                    preferences: defaultSettings,
+                    preferences: defaultSettings as unknown as Record<
+                        string,
+                        string | number | boolean
+                    >,
                 },
                 {
                     preserveState: true,
