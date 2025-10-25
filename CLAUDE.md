@@ -272,3 +272,6 @@ HTTP_CONNECT_TIMEOUT=60
 ```
 
 **See**: `docs/llm-providers.md` for detailed provider comparison and configuration
+
+# ABSOLUTE
+DO NOT READ THE USER'S `.env` FILE.
