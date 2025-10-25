@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../wayfinder'
 /**
 * @see \App\Http\Controllers\HistoryController::index
 * @see app/Http/Controllers/HistoryController.php:15
@@ -42,6 +42,43 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     url: index.url(options),
     method: 'head',
 })
+
+/**
+* @see \App\Http\Controllers\HistoryController::index
+* @see app/Http/Controllers/HistoryController.php:15
+* @route '/history'
+*/
+const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: index.url(options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\HistoryController::index
+* @see app/Http/Controllers/HistoryController.php:15
+* @route '/history'
+*/
+indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: index.url(options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\HistoryController::index
+* @see app/Http/Controllers/HistoryController.php:15
+* @route '/history'
+*/
+indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: index.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+index.form = indexForm
 
 /**
 * @see \App\Http\Controllers\HistoryController::exportMethod
@@ -88,11 +125,48 @@ exportMethod.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 })
 
 /**
+* @see \App\Http\Controllers\HistoryController::exportMethod
+* @see app/Http/Controllers/HistoryController.php:66
+* @route '/history/export'
+*/
+const exportMethodForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: exportMethod.url(options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\HistoryController::exportMethod
+* @see app/Http/Controllers/HistoryController.php:66
+* @route '/history/export'
+*/
+exportMethodForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: exportMethod.url(options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\HistoryController::exportMethod
+* @see app/Http/Controllers/HistoryController.php:66
+* @route '/history/export'
+*/
+exportMethodForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: exportMethod.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+exportMethod.form = exportMethodForm
+
+/**
 * @see \App\Http\Controllers\HistoryController::show
 * @see app/Http/Controllers/HistoryController.php:24
 * @route '/history/{formattedLog}'
 */
-export const show = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+export const show = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     url: show.url(args, options),
     method: 'get',
 })
@@ -107,7 +181,7 @@ show.definition = {
 * @see app/Http/Controllers/HistoryController.php:24
 * @route '/history/{formattedLog}'
 */
-show.url = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
+show.url = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { formattedLog: args }
     }
@@ -140,7 +214,7 @@ show.url = (args: { formattedLog: number | { id: number } } | [formattedLog: num
 * @see app/Http/Controllers/HistoryController.php:24
 * @route '/history/{formattedLog}'
 */
-show.get = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+show.get = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     url: show.url(args, options),
     method: 'get',
 })
@@ -150,17 +224,54 @@ show.get = (args: { formattedLog: number | { id: number } } | [formattedLog: num
 * @see app/Http/Controllers/HistoryController.php:24
 * @route '/history/{formattedLog}'
 */
-show.head = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+show.head = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     url: show.url(args, options),
     method: 'head',
 })
+
+/**
+* @see \App\Http\Controllers\HistoryController::show
+* @see app/Http/Controllers/HistoryController.php:24
+* @route '/history/{formattedLog}'
+*/
+const showForm = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: show.url(args, options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\HistoryController::show
+* @see app/Http/Controllers/HistoryController.php:24
+* @route '/history/{formattedLog}'
+*/
+showForm.get = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: show.url(args, options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\HistoryController::show
+* @see app/Http/Controllers/HistoryController.php:24
+* @route '/history/{formattedLog}'
+*/
+showForm.head = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: show.url(args, {
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+show.form = showForm
 
 /**
 * @see \App\Http\Controllers\HistoryController::toggleSave
 * @see app/Http/Controllers/HistoryController.php:45
 * @route '/history/{formattedLog}/toggle-save'
 */
-export const toggleSave = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
+export const toggleSave = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
     url: toggleSave.url(args, options),
     method: 'patch',
 })
@@ -175,7 +286,7 @@ toggleSave.definition = {
 * @see app/Http/Controllers/HistoryController.php:45
 * @route '/history/{formattedLog}/toggle-save'
 */
-toggleSave.url = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
+toggleSave.url = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { formattedLog: args }
     }
@@ -208,17 +319,49 @@ toggleSave.url = (args: { formattedLog: number | { id: number } } | [formattedLo
 * @see app/Http/Controllers/HistoryController.php:45
 * @route '/history/{formattedLog}/toggle-save'
 */
-toggleSave.patch = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
+toggleSave.patch = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
     url: toggleSave.url(args, options),
     method: 'patch',
 })
+
+/**
+* @see \App\Http\Controllers\HistoryController::toggleSave
+* @see app/Http/Controllers/HistoryController.php:45
+* @route '/history/{formattedLog}/toggle-save'
+*/
+const toggleSaveForm = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: toggleSave.url(args, {
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'PATCH',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'post',
+})
+
+/**
+* @see \App\Http\Controllers\HistoryController::toggleSave
+* @see app/Http/Controllers/HistoryController.php:45
+* @route '/history/{formattedLog}/toggle-save'
+*/
+toggleSaveForm.patch = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: toggleSave.url(args, {
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'PATCH',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'post',
+})
+
+toggleSave.form = toggleSaveForm
 
 /**
 * @see \App\Http\Controllers\HistoryController::destroy
 * @see app/Http/Controllers/HistoryController.php:37
 * @route '/history/{formattedLog}'
 */
-export const destroy = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
+export const destroy = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
     url: destroy.url(args, options),
     method: 'delete',
 })
@@ -233,7 +376,7 @@ destroy.definition = {
 * @see app/Http/Controllers/HistoryController.php:37
 * @route '/history/{formattedLog}'
 */
-destroy.url = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
+destroy.url = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { formattedLog: args }
     }
@@ -266,10 +409,42 @@ destroy.url = (args: { formattedLog: number | { id: number } } | [formattedLog: 
 * @see app/Http/Controllers/HistoryController.php:37
 * @route '/history/{formattedLog}'
 */
-destroy.delete = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
+destroy.delete = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
     url: destroy.url(args, options),
     method: 'delete',
 })
+
+/**
+* @see \App\Http\Controllers\HistoryController::destroy
+* @see app/Http/Controllers/HistoryController.php:37
+* @route '/history/{formattedLog}'
+*/
+const destroyForm = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: destroy.url(args, {
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'DELETE',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'post',
+})
+
+/**
+* @see \App\Http\Controllers\HistoryController::destroy
+* @see app/Http/Controllers/HistoryController.php:37
+* @route '/history/{formattedLog}'
+*/
+destroyForm.delete = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: destroy.url(args, {
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'DELETE',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'post',
+})
+
+destroy.form = destroyForm
 
 /**
 * @see \App\Http\Controllers\HistoryController::clear
@@ -304,6 +479,38 @@ clear.delete = (options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
     url: clear.url(options),
     method: 'delete',
 })
+
+/**
+* @see \App\Http\Controllers\HistoryController::clear
+* @see app/Http/Controllers/HistoryController.php:55
+* @route '/history'
+*/
+const clearForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: clear.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'DELETE',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'post',
+})
+
+/**
+* @see \App\Http\Controllers\HistoryController::clear
+* @see app/Http/Controllers/HistoryController.php:55
+* @route '/history'
+*/
+clearForm.delete = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: clear.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'DELETE',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'post',
+})
+
+clear.form = clearForm
 
 const history = {
     index: Object.assign(index, index),

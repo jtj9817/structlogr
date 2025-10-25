@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition } from './../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../wayfinder'
 /**
 * @see \App\Http\Controllers\LogFormatterController::format
 * @see app/Http/Controllers/LogFormatterController.php:23
@@ -32,6 +32,28 @@ format.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     url: format.url(options),
     method: 'post',
 })
+
+/**
+* @see \App\Http\Controllers\LogFormatterController::format
+* @see app/Http/Controllers/LogFormatterController.php:23
+* @route '/format'
+*/
+const formatForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: format.url(options),
+    method: 'post',
+})
+
+/**
+* @see \App\Http\Controllers\LogFormatterController::format
+* @see app/Http/Controllers/LogFormatterController.php:23
+* @route '/format'
+*/
+formatForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: format.url(options),
+    method: 'post',
+})
+
+format.form = formatForm
 
 const formatter = {
     format: Object.assign(format, format),
