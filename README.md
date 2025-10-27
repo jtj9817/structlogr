@@ -12,7 +12,7 @@ A modern web application for transforming raw log text into structured JSON form
 - **Modern Tech Stack**: Laravel 12 backend with React 19 + Inertia.js 2.0 frontend
 - **Full Authentication System**: Email/password authentication with two-factor support via Laravel Fortify
 - **Accessibility First**: Keyboard shortcuts, ARIA labels, screen reader support, and skip navigation
-- **Settings & Preferences**: Customizable formatting preferences, auto-format toggle, and appearance settings
+- **Settings & Preferences**: Backend-persisted user preferences with cross-device sync, customizable formatting options, and appearance settings
 - **Type-Safe Routing**: Laravel Wayfinder integration for type-safe routes in TypeScript
 - **Dark Mode**: Built-in theme switching with user preferences
 - **Responsive UI**: Tailwind CSS 4.0 + Radix UI components with mobile navigation
@@ -218,7 +218,13 @@ Authenticated users can manage:
 - **Password**: Change account password
 - **Two-Factor Authentication**: Enable/disable 2FA with recovery codes
 - **Appearance**: Theme selection (light/dark/system)
-- **Formatting Preferences**: Auto-format toggle, timestamp display options
+- **Formatting Preferences**: Backend-persisted preferences including:
+  - Output format and JSON indentation
+  - Auto-copy results and line numbers
+  - History saving and analytics preferences
+  - Font size and animation settings
+  - Custom API endpoint configuration
+  - All preferences sync across devices and sessions
 
 ## Development
 
@@ -260,6 +266,10 @@ structlogr/
 │   │   ├── Controllers/
 │   │   │   ├── Auth/              # Authentication controllers
 │   │   │   ├── Settings/          # User settings controllers
+│   │   │   │   ├── PasswordController.php
+│   │   │   │   ├── PreferencesController.php  # Preferences API
+│   │   │   │   ├── ProfileController.php
+│   │   │   │   └── TwoFactorAuthenticationController.php
 │   │   │   ├── HistoryController.php # History management
 │   │   │   └── LogFormatterController.php
 │   │   ├── Middleware/
@@ -302,7 +312,7 @@ structlogr/
 │       └── types/                  # TypeScript types
 ├── routes/
 │   ├── auth.php                    # Auth routes
-│   ├── settings.php                # Settings routes
+│   ├── settings.php                # Settings routes (profile, password, 2FA, preferences)
 │   └── web.php                     # Main web routes
 ├── tests/
 │   ├── Feature/
