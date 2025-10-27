@@ -136,6 +136,37 @@ User settings management under `app/Http/Controllers/Settings/`:
 - **ProfileController**: Update name, email
 - **PasswordController**: Change password
 - **TwoFactorAuthenticationController**: Enable/disable 2FA, view recovery codes
+- **PreferencesController**: Manage user preferences with backend persistence
+
+#### PreferencesController
+
+**Location**: `app/Http/Controllers/Settings/PreferencesController.php`
+
+**Methods**:
+- `index()`: Returns user's current preferences
+- `update(Request $request)`: Updates user preferences with validation
+
+**Validation Rules**:
+- `outputFormat`: Must be 'json', 'yaml', or 'xml'
+- `jsonIndentation`: Integer between 0 and 8
+- `autoCopyResults`: Boolean
+- `showLineNumbers`: Boolean
+- `saveToHistory`: Boolean
+- `anonymousAnalytics`: Boolean
+- `avoidSensitiveStorage`: Boolean
+- `fontSize`: Must be 'small', 'medium', or 'large'
+- `reduceAnimations`: Boolean
+- `customApiEndpoint`: Optional URL
+- `apiKey`: Optional string (max 255 chars)
+- `timeoutSeconds`: Integer between 5 and 300
+
+**Routes**:
+```php
+Route::middleware('auth')->group(function () {
+    Route::get('/settings/preferences', [PreferencesController::class, 'index'])->name('preferences.index');
+    Route::patch('/settings/preferences', [PreferencesController::class, 'update'])->name('preferences.update');
+});
+```
 
 #### HistoryController
 
@@ -341,17 +372,43 @@ public function user(): BelongsTo
 
 **Location**: `app/Models/User.php`
 
-Standard Laravel User model with Fortify two-factor authentication traits.
+Standard Laravel User model with Fortify two-factor authentication traits and user preferences support.
 
 **Database Table**: `users`
 - `id`: Primary key
 - `name`: User full name
 - `email`: Email address (unique)
 - `password`: Hashed password
+- `preferences`: JSON - User preferences with defaults (NEW)
 - `two_factor_secret`: Encrypted 2FA secret
 - `two_factor_recovery_codes`: Encrypted recovery codes
 - `two_factor_confirmed_at`: Timestamp
 - `timestamps`: created_at, updated_at
+
+**Preferences Schema**:
+The User model includes a `getPreferencesAttribute()` accessor that merges stored preferences with sensible defaults:
+
+```php
+[
+    'outputFormat' => 'json',           // json, yaml, xml
+    'jsonIndentation' => 2,             // 0-8 spaces
+    'autoCopyResults' => false,         // Auto-copy formatted output
+    'showLineNumbers' => true,          // Display line numbers
+    'saveToHistory' => true,            // Persist to history
+    'anonymousAnalytics' => true,       // Usage analytics
+    'avoidSensitiveStorage' => false,   // Skip sensitive data
+    'fontSize' => 'medium',             // small, medium, large
+    'reduceAnimations' => false,        // Reduce motion
+    'customApiEndpoint' => '',          // Custom LLM endpoint
+    'apiKey' => '',                     // Custom API key
+    'timeoutSeconds' => 30,             // API timeout (5-300)
+]
+```
+
+**Casts**:
+```php
+'preferences' => 'array',  // Automatic JSON encoding/decoding
+```
 
 ### Middleware
 
@@ -367,12 +424,15 @@ Standard Laravel User model with Fortify two-factor authentication traits.
     'auth' => [
         'user' => $request->user(),
     ],
+    'preferences' => $request->user()?->preferences,  // User preferences (NEW)
     'flash' => [
         'message' => session('message'),
         'error' => session('error'),
     ],
 ]
 ```
+
+User preferences are automatically shared with all Inertia pages when authenticated, enabling consistent preference application across the frontend without additional API calls.
 
 #### HandleAppearance
 
@@ -919,23 +979,35 @@ interface HistoryEntry {
 }
 ```
 
-#### usePreferences
+#### useSettings
 
-**Location**: `resources/js/hooks/use-preferences.ts`
+**Location**: `resources/js/hooks/use-settings.ts`
 
-**Purpose**: Manage user formatting preferences
+**Purpose**: Manage user formatting preferences with backend persistence
 
 **Features**:
-- Timestamp format preferences
-- Log level normalization
-- Timezone conversion
-- Auto-format toggle
-- Preference persistence
+- Backend synchronization via PreferencesController API
+- LocalStorage fallback for guest users
+- Automatic sync on preference changes
+- Optimistic UI updates
+- 12 configurable settings:
+  - Output format, JSON indentation
+  - Auto-copy results, line numbers
+  - History saving, analytics
+  - Sensitive data handling
+  - Font size, animations
+  - Custom API endpoint, API key, timeout
 
 **API**:
 ```typescript
-const { preferences, updatePreferences } = usePreferences();
+const { settings, updateSettings, isLoading } = useSettings();
 ```
+
+**Backend Integration**:
+- Authenticated users: Preferences persist to database via PATCH `/settings/preferences`
+- Guest users: Preferences stored in localStorage only
+- Automatic merge with server preferences on mount
+- Real-time sync across tabs/devices for authenticated users
 
 ### Routing
 
@@ -950,19 +1022,29 @@ wayfinder({
 ```
 
 **Generated Files**:
-- `resources/js/actions/`: Server action helpers
+- `resources/js/actions/`: Server action helpers (3,325 lines generated)
+  - Auth actions (login, register, password reset, email verification)
+  - Settings actions (profile, password, 2FA, preferences)
+  - History actions (CRUD, toggle save, export)
+  - Formatter actions (format logs)
 - `resources/js/routes/`: Route helper functions
 - `resources/js/wayfinder/index.ts`: Core routing utilities
 
 **Usage**:
 ```typescript
 import { login, register } from '@/routes';
+import { preferences } from '@/routes/preferences';
 
 <Link href={login()}>Log in</Link>
 <Link href={register()}>Register</Link>
+<Link href={preferences.index()}>Preferences</Link>
 ```
 
-**Type Safety**: Full TypeScript support for route parameters and query strings
+**Type Safety**: 
+- Full TypeScript support for route parameters and query strings
+- Form variant support for POST/PATCH/DELETE actions
+- Inertia FormData type compatibility with type assertions
+- Auto-generated action types for all Laravel routes
 
 ---
 
@@ -983,9 +1065,28 @@ CREATE TABLE users (
     two_factor_recovery_codes TEXT NULL,
     two_factor_confirmed_at TIMESTAMP NULL,
     remember_token VARCHAR(100) NULL,
+    preferences JSON NULL,                -- NEW: User preferences with defaults
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL
 );
+```
+
+**Preferences JSON Structure**:
+```json
+{
+    "outputFormat": "json",
+    "jsonIndentation": 2,
+    "autoCopyResults": false,
+    "showLineNumbers": true,
+    "saveToHistory": true,
+    "anonymousAnalytics": true,
+    "avoidSensitiveStorage": false,
+    "fontSize": "medium",
+    "reduceAnimations": false,
+    "customApiEndpoint": "",
+    "apiKey": "",
+    "timeoutSeconds": 30
+}
 ```
 
 #### formatted_logs
