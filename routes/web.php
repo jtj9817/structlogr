@@ -9,6 +9,7 @@ Route::post('/format', [LogFormatterController::class, 'format'])->name('formatt
 
 Route::middleware('auth')->prefix('history')->name('history.')->group(function () {
     Route::get('/', [HistoryController::class, 'index'])->name('index');
+    Route::get('/search', [HistoryController::class, 'search'])->name('search');
     Route::get('/export', [HistoryController::class, 'export'])->name('export');
     Route::get('/{formattedLog}', [HistoryController::class, 'show'])->name('show');
     Route::patch('/{formattedLog}/toggle-save', [HistoryController::class, 'toggleSave'])->name('toggle-save');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\HistorySearchRequest;
 use App\Models\FormattedLog;
 use App\Services\HistoryService;
 use Illuminate\Http\JsonResponse;
@@ -18,6 +19,24 @@ class HistoryController extends Controller
 
         return response()->json([
             'data' => $this->historyService->payloadForUser($user),
+        ]);
+    }
+
+    public function search(HistorySearchRequest $request): JsonResponse
+    {
+        $user = $request->user();
+
+        abort_unless($user, 401);
+
+        $payload = $this->historyService->search(
+            $user,
+            (string) $request->input('query'),
+            (string) $request->input('scope', 'all'),
+            (int) $request->input('limit', 20),
+        );
+
+        return response()->json([
+            'data' => $payload,
         ]);
     }
 
