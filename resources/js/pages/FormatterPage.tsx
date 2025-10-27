@@ -153,6 +153,7 @@ type HistoryRoutesConfig = {
     toggle: string;
     clear: string;
     export: string;
+    search: string;
 };
 
 interface FormatterPageProps {
@@ -649,6 +650,8 @@ export default function FormatterPage({
                     onShortcutsOpen={() => setShortcutsOpen(true)}
                     onHistoryOpen={handleHistoryOpen}
                     onSettingsOpen={() => setSettingsOpen(true)}
+                    onSearchResultSelect={handleLoadHistoryEntry}
+                    searchRoute={historyRouteConfig?.search}
                 />
 
                 <main id={mainContentId} role="main">

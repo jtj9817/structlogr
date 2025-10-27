@@ -7,6 +7,7 @@ interface HistoryRoutes {
     toggle: string;
     clear: string;
     export: string;
+    search?: string;
 }
 
 interface HistoryStatePayload {

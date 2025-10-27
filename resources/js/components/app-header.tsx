@@ -2,6 +2,7 @@ import AppLogo from '@/components/app-logo';
 import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { MobileNavigation } from '@/components/mobile-navigation';
+import { SearchDialog } from '@/components/search/search-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -21,6 +22,7 @@ import { useScrollShadow } from '@/hooks/use-scroll-shadow';
 import { cn } from '@/lib/utils';
 import { home as formatterHome, login, register } from '@/routes';
 import { edit as profileSettingsRoute } from '@/routes/profile';
+import historyRoutes from '@/routes/history';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import {
@@ -35,7 +37,7 @@ import {
     Settings,
     Sparkles,
 } from 'lucide-react';
-import { type ReactNode, useMemo } from 'react';
+import { type ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 
 const primaryNavItems: NavItem[] = [
     {
@@ -86,6 +88,8 @@ interface AppHeaderProps {
     onHelpOpen?: () => void;
     onSettingsOpen?: () => void;
     onShortcutsOpen?: () => void;
+    onSearchResultSelect?: (entryId: number) => Promise<void> | void;
+    searchRoute?: string | null;
 }
 
 export function AppHeader({
@@ -94,12 +98,55 @@ export function AppHeader({
     onHelpOpen,
     onSettingsOpen,
     onShortcutsOpen,
+    onSearchResultSelect,
+    searchRoute,
 }: AppHeaderProps) {
     const page = usePage<SharedData>();
     const { auth } = page.props;
     const user = auth.user;
     const getInitials = useInitials();
     const isScrolled = useScrollShadow();
+    const [searchOpen, setSearchOpen] = useState(false);
+    const defaultSearchEndpoint = useMemo(() => historyRoutes.search?.url?.(), []);
+    const searchEndpoint = searchRoute ?? defaultSearchEndpoint ?? null;
+    const canSearch = Boolean(user && searchEndpoint);
+
+    const openSearch = useCallback(() => {
+        if (!canSearch) {
+            return;
+        }
+
+        setSearchOpen(true);
+    }, [canSearch]);
+
+    useEffect(() => {
+        if (!user) {
+            setSearchOpen(false);
+
+            return;
+        }
+
+        const handleKeyDown = (event: KeyboardEvent) => {
+            const isModifier = event.metaKey || event.ctrlKey;
+            if (!isModifier || event.key.toLowerCase() !== 'k') {
+                return;
+            }
+
+            const target = event.target as HTMLElement | null;
+            if (target && ['INPUT', 'TEXTAREA'].includes(target.tagName)) {
+                return;
+            }
+
+            event.preventDefault();
+            openSearch();
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [openSearch, user]);
 
     const stringUserProp = (prop: string) => {
         if (!user) return null;
@@ -389,15 +436,29 @@ export function AppHeader({
                                 </Tooltip>
                             </TooltipProvider>
                         )}
-                        <Button
-                            id="search-button"
-                            variant="ghost"
-                            size="icon"
-                            className="hidden h-9 w-9 md:inline-flex"
-                            aria-label="Search"
-                        >
-                            <Search className="size-5 opacity-80" />
-                        </Button>
+                        <TooltipProvider delayDuration={0}>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        id="search-button"
+                                        variant="ghost"
+                                        size="icon"
+                                        className="hidden h-9 w-9 md:inline-flex"
+                                        onClick={openSearch}
+                                        aria-label={canSearch ? 'Search history' : 'Sign in to search history'}
+                                        aria-expanded={searchOpen}
+                                        disabled={!canSearch}
+                                    >
+                                        <Search className="size-5 opacity-80" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>
+                                        {canSearch ? 'Search history (⌘K / Ctrl+K)' : 'Sign in to search history'}
+                                    </p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                         {user ? (
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
@@ -436,6 +497,13 @@ export function AppHeader({
                     </div>
                 </div>
             </header>
+            <SearchDialog
+                open={searchOpen}
+                onOpenChange={setSearchOpen}
+                searchRoute={searchEndpoint}
+                canSearch={canSearch}
+                onSelectResult={onSearchResultSelect}
+            />
             {breadcrumbs.length > 1 && (
                 <div id="breadcrumbs-wrapper" className="flex w-full border-b border-border/70">
                     <div id="breadcrumbs-container" className="mx-auto flex h-12 w-full items-center justify-start px-4 text-neutral-500 sm:px-6 md:max-w-7xl lg:px-8">

@@ -79,6 +79,7 @@ class LogFormatterController extends Controller
             'toggle' => $base.'/:id/toggle-save',
             'clear' => route('history.clear'),
             'export' => route('history.export'),
+            'search' => route('history.search'),
         ];
     }
 }
