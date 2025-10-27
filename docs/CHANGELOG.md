@@ -5,6 +5,332 @@ All notable changes to StructLogr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [October 27, 2025] - User Preferences Backend & Type Safety Enhancements
+
+### Added
+
+#### User Preferences Backend System (9-Phase Implementation)
+- **Database schema for preferences**
+  - Added `preferences` JSON column to users table
+  - Nullable for backward compatibility with existing users
+  - Native MySQL 8.0 JSON support
+  - Migration: `2025_10_23_201613_add_preferences_to_users_table.php`
+
+- **User model preferences support**
+  - Added `preferences` to `$fillable` and `$casts` arrays
+  - `getPreferencesAttribute()` accessor with comprehensive defaults
+  - 12 configurable preference settings:
+    - `outputFormat`: json, yaml, xml
+    - `jsonIndentation`: 0-8 spaces
+    - `autoCopyResults`: Auto-copy formatted output
+    - `showLineNumbers`: Display line numbers
+    - `saveToHistory`: Persist to history
+    - `anonymousAnalytics`: Usage analytics
+    - `avoidSensitiveStorage`: Skip sensitive data
+    - `fontSize`: small, medium, large
+    - `reduceAnimations`: Reduce motion
+    - `customApiEndpoint`: Custom LLM endpoint
+    - `apiKey`: Custom API key
+    - `timeoutSeconds`: API timeout (5-300 seconds)
+  - Automatic merge with defaults for null/missing preferences
+
+- **PreferencesController API endpoints**
+  - `GET /settings/preferences` - Retrieve user preferences
+  - `PATCH /settings/preferences` - Update preferences with validation
+  - Comprehensive validation rules for all preference fields
+  - JSON response format with error handling
+  - Routes added to `routes/settings.php`
+
+- **Inertia middleware preferences sharing**
+  - User preferences automatically shared with all Inertia pages
+  - Available via `usePage().props.preferences`
+  - Eliminates need for separate API calls on page load
+  - Real-time updates on preference changes
+
+- **Frontend preferences hook refactored**
+  - `use-settings.ts` now syncs with backend via API
+  - Authenticated users: Database persistence
+  - Guest users: LocalStorage fallback
+  - Optimistic UI updates for instant feedback
+  - Automatic cross-device synchronization
+  - Backend integration with PATCH requests
+
+- **TypeScript type definitions**
+  - `UserPreferences` interface with all 12 fields
+  - `SharedData` interface includes preferences
+  - Full type safety across frontend
+  - IntelliSense support for preferences
+
+- **Wayfinder routes for preferences**
+  - Type-safe route helpers generated
+  - `preferences.index()` and `preferences.update()` actions
+  - Form variant support for PATCH requests
+  - 151 lines of generated route code
+
+- **Comprehensive test coverage (981 test lines)**
+  - `UserPreferencesTest.php` (193 lines) - Model accessor/mutator tests
+  - `PreferencesTest.php` (236 lines) - Controller endpoint tests
+  - `PreferencesValidationTest.php` (338 lines) - Validation rule tests
+  - `PreferencesMiddlewareTest.php` (214 lines) - Inertia sharing tests
+  - 100% coverage of preferences feature
+
+#### Wayfinder Type-Safe Routes Generation
+- **Generated server action helpers (3,325 lines)**
+  - Auth actions: Login, register, password reset, email verification
+  - Settings actions: Profile, password, 2FA, preferences
+  - History actions: CRUD, toggle save, clear, export
+  - Formatter actions: Format logs
+  - All controllers now have type-safe action wrappers
+
+- **Enhanced route type safety**
+  - Form variant support for POST/PATCH/DELETE actions
+  - Inertia FormData compatibility with type assertions
+  - Route parameter validation at compile-time
+  - Auto-generated action types for all Laravel routes
+
+### Changed
+
+#### Backend Updates
+- **User model enhancements**
+  - Added `preferences` attribute with casting
+  - Default preferences align with frontend expectations
+  - Accessor ensures consistent data structure
+  - Graceful handling of null preferences
+
+- **Settings routes organization**
+  - Preferences routes added to settings group
+  - Consistent naming convention with other settings controllers
+  - Middleware protection with `auth` requirement
+
+#### Frontend Updates
+- **Settings hook architecture**
+  - `use-settings.ts` completely refactored (82 lines changed)
+  - Backend synchronization via PreferencesController
+  - LocalStorage fallback for guest users
+  - Optimistic updates for better UX
+  - Type-safe preference updates
+
+- **Inertia type definitions**
+  - `SharedData` interface extended with preferences
+  - `UserPreferences` type added to index.d.ts
+  - Better type inference throughout application
+
+#### TypeScript Improvements
+- **Inertia FormData compatibility**
+  - Type assertions added for form data compatibility
+  - Empty interface replaced with type alias
+  - Fixed TypeScript strict mode errors
+  - Better type safety in `use-settings.ts`
+
+### Fixed
+
+#### Type Safety Issues
+- **Inertia FormData compatibility fix**
+  - Added type assertions in `use-settings.ts`
+  - Resolved FormData type mismatch warnings
+  - Fixed strict TypeScript compilation errors
+  - Improved type inference for Inertia forms
+
+- **Empty interface replacement**
+  - Changed empty interface to type alias
+  - Better TypeScript best practices compliance
+  - Resolved ESLint warnings
+
+#### Route Reference Corrections
+- **Home route fixes**
+  - Added 'home' route to resolve RouteNotFoundException
+  - Updated all auth redirects to use '/' (formatter page)
+  - Fixed route imports in layout components
+  - Corrected test assertions to use 'home' route
+  - Removed dashboard route references
+
+### Technical Details
+
+#### Database Migration
+```sql
+-- Migration: 2025_10_23_201613_add_preferences_to_users_table.php
+ALTER TABLE users
+ADD COLUMN preferences JSON NULL AFTER remember_token;
+```
+
+#### User Model Accessor
+```php
+public function getPreferencesAttribute($value): array
+{
+    $defaults = [
+        'outputFormat' => 'json',
+        'jsonIndentation' => 2,
+        'autoCopyResults' => false,
+        'showLineNumbers' => true,
+        'saveToHistory' => true,
+        'anonymousAnalytics' => true,
+        'avoidSensitiveStorage' => false,
+        'fontSize' => 'medium',
+        'reduceAnimations' => false,
+        'customApiEndpoint' => '',
+        'apiKey' => '',
+        'timeoutSeconds' => 30,
+    ];
+
+    if (is_null($value) || $value === '') {
+        return $defaults;
+    }
+
+    $preferences = is_string($value) ? json_decode($value, true) : $value;
+    return array_merge($defaults, $preferences ?? []);
+}
+```
+
+#### PreferencesController Routes
+```php
+Route::middleware('auth')->prefix('settings')->group(function () {
+    Route::get('/preferences', [PreferencesController::class, 'index'])->name('preferences.index');
+    Route::patch('/preferences', [PreferencesController::class, 'update'])->name('preferences.update');
+});
+```
+
+#### Middleware Sharing
+```php
+public function share(Request $request): array
+{
+    return [
+        ...parent::share($request),
+        'auth' => [
+            'user' => $request->user(),
+        ],
+        'preferences' => $request->user()?->preferences,  // NEW
+        'flash' => [
+            'message' => fn () => $request->session()->get('message'),
+            'error' => fn () => $request->session()->get('error'),
+        ],
+    ];
+}
+```
+
+#### Frontend Hook Usage
+```typescript
+// Authenticated users - backend persistence
+const { settings, updateSettings, isLoading } = useSettings();
+
+// Updates sync to database automatically
+updateSettings({ fontSize: 'large' });
+
+// Guest users - localStorage only
+// Automatically falls back without authentication
+```
+
+#### TypeScript Types
+```typescript
+export interface UserPreferences {
+    outputFormat: 'json' | 'yaml' | 'xml';
+    jsonIndentation: number;
+    autoCopyResults: boolean;
+    showLineNumbers: boolean;
+    saveToHistory: boolean;
+    anonymousAnalytics: boolean;
+    avoidSensitiveStorage: boolean;
+    fontSize: 'small' | 'medium' | 'large';
+    reduceAnimations: boolean;
+    customApiEndpoint: string;
+    apiKey: string;
+    timeoutSeconds: number;
+}
+```
+
+### Performance
+
+- **Database query optimization**
+  - Preferences loaded once per request via Inertia middleware
+  - No additional queries needed on frontend preference access
+  - JSON column uses native MySQL 8.0 performance optimizations
+
+- **Frontend state management**
+  - LocalStorage fallback for guest users (no backend dependency)
+  - Optimistic updates reduce perceived latency
+  - Debounced API calls prevent request flooding
+
+### Security
+
+- **Validation and sanitization**
+  - Comprehensive validation rules on all preference fields
+  - Enum validation for restricted values (outputFormat, fontSize)
+  - Range validation for numeric values (jsonIndentation, timeoutSeconds)
+  - URL validation for customApiEndpoint
+  - String length limits on apiKey (255 chars)
+
+- **Authorization**
+  - Auth middleware required for all preferences endpoints
+  - Users can only access/modify their own preferences
+  - CSRF protection on all PATCH requests
+
+### Testing
+
+- **Model tests** (193 lines)
+  - Default preferences accessor functionality
+  - JSON casting verification
+  - Null preference handling
+  - Preference merging with defaults
+  - Mutator behavior with partial updates
+
+- **Controller tests** (236 lines)
+  - GET preferences endpoint authorization
+  - PATCH preferences endpoint validation
+  - Successful preference updates
+  - Error responses for invalid data
+  - JSON response format verification
+
+- **Validation tests** (338 lines)
+  - All 12 preference field validations
+  - Enum value enforcement
+  - Range boundary testing
+  - Optional field handling
+  - URL format validation
+  - Type coercion testing
+
+- **Middleware tests** (214 lines)
+  - Preferences shared with Inertia pages
+  - Null handling for guest users
+  - Preference updates reflected in subsequent requests
+  - Cross-page preference consistency
+
+### Developer Experience
+
+- **Type-safe preferences**
+  - Full IntelliSense support in VS Code
+  - Compile-time preference key validation
+  - Auto-completion for preference values
+
+- **Simplified backend integration**
+  - No manual API client configuration
+  - Wayfinder handles route generation
+  - Type-safe route helpers
+
+- **Comprehensive documentation**
+  - Implementation plan: `docs/settings-backend-implementation-plan.md`
+  - Architecture updates: `docs/architecture-overview.md`
+  - Test coverage examples in all test files
+
+### Documentation
+
+- **Implementation plan documented**
+  - 9-phase implementation guide (762 lines)
+  - Each phase with clear goals, context, and requirements
+  - Testing procedures for each phase
+  - Success criteria and rollback plans
+
+- **Architecture documentation updated**
+  - PreferencesController section added
+  - User model preferences documented
+  - Middleware sharing explanation
+  - Database schema updates
+
+- **README updates**
+  - Preferences feature highlighted
+  - Settings section expanded
+  - Type-safe routing mentioned
+
+---
+
 ## [October 23, 2025] - History Title Field & Keyboard Shortcuts Enhancement
 
 ### Added
