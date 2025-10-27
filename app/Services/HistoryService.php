@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 class HistoryService
 {
     private const DEFAULT_LIMIT = 20;
+
     private const MAX_LIMIT = 50;
 
     public function entriesForUser(User $user, int $limit = 50): Collection
