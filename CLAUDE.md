@@ -54,8 +54,15 @@ npm run build
 
 **Testing:**
 ```bash
-./vendor/bin/sail artisan test
+./vendor/bin/sail artisan test  # Uses SQLite in-memory (fast execution)
 ```
+
+**Test Configuration:**
+- Test environment configured in `.env.testing`
+- Database: SQLite in-memory (`:memory:`)
+- Session driver: `array` (no persistence)
+- BCRYPT rounds: 4 (faster password hashing)
+- Test coverage: Auth, History (including search), Settings, User model
 
 **Code quality:**
 ```bash
@@ -199,6 +206,19 @@ npm run build:ssr
 - Comprehensive logging system with request timing
 - Retry logic with exponential backoff (3 attempts)
 - Schema validation and user preferences support
+
+**History Management:**
+- Track all formatted logs automatically
+- Save/unsave entries for quick access
+- Full-text search across titles, summaries, raw logs, log types
+- Search scopes: All, Recent (unsaved), Saved (bookmarked)
+- Search keyboard shortcut: `Cmd+K` / `Ctrl+K` opens search dialog
+- Sidebar keyboard shortcut: `Cmd+H` / `Ctrl+H` toggles history sidebar
+- Export entire history as JSON
+- Delete individual or all entries
+- Backend: `HistoryController` with search endpoint
+- Frontend: `useHistory` hook for management, `useSearch` hook for search
+- Search implementation: MySQL full-text search with debouncing (250ms)
 
 **Authentication:**
 - Laravel Fortify with 2FA support
