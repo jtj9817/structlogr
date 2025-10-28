@@ -457,3 +457,47 @@ For issues, questions, or contributions, please open an issue on GitHub.
 ---
 
 **Powered by Laravel + React + Prism**
+
+## Test Configuration
+
+The project is configured to use **SQLite in-memory database** for testing, which provides fast, isolated test execution without requiring external database dependencies.
+
+### Test Environment Setup
+
+- **Test Database**: SQLite `:memory:` (in-memory)
+- **Configuration**: `.env.testing` file
+- **PHPUnit Config**: `phpunit.xml` with SQLite environment variables
+- **Migration Support**: All tests use `RefreshDatabase` trait for automatic database setup/teardown
+
+### Running Tests
+
+```bash
+# Run all tests
+./vendor/bin/pest
+
+# Run specific test file
+./vendor/bin/pest tests/Feature/History/SearchHistoryTest.php
+
+# Run only feature tests
+./vendor/bin/pest --filter="Feature"
+```
+
+### Key Benefits
+
+1. **No external dependencies** - Tests run without Sail containers
+2. **Fast execution** - In-memory database eliminates I/O overhead  
+3. **Isolated execution** - Each test gets a fresh database state
+4. **CI-friendly** - Works in automated build environments
+
+### Test Environment Configuration
+
+The test environment is configured in two files:
+
+1. **`.env.testing`** - Contains testing-specific environment variables
+2. **`phpunit.xml`** - Sets environment variables for PHPUnit execution
+
+Both files use SQLite with in-memory database configuration:
+- `DB_CONNECTION=sqlite`
+- `DB_DATABASE=:memory:`
+
+This configuration ensures that all tests, including complex ones like `SearchHistoryTest`, can run successfully without requiring MySQL connections.
