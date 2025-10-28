@@ -18,14 +18,7 @@ import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAppearance } from '@/hooks/use-appearance';
 import { useSettings } from '@/hooks/use-settings';
-import {
-    Monitor,
-    Moon,
-    RotateCcw,
-    Save,
-    Settings,
-    Sun,
-} from 'lucide-react';
+import { Monitor, Moon, RotateCcw, Save, Settings, Sun } from 'lucide-react';
 
 interface SettingsPanelProps {
     open: boolean;
@@ -64,19 +57,19 @@ export function SettingsPanel({ open, onOpenChange }: SettingsPanelProps) {
                     <TabsList className="h-auto w-full gap-2 overflow-x-auto">
                         <TabsTrigger
                             value="output"
-                            className="flex-1 min-w-[120px] px-6 py-2.5"
+                            className="min-w-[120px] flex-1 px-6 py-2.5"
                         >
                             Output
                         </TabsTrigger>
                         <TabsTrigger
                             value="privacy"
-                            className="flex-1 min-w-[120px] px-6 py-2.5"
+                            className="min-w-[120px] flex-1 px-6 py-2.5"
                         >
                             Privacy
                         </TabsTrigger>
                         <TabsTrigger
                             value="display"
-                            className="flex-1 min-w-[120px] px-6 py-2.5"
+                            className="min-w-[120px] flex-1 px-6 py-2.5"
                         >
                             Display
                         </TabsTrigger>
@@ -92,13 +85,19 @@ export function SettingsPanel({ open, onOpenChange }: SettingsPanelProps) {
                                 {/* Default Output Format */}
                                 <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-5 shadow-sm transition-colors hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600">
                                     <div className="flex flex-col gap-2.5">
-                                        <Label htmlFor="output-format" className="font-medium">
+                                        <Label
+                                            htmlFor="output-format"
+                                            className="font-medium"
+                                        >
                                             Default Output Format
                                         </Label>
                                         <Select
                                             value={settings.outputFormat}
                                             onValueChange={(
-                                                value: 'json' | 'table' | 'cards',
+                                                value:
+                                                    | 'json'
+                                                    | 'table'
+                                                    | 'cards',
                                             ) =>
                                                 updateSetting(
                                                     'outputFormat',
@@ -183,9 +182,12 @@ export function SettingsPanel({ open, onOpenChange }: SettingsPanelProps) {
 
                             <div className="flex flex-col gap-6">
                                 {/* Auto-copy Results */}
-                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-5 shadow-sm transition-colors hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600 sm:flex-row sm:items-center sm:justify-between">
+                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-5 shadow-sm transition-colors hover:border-gray-300 sm:flex-row sm:items-center sm:justify-between dark:border-gray-700 dark:hover:border-gray-600">
                                     <div className="space-y-1.5">
-                                        <Label htmlFor="auto-copy" className="font-medium">
+                                        <Label
+                                            htmlFor="auto-copy"
+                                            className="font-medium"
+                                        >
                                             Auto-copy Results
                                         </Label>
                                         <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -206,9 +208,12 @@ export function SettingsPanel({ open, onOpenChange }: SettingsPanelProps) {
                                 </section>
 
                                 {/* Show Line Numbers */}
-                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-5 shadow-sm transition-colors hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600 sm:flex-row sm:items-center sm:justify-between">
+                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-5 shadow-sm transition-colors hover:border-gray-300 sm:flex-row sm:items-center sm:justify-between dark:border-gray-700 dark:hover:border-gray-600">
                                     <div className="space-y-1.5">
-                                        <Label htmlFor="show-line-numbers" className="font-medium">
+                                        <Label
+                                            htmlFor="show-line-numbers"
+                                            className="font-medium"
+                                        >
                                             Show Line Numbers
                                         </Label>
                                         <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -238,9 +243,12 @@ export function SettingsPanel({ open, onOpenChange }: SettingsPanelProps) {
 
                             <div className="flex flex-col gap-6">
                                 {/* Save to History */}
-                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-5 shadow-sm transition-colors hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600 sm:flex-row sm:items-center sm:justify-between">
+                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-5 shadow-sm transition-colors hover:border-gray-300 sm:flex-row sm:items-center sm:justify-between dark:border-gray-700 dark:hover:border-gray-600">
                                     <div className="space-y-1.5">
-                                        <Label htmlFor="save-history" className="font-medium">
+                                        <Label
+                                            htmlFor="save-history"
+                                            className="font-medium"
+                                        >
                                             Save to History
                                         </Label>
                                         <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -254,29 +262,6 @@ export function SettingsPanel({ open, onOpenChange }: SettingsPanelProps) {
                                         onCheckedChange={(checked: boolean) =>
                                             updateSetting(
                                                 'saveToHistory',
-                                                checked,
-                                            )
-                                        }
-                                    />
-                                </section>
-
-                                {/* Don't Store Sensitive Data */}
-                                <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-5 shadow-sm transition-colors hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600 sm:flex-row sm:items-center sm:justify-between">
-                                    <div className="space-y-1.5">
-                                        <Label htmlFor="avoid-sensitive" className="font-medium">
-                                            Avoid Storing Sensitive Data
-                                        </Label>
-                                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                                            Don't save logs that may contain
-                                            sensitive information
-                                        </p>
-                                    </div>
-                                    <Switch
-                                        id="avoid-sensitive"
-                                        checked={settings.avoidSensitiveStorage}
-                                        onCheckedChange={(checked: boolean) =>
-                                            updateSetting(
-                                                'avoidSensitiveStorage',
                                                 checked,
                                             )
                                         }
@@ -363,18 +348,21 @@ export function SettingsPanel({ open, onOpenChange }: SettingsPanelProps) {
                                 {/* Font Size */}
                                 <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-5 shadow-sm transition-colors hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600">
                                     <div className="flex flex-col gap-2.5">
-                                        <Label htmlFor="font-size" className="font-medium">
+                                        <Label
+                                            htmlFor="font-size"
+                                            className="font-medium"
+                                        >
                                             Font Size
                                         </Label>
                                         <Select
                                             value={settings.fontSize}
                                             onValueChange={(
-                                                value: 'small' | 'medium' | 'large',
+                                                value:
+                                                    | 'small'
+                                                    | 'medium'
+                                                    | 'large',
                                             ) =>
-                                                updateSetting(
-                                                    'fontSize',
-                                                    value,
-                                                )
+                                                updateSetting('fontSize', value)
                                             }
                                         >
                                             <SelectTrigger id="font-size">
@@ -398,14 +386,13 @@ export function SettingsPanel({ open, onOpenChange }: SettingsPanelProps) {
                                         application
                                     </p>
                                 </section>
-
                             </div>
                         </div>
                     </TabsContent>
                 </Tabs>
 
                 {/* Actions */}
-                <div className="mt-8 flex flex-col gap-4 border-t border-gray-200 pt-8 dark:border-gray-700 sm:flex-row sm:items-center sm:justify-between">
+                <div className="mt-8 flex flex-col gap-4 border-t border-gray-200 pt-8 sm:flex-row sm:items-center sm:justify-between dark:border-gray-700">
                     <Button
                         variant="outline"
                         onClick={handleReset}
