@@ -21,7 +21,8 @@ The History feature allows authenticated users to:
 - **Track** all formatted log entries automatically
 - **Save** important entries for quick access
 - **Browse** recent and saved entries with preview text
-- **Search** through history with visual log type indicators
+- **Search** through history with full-text search (titles, summaries, raw logs, log types)
+- **Filter** search results by scope (all, recent, saved)
 - **Export** entire history as JSON
 - **Delete** individual or all history entries
 - **Load** previous entries back into the formatter
@@ -65,6 +66,7 @@ The History system follows a layered architecture:
 │  │  HistoryController                 │ │
 │  │  - index()                         │ │
 │  │  - show()                          │ │
+│  │  - search()                        │ │
 │  │  - destroy()                       │ │
 │  │  - toggleSave()                    │ │
 │  │  - clear()                         │ │
@@ -74,6 +76,7 @@ The History system follows a layered architecture:
 │  │  HistoryService                    │ │
 │  │  - entriesForUser()                │ │
 │  │  - payloadForUser()                │ │
+│  │  - search()                        │ │
 │  └────────────────────────────────────┘ │
 │  ┌────────────────────────────────────┐ │
 │  │  FormattedLog Model                │ │
@@ -621,6 +624,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/history', [HistoryController::class, 'index'])
         ->name('history.index');
     
+    Route::get('/history/search', [HistoryController::class, 'search'])
+        ->name('history.search');
+    
     Route::get('/history/{formattedLog}', [HistoryController::class, 'show'])
         ->name('history.show');
     
@@ -682,14 +688,65 @@ Route::middleware('auth')->group(function () {
 }
 ```
 
+#### GET /history/search
+
+**Query Parameters**:
+- `query` (required): Search query string (2-100 characters, trimmed)
+- `limit` (optional): Results limit (1-50, default: 20)
+- `scope` (optional): Search scope - 'all' (default), 'recent', 'saved'
+
+**Request Example**:
+```
+GET /history/search?query=timeout&limit=20&scope=all
+```
+
+**Response**:
+```json
+{
+  "data": {
+    "query": "timeout",
+    "results": [
+      {
+        "id": 123,
+        "title": "Database Connection Timeout",
+        "summary": "Database connection failed",
+        "preview": "2024-10-15 14:23:45 [ERROR] Database connection failed - timeout after 30s",
+        "detectedLogType": "application_error",
+        "createdAt": "2025-10-21T12:34:56Z",
+        "fieldCount": 5,
+        "isSaved": false,
+        "collection": "recent"
+      }
+    ],
+    "meta": {
+      "limit": 20,
+      "count": 1,
+      "scope": "all"
+    }
+  }
+}
+```
+
+**Search Features**:
+- **Full-text search**: MySQL `MATCH ... AGAINST` syntax searches across `title`, `summary`, `raw_log`, and `detected_log_type` columns
+- **Scope filtering**: 
+  - `'all'`: Searches all user history entries
+  - `'recent'`: Searches only unsaved entries (`is_saved = false`)
+  - `'saved'`: Searches only bookmarked entries (`is_saved = true`)
+- **Relevance ordering**: Results ordered by relevance score, then creation date (DESC)
+- **Privacy isolation**: All searches scoped to authenticated user only
+- **Validation**: Query sanitization via `HistorySearchRequest` with whitespace trimming
+
 ---
 
 ## User Interface
 
 ### Accessing History
 
-- **Keyboard Shortcut**: `Ctrl+K` or `Cmd+K`
-- **Button**: History icon in toolbar
+- **Search Keyboard Shortcut**: `Cmd+K` (Mac) / `Ctrl+K` (Windows/Linux) - Opens search dialog
+- **Sidebar Keyboard Shortcut**: `Cmd+H` (Mac) / `Ctrl+H` (Windows/Linux) - Toggles history sidebar
+- **Search Button**: Magnifying glass icon in header
+- **History Button**: History icon in toolbar
 - **Auto-open**: After formatting a log (optional setting)
 
 ### Sidebar Layout
@@ -740,11 +797,32 @@ Route::middleware('auth')->group(function () {
 1. **Format a log** using the main formatter
 2. **Entry auto-saves** to Recent history
 3. **Mark as saved** if important
-4. **Browse history** via sidebar (`Ctrl+K`)
-5. **Load previous entry** to re-format or reference
-6. **Export history** for external analysis
+4. **Search history** via search dialog (`Cmd+K` / `Ctrl+K`)
+5. **Browse history** via sidebar (`Cmd+H` / `Ctrl+H`)
+6. **Load previous entry** to re-format or reference
+7. **Export history** for external analysis
 
 ### Advanced Usage
+
+#### Search History
+
+```typescript
+// Open search dialog with Cmd+K / Ctrl+K
+// Or programmatically:
+const { results, meta } = useSearch({
+    endpoint: '/history/search',
+    defaultScope: 'all',
+    limit: 20,
+});
+
+// Set search query
+setQuery('database timeout');
+
+// Filter by scope
+setScope('saved'); // 'all', 'recent', or 'saved'
+
+// Results update automatically with debouncing (250ms)
+```
 
 #### Bulk Export
 
