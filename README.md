@@ -136,16 +136,30 @@ The application will be available at **http://localhost:8001**
 ### History Management
 
 Authenticated users can:
-- **View History**: Access all formatted logs via the History sidebar (`Ctrl+K`)
+- **View History**: Access all formatted logs via the History sidebar
 - **Save Entries**: Mark important entries as saved for quick access
-- **Search**: Browse recent and saved entries with preview text
+- **Search History**: Full-text search across titles, summaries, raw logs, and log types
+- **Filter by Scope**: Search within All, Recent (unsaved), or Saved entries
 - **Export**: Download entire history as JSON file
 - **Clear**: Remove all or individual history entries
+
+### Search Feature
+
+The search system provides fast, full-text search across your history:
+
+- **Search Trigger**: `Cmd+K` (Mac) or `Ctrl+K` (Windows/Linux) to open search dialog
+- **Search Scopes**: Filter results by All entries, Recent only, or Saved only
+- **Live Results**: Debounced search updates results as you type (250ms delay)
+- **Result Preview**: See title, summary, preview text, and metadata for each match
+- **Quick Navigation**: Click any result to view the full formatted log
+- **Backend**: MySQL full-text search with `MATCH ... AGAINST` syntax
+- **Privacy**: All searches are user-scoped for data isolation
 
 ### Keyboard Shortcuts
 
 - `Ctrl+Enter` or `Cmd+Enter`: Format log
-- `Ctrl+K` or `Cmd+K`: Toggle history sidebar
+- `Ctrl+K` or `Cmd+K`: Open search dialog
+- `Ctrl+H` or `Cmd+H`: Toggle history sidebar
 - `Ctrl+L` or `Cmd+L`: Clear input
 - `?`: Show keyboard shortcuts help
 
@@ -234,7 +248,7 @@ Authenticated users can manage:
 ```bash
 ./vendor/bin/sail artisan migrate        # Run migrations
 ./vendor/bin/sail artisan tinker         # Laravel REPL
-./vendor/bin/sail artisan test           # Run PHPUnit tests
+./vendor/bin/sail artisan test           # Run PHPUnit tests (SQLite in-memory)
 ./vendor/bin/sail composer pint          # Fix PHP code style
 ```
 
@@ -299,6 +313,7 @@ structlogr/
 │       ├── data/                   # Static data (sample logs, tips)
 │       ├── hooks/                  # Custom React hooks
 │       │   ├── use-history.ts      # History management
+│       │   ├── use-search.ts       # Search functionality
 │       │   ├── use-settings.ts     # Settings management
 │       │   ├── use-keyboard-shortcuts.ts
 │       │   └── ...
@@ -310,12 +325,17 @@ structlogr/
 │       │   └── welcome.tsx         # Landing page
 │       ├── routes/                 # Wayfinder route helpers
 │       └── types/                  # TypeScript types
+│           ├── search.ts           # Search types
+│           └── ...
 ├── routes/
 │   ├── auth.php                    # Auth routes
 │   ├── settings.php                # Settings routes (profile, password, 2FA, preferences)
-│   └── web.php                     # Main web routes
+│   └── web.php                     # Main web routes (formatter, history, search)
 ├── tests/
 │   ├── Feature/
+│   │   ├── Auth/                   # Authentication tests
+│   │   ├── History/                # History tests (including search)
+│   │   └── Settings/               # Settings tests
 │   └── Unit/
 └── docs/                           # Documentation
 ```
@@ -332,11 +352,23 @@ The project enforces code quality through:
 
 ### Testing
 
-Run the test suite:
+The test suite uses SQLite in-memory database for fast execution:
 
 ```bash
 ./vendor/bin/sail artisan test
 ```
+
+Tests are configured via `.env.testing` with:
+- `DB_CONNECTION=sqlite`
+- `DB_DATABASE=:memory:`
+- `SESSION_DRIVER=array`
+- `BCRYPT_ROUNDS=4` (faster hashing)
+
+Test coverage includes:
+- Authentication flows with 2FA
+- History management and search functionality
+- Settings and preferences validation
+- User model and relationships
 
 Run with coverage:
 
