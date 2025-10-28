@@ -175,6 +175,7 @@ Route::middleware('auth')->group(function () {
 **Methods**:
 - `index()`: Returns user's history (recent and saved entries)
 - `show(FormattedLog $formattedLog)`: Retrieves specific history entry
+- `search(HistorySearchRequest $request)`: Performs full-text search on history
 - `destroy(FormattedLog $formattedLog)`: Deletes history entry
 - `toggleSave(FormattedLog $formattedLog)`: Toggles saved status
 - `clear()`: Clears all user history
@@ -184,6 +185,7 @@ Route::middleware('auth')->group(function () {
 ```php
 Route::middleware('auth')->group(function () {
     Route::get('/history', [HistoryController::class, 'index'])->name('history.index');
+    Route::get('/history/search', [HistoryController::class, 'search'])->name('history.search');
     Route::get('/history/{formattedLog}', [HistoryController::class, 'show'])->name('history.show');
     Route::delete('/history/{formattedLog}', [HistoryController::class, 'destroy'])->name('history.destroy');
     Route::patch('/history/{formattedLog}/toggle-save', [HistoryController::class, 'toggleSave'])->name('history.toggle');
@@ -203,6 +205,7 @@ Route::middleware('auth')->group(function () {
 - Formats history data for frontend consumption
 - Separates recent vs saved entries
 - Generates preview text from raw logs
+- Performs full-text search across history entries
 
 **Key Methods**:
 
@@ -219,6 +222,19 @@ public function payloadForUser(User $user, int $limit = 50): array
 - Returns structured payload with `recent` and `saved` arrays
 - Each entry includes: id, summary, preview, createdAt, detectedLogType, fieldCount, isSaved
 - Preview text is sanitized (120 char limit, newlines removed)
+
+```php
+public function search(User $user, string $query, int $limit = 20, string $scope = 'all'): Collection
+```
+- Performs MySQL full-text search using `MATCH ... AGAINST` syntax
+- Searches across: `title`, `summary`, `raw_log`, `detected_log_type` columns
+- Supports three search scopes:
+  - `'all'`: Searches all user history entries
+  - `'recent'`: Searches only unsaved entries (`is_saved = false`)
+  - `'saved'`: Searches only bookmarked entries (`is_saved = true`)
+- Returns results ordered by relevance score, then creation date (DESC)
+- User-scoped queries ensure privacy isolation
+- Query sanitization via `HistorySearchRequest` validation
 
 #### LogFormatterService
 
@@ -541,6 +557,8 @@ resources/js/
 │   │   ├── history-sidebar.tsx # History sidebar
 │   │   ├── onboarding-tour.tsx # Onboarding
 │   │   └── welcome-banner.tsx  # Welcome banner
+│   ├── search/                 # Search components
+│   │   └── search-dialog.tsx   # Search dialog with keyboard shortcuts
 │   ├── illustrations/
 │   │   └── empty-log-illustration.tsx # Empty state illustration
 │   ├── alert-error.tsx         # Error alert component
@@ -590,6 +608,7 @@ resources/js/
 │   ├── use-mobile.tsx          # Mobile detection
 │   ├── use-preferences.ts      # User preferences
 │   ├── use-scroll-shadow.ts    # Scroll shadows
+│   ├── use-search.ts           # Search functionality with debouncing
 │   ├── use-settings.ts         # Settings management
 │   ├── use-two-factor-auth.ts  # 2FA logic
 │   └── use-unique-id.tsx       # Unique ID generation
@@ -640,6 +659,7 @@ resources/js/
 ├── types/                      # TypeScript type definitions
 │   ├── history.ts              # History types
 │   ├── preferences.ts          # Preferences types
+│   ├── search.ts               # Search types (SearchScope, SearchResult, SearchResponse)
 │   ├── index.d.ts              # Global types
 │   └── vite-env.d.ts
 ├── wayfinder/                  # Wayfinder generated code
@@ -1008,6 +1028,67 @@ const { settings, updateSettings, isLoading } = useSettings();
 - Guest users: Preferences stored in localStorage only
 - Automatic merge with server preferences on mount
 - Real-time sync across tabs/devices for authenticated users
+
+#### useSearch
+
+**Location**: `resources/js/hooks/use-search.ts`
+
+**Purpose**: Full-text search functionality for history entries
+
+**Features**:
+- Debounced query execution (250ms default delay)
+- Search scope filtering (all, recent, saved)
+- Automatic request cancellation for stale queries
+- Status tracking (idle, loading, success, error)
+- Result caching and metadata management
+- Endpoint validation and origin normalization
+- User-friendly error handling
+
+**API**:
+```typescript
+const {
+    query,
+    setQuery,
+    scope,
+    setScope,
+    results,
+    meta,
+    status,
+    error,
+    isSearching,
+    canSearch,
+    performSearch,
+    reset,
+} = useSearch({
+    endpoint: '/history/search',
+    defaultScope: 'all',
+    limit: 20,
+    debounceMs: 250,
+    enabled: true,
+});
+```
+
+**Search Result Type**:
+```typescript
+interface SearchResult {
+    id: number;
+    title: string | null;
+    summary: string | null;
+    preview: string;
+    detectedLogType: string | null;
+    createdAt: string;
+    fieldCount: number;
+    isSaved: boolean;
+    collection: 'recent' | 'saved';
+}
+```
+
+**Backend Integration**:
+- Queries MySQL full-text search via GET `/history/search`
+- Query validation: 2-100 characters, trimmed whitespace
+- Scope filtering: 'all', 'recent' (unsaved), 'saved' (bookmarked)
+- Results ordered by relevance score, then creation date DESC
+- Privacy: All searches scoped to authenticated user
 
 ### Routing
 
