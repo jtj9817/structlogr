@@ -181,11 +181,5 @@ npm run build:ssr
 ```bash
 ./vendor/bin/sail artisan inertia:start-ssr
 ```
-
-## Implementation Plan
-
-Refer to `docs/StructLogr_Implementation_Plan.md` for the detailed development plan including:
-- Log formatting service architecture
-- Prism package integration
-- Database schema for formatted logs
-- Frontend form implementation
+## IMPORTANT
+DO NOT READ THE USER'S `.env` FILE. INSTEAD, ASK FOR PERMISSION TO USE THE `rg` TO VERIFY IF THE `.env` FILE CONTAINS THE TARGET STRING TO LOOK FOR.
