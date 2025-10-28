@@ -5,6 +5,82 @@ All notable changes to StructLogr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [October 27, 2025] - History Search Feature & Testing Infrastructure
+
+### Added
+
+#### Full-Text Search for History Entries
+- **Backend search API**
+  - `GET /history/search` endpoint with authenticated access
+  - `HistorySearchRequest` validation with query sanitization
+  - Search query: 2-100 characters, trimmed whitespace
+  - Configurable limit: 1-50 results (default: 20)
+  - Search scopes: 'all', 'recent', 'saved'
+  - Route: `history.search` added to `routes/web.php`
+
+- **HistoryService search implementation**
+  - Full-text MySQL search using `MATCH ... AGAINST` syntax
+  - Searches across: `title`, `summary`, `raw_log`, `detected_log_type`
+  - Scope filtering: Recent (unsaved), Saved (bookmarked), All entries
+  - Results include: id, title, summary, preview, log type, timestamps
+  - Ordered by relevance score then creation date (DESC)
+  - User-scoped queries (privacy isolation)
+
+- **Frontend search UI**
+  - Search dialog component with keyboard shortcuts
+  - Global search trigger: `Cmd+K` (Mac) / `Ctrl+K` (Windows/Linux)
+  - Header search button with magnifying glass icon
+  - Real-time search results with debouncing (250ms)
+  - Scope toggle buttons: All, Recent, Saved
+  - Result cards with preview, metadata, and navigation
+  - Empty state with helpful messaging
+
+- **useSearch React hook**
+  - Debounced query execution (configurable delay)
+  - Automatic request cancellation for stale queries
+  - Status tracking: idle, loading, success, error
+  - Search scope management with normalization
+  - Result caching and metadata (count, limit, scope)
+  - Error handling with user-friendly messages
+  - Endpoint validation and origin normalization
+
+- **TypeScript type definitions**
+  - `SearchScope`: 'all' | 'recent' | 'saved'
+  - `SearchResult`: Structured search result interface
+  - `SearchResponse`: API response format with metadata
+  - Full type safety for search operations
+
+- **Comprehensive test coverage**
+  - `tests/Feature/History/SearchHistoryTest.php` (177 lines)
+  - Tests for query matching, scope filtering, privacy isolation
+  - Validation tests for query length, limit bounds, scope values
+  - Empty result handling and metadata verification
+  - Authentication requirement tests
+
+#### Testing Infrastructure Improvements
+- **SQLite in-memory testing**
+  - `.env.testing` configured with SQLite `:memory:` database
+  - Faster test execution (no disk I/O)
+  - `DB_CONNECTION=sqlite` for test environment
+  - `phpunit.xml` updated with SQLite configuration
+  - Session driver set to 'array' for tests
+  - BCRYPT_ROUNDS=4 for faster password hashing in tests
+
+### Changed
+
+#### History System Enhancements
+- **Route parameter flexibility**
+  - History routes now accept string IDs (previously numeric-only)
+  - Wayfinder route types updated for compatibility
+  - Improved route matching and type safety
+
+#### Code Quality
+- **Consistent formatting**
+  - Applied Laravel Pint to backend code
+  - Consistent spacing and style across PHP files
+
+---
+
 ## [October 27, 2025] - User Preferences Backend & Type Safety Enhancements
 
 ### Added
