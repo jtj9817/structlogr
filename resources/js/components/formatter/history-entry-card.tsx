@@ -45,7 +45,7 @@ export function HistoryEntryCard({
     return (
         <Card
             id={`history-entry-${entry.id}`}
-            className="group cursor-pointer p-3 transition-all hover:shadow-md hover:scale-[1.01] active:scale-[0.99]"
+            className="group cursor-pointer p-3 transition-all hover:scale-[1.01] hover:shadow-md active:scale-[0.99]"
             onClick={(e) => {
                 if (disabled) return;
                 const target = e.target as HTMLElement;
@@ -55,8 +55,11 @@ export function HistoryEntryCard({
             }}
         >
             <div className="flex items-start gap-2">
-                <FileText className="mt-0.5 h-4 w-4 flex-shrink-0 text-muted-foreground" />
-                
+                <FileText
+                    id={`history-entry-icon-${entry.id}`}
+                    className="mt-0.5 h-4 w-4 flex-shrink-0 text-muted-foreground"
+                />
+
                 <div className="min-w-0 flex-1">
                     <p
                         id={`history-entry-headline-${entry.id}`}
@@ -68,12 +71,24 @@ export function HistoryEntryCard({
                         id={`history-entry-metadata-${entry.id}`}
                         className="mt-0.5 flex flex-wrap items-center gap-1 text-xs text-muted-foreground"
                     >
-                        <Clock className="h-3 w-3" />
-                        <span>{formatDate(entry.createdAt)}</span>
+                        <Clock
+                            id={`history-entry-clock-${entry.id}`}
+                            className="h-3 w-3"
+                        />
+                        <span id={`history-entry-date-${entry.id}`}>
+                            {formatDate(entry.createdAt)}
+                        </span>
                         <span className="text-muted-foreground/50">•</span>
-                        <span className="uppercase tracking-wide">{logTypeLabel}</span>
+                        <span
+                            id={`history-entry-type-${entry.id}`}
+                            className="tracking-wide uppercase"
+                        >
+                            {logTypeLabel}
+                        </span>
                         <span className="text-muted-foreground/50">•</span>
-                        <span>{entry.fieldCount ?? 0} fields</span>
+                        <span id={`history-entry-fields-${entry.id}`}>
+                            {entry.fieldCount ?? 0} fields
+                        </span>
                     </div>
                 </div>
 
@@ -88,9 +103,30 @@ export function HistoryEntryCard({
                         }}
                         className="h-8 w-8 p-0"
                         disabled={disabled}
-                        aria-label={entry.isSaved ? 'Unsave entry' : 'Save entry'}
+                        aria-label={
+                            entry.isSaved ? 'Unsave entry' : 'Save entry'
+                        }
                     >
                         <Star
+                            className={`h-4 w-4 ${entry.isSaved ? 'fill-yellow-400 text-yellow-400' : 'text-gray-400'}`}
+                        />
+                    </Button>
+                    <Button
+                        id={`history-entry-star-${entry.id}`}
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onToggleSave();
+                        }}
+                        className="h-8 w-8 p-0"
+                        disabled={disabled}
+                        aria-label={
+                            entry.isSaved ? 'Unsave entry' : 'Save entry'
+                        }
+                    >
+                        <Star
+                            id={`history-entry-star-icon-${entry.id}`}
                             className={`h-4 w-4 ${entry.isSaved ? 'fill-yellow-400 text-yellow-400' : 'text-gray-400'}`}
                         />
                     </Button>
@@ -106,7 +142,27 @@ export function HistoryEntryCard({
                         disabled={disabled}
                         aria-label="Copy entry"
                     >
-                        <Copy className="h-4 w-4" />
+                        <Copy
+                            id={`history-entry-copy-icon-${entry.id}`}
+                            className="h-4 w-4"
+                        />
+                    </Button>
+                    <Button
+                        id={`history-entry-delete-${entry.id}`}
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onDelete();
+                        }}
+                        className="h-8 w-8 p-0 text-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/20"
+                        disabled={disabled}
+                        aria-label="Delete entry"
+                    >
+                        <Trash2
+                            id={`history-entry-delete-icon-${entry.id}`}
+                            className="h-4 w-4"
+                        />
                     </Button>
                     <Button
                         id={`history-entry-delete-${entry.id}`}

@@ -57,9 +57,20 @@ export function HistorySidebar({
     };
 
     const EmptyState = ({ message }: { message: string }) => (
-        <div className="flex h-full flex-col items-center justify-center gap-2 px-6 py-8 text-center">
-            <History className="h-10 w-10 text-muted-foreground/60" />
-            <p className="text-sm text-muted-foreground">{message}</p>
+        <div
+            id="history-empty-state"
+            className="flex h-full flex-col items-center justify-center gap-2 px-6 py-8 text-center"
+        >
+            <History
+                id="history-empty-icon"
+                className="h-10 w-10 text-muted-foreground/60"
+            />
+            <p
+                id="history-empty-message"
+                className="text-sm text-muted-foreground"
+            >
+                {message}
+            </p>
         </div>
     );
 
@@ -74,7 +85,7 @@ export function HistorySidebar({
                 side="right"
                 className="flex w-full max-w-lg flex-col gap-6 px-4 py-6 sm:px-6 lg:max-w-2xl"
             >
-                <SheetHeader className="text-left">
+                <SheetHeader id="history-sheet-header" className="text-left">
                     <SheetTitle
                         id="history-sidebar-title"
                         className="text-xl font-semibold"
@@ -83,8 +94,14 @@ export function HistorySidebar({
                     </SheetTitle>
                 </SheetHeader>
 
-                <div className="flex flex-1 flex-col gap-4 overflow-hidden">
-                    <ScrollArea className="h-full min-h-0 rounded-lg border border-border/40 bg-background/80 pr-4">
+                <div
+                    id="history-content-container"
+                    className="flex flex-1 flex-col gap-4 overflow-hidden"
+                >
+                    <ScrollArea
+                        id="history-scroll-area"
+                        className="h-full min-h-0 rounded-lg border border-border/40 bg-background/80 pr-4"
+                    >
                         {recentEntries.length === 0 ? (
                             <EmptyState message={recentEmptyMessage} />
                         ) : (
@@ -107,7 +124,10 @@ export function HistorySidebar({
                     </ScrollArea>
                 </div>
 
-                <div className="flex flex-col gap-2 border-t border-border/40 pt-4 sm:flex-row sm:items-center">
+                <div
+                    id="history-actions-container"
+                    className="flex flex-col gap-2 border-t border-border/40 pt-4 sm:flex-row sm:items-center"
+                >
                     <Button
                         id="history-export-button"
                         variant="outline"
