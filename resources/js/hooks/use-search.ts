@@ -62,7 +62,7 @@ export function useSearch(options: UseSearchOptions = {}): UseSearchReturn {
     const [lastFetchedQuery, setLastFetchedQuery] = useState('');
 
     const controllerRef = useRef<AbortController | null>(null);
-    const debounceRef = useRef<number>();
+    const debounceRef = useRef<number | undefined>(undefined);
     const lastRequestRef = useRef<{ query: string; scope: SearchScope } | null>(null);
 
     const isClient = typeof window !== 'undefined';

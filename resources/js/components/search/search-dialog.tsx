@@ -66,7 +66,6 @@ export function SearchDialog({
         setScope,
         results,
         meta,
-        status,
         error,
         isSearching,
         lastFetchedQuery,
