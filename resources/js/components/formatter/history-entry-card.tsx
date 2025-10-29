@@ -92,25 +92,7 @@ export function HistoryEntryCard({
                     </div>
                 </div>
 
-                <div className="flex items-center gap-1">
-                    <Button
-                        id={`history-entry-star-${entry.id}`}
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onToggleSave();
-                        }}
-                        className="h-8 w-8 p-0"
-                        disabled={disabled}
-                        aria-label={
-                            entry.isSaved ? 'Unsave entry' : 'Save entry'
-                        }
-                    >
-                        <Star
-                            className={`h-4 w-4 ${entry.isSaved ? 'fill-yellow-400 text-yellow-400' : 'text-gray-400'}`}
-                        />
-                    </Button>
+                <div className="flex flex-shrink-0 items-center gap-1">
                     <Button
                         id={`history-entry-star-${entry.id}`}
                         variant="ghost"
@@ -163,20 +145,6 @@ export function HistoryEntryCard({
                             id={`history-entry-delete-icon-${entry.id}`}
                             className="h-4 w-4"
                         />
-                    </Button>
-                    <Button
-                        id={`history-entry-delete-${entry.id}`}
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onDelete();
-                        }}
-                        className="h-8 w-8 p-0 text-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/20"
-                        disabled={disabled}
-                        aria-label="Delete entry"
-                    >
-                        <Trash2 className="h-4 w-4" />
                     </Button>
                 </div>
             </div>
