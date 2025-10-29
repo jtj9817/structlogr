@@ -28,20 +28,15 @@ import { useFormattingTimer } from '@/hooks/use-formatting-timer';
 import { useHistory } from '@/hooks/use-history';
 import {
     commonShortcuts,
-    useKeyboardShortcuts,
     getShortcutDisplay,
+    useKeyboardShortcuts,
 } from '@/hooks/use-keyboard-shortcuts';
 import { usePreferences } from '@/hooks/use-preferences';
 import { cn } from '@/lib/utils';
 import { type SharedData } from '@/types';
 import type { HistoryEntry } from '@/types/history';
 import { Head, useForm, usePage } from '@inertiajs/react';
-import {
-    Check,
-    ClipboardCopy,
-    Maximize2,
-    Settings,
-} from 'lucide-react';
+import { Check, ClipboardCopy, Maximize2, Settings } from 'lucide-react';
 import {
     FormEventHandler,
     useCallback,
@@ -144,7 +139,6 @@ const syntaxHighlightJson = (json: string) => {
 
 type HistoryPayload = {
     recent: HistoryEntry[];
-    saved: HistoryEntry[];
 };
 
 type HistoryRoutesConfig = {
@@ -277,14 +271,21 @@ export default function FormatterPage({
     const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'error'>(
         'idle',
     );
-    const [inputCopyStatus, setInputCopyStatus] = useState<'idle' | 'copied' | 'error'>(
-        'idle',
+    const [inputCopyStatus, setInputCopyStatus] = useState<
+        'idle' | 'copied' | 'error'
+    >('idle');
+    const {
+        elapsedTime,
+        isRunning: timerRunning,
+        start: startTimer,
+        stop: stopTimer,
+        reset: resetTimer,
+    } = useFormattingTimer();
+    const [formattingDuration, setFormattingDuration] = useState<number | null>(
+        null,
     );
-    const { elapsedTime, isRunning: timerRunning, start: startTimer, stop: stopTimer, reset: resetTimer } = useFormattingTimer();
-    const [formattingDuration, setFormattingDuration] = useState<number | null>(null);
     const {
         recentEntries,
-        savedEntries,
         loadEntry: loadHistoryEntry,
         removeEntry,
         toggleSaved,
@@ -451,14 +452,19 @@ export default function FormatterPage({
             onSuccess: () => {
                 const duration = stopTimer();
                 setFormattingDuration(duration);
-                setStatusMessage(`Log formatting complete in ${(duration / 1000).toFixed(2)}s`);
+                setStatusMessage(
+                    `Log formatting complete in ${(duration / 1000).toFixed(2)}s`,
+                );
                 setTimeout(() => setStatusMessage(''), 3000);
                 setTimeout(() => outputRef.current?.focus(), 100);
             },
             onError: (errors) => {
                 stopTimer();
                 setFormattingDuration(null);
-                const errorMessage = errors.raw_log || errors.llm_model || 'Error formatting log';
+                const errorMessage =
+                    errors.raw_log ||
+                    errors.llm_model ||
+                    'Error formatting log';
                 setStatusMessage(errorMessage);
                 setTimeout(() => setStatusMessage(''), 3000);
                 setTimeout(() => errorRef.current?.focus(), 100);
@@ -611,7 +617,7 @@ export default function FormatterPage({
             return (
                 <pre
                     ref={outputRef}
-                    className="m-0 whitespace-pre-wrap text-sm leading-6"
+                    className="m-0 text-sm leading-6 whitespace-pre-wrap"
                     tabIndex={0}
                     aria-label="Formatted JSON output"
                 >
@@ -635,7 +641,7 @@ export default function FormatterPage({
         }
 
         return (
-            <pre className="m-0 whitespace-pre-wrap text-left text-sm text-muted-foreground">
+            <pre className="m-0 text-left text-sm whitespace-pre-wrap text-muted-foreground">
                 {dummyFormattedPreview}
             </pre>
         );
@@ -683,9 +689,14 @@ export default function FormatterPage({
                                     className="flex h-full flex-col shadow-sm transition-shadow hover:shadow-md"
                                 >
                                     <CardHeader id={inputCardHeaderId}>
-                                        <CardTitle id={inputCardTitleId}>Raw Log Input</CardTitle>
+                                        <CardTitle id={inputCardTitleId}>
+                                            Raw Log Input
+                                        </CardTitle>
                                     </CardHeader>
-                                    <CardContent id={inputCardContentId} className="flex flex-1 flex-col gap-6 overflow-hidden">
+                                    <CardContent
+                                        id={inputCardContentId}
+                                        className="flex flex-1 flex-col gap-6 overflow-hidden"
+                                    >
                                         <form
                                             id={formId}
                                             onSubmit={submit}
@@ -693,7 +704,10 @@ export default function FormatterPage({
                                             aria-label="Log formatting form"
                                         >
                                             {/* Sample Logs Dropdown */}
-                                            <div id={sampleLogsContainerId} className="space-y-2">
+                                            <div
+                                                id={sampleLogsContainerId}
+                                                className="space-y-2"
+                                            >
                                                 <label
                                                     id={sampleLogsLabelId}
                                                     htmlFor={sampleLogsSelectId}
@@ -715,7 +729,12 @@ export default function FormatterPage({
                                                     defaultValue=""
                                                     aria-label="Select a sample log to load"
                                                 >
-                                                    <option id={sampleLogsOptionDefaultId} value="">
+                                                    <option
+                                                        id={
+                                                            sampleLogsOptionDefaultId
+                                                        }
+                                                        value=""
+                                                    >
                                                         Select a sample log
                                                         type...
                                                     </option>
@@ -731,14 +750,21 @@ export default function FormatterPage({
                                             </div>
 
                                             {/* Input Toolbar */}
-                                            <div id={inputToolbarId} className="flex justify-end">
+                                            <div
+                                                id={inputToolbarId}
+                                                className="flex justify-end"
+                                            >
                                                 <Button
                                                     id={viewFullInputButtonId}
                                                     type="button"
                                                     variant="outline"
                                                     size="sm"
-                                                    onClick={() => setInputModalOpen(true)}
-                                                    disabled={!data.raw_log.trim()}
+                                                    onClick={() =>
+                                                        setInputModalOpen(true)
+                                                    }
+                                                    disabled={
+                                                        !data.raw_log.trim()
+                                                    }
                                                     className="inline-flex items-center gap-2"
                                                     aria-label="Open full input text in a modal dialog"
                                                 >
@@ -748,8 +774,16 @@ export default function FormatterPage({
                                             </div>
 
                                             {/* Textarea with Clear Button */}
-                                            <div id={textareaWrapperId} className="flex min-h-0 flex-1 flex-col gap-3">
-                                                <div id={textareaContainerRelativeId} className="relative flex min-h-0 flex-1">
+                                            <div
+                                                id={textareaWrapperId}
+                                                className="flex min-h-0 flex-1 flex-col gap-3"
+                                            >
+                                                <div
+                                                    id={
+                                                        textareaContainerRelativeId
+                                                    }
+                                                    className="relative flex min-h-0 flex-1"
+                                                >
                                                     <Textarea
                                                         ref={textareaRef}
                                                         id={rawLogTextareaId}
@@ -770,9 +804,13 @@ export default function FormatterPage({
                                                     />
                                                     {data.raw_log && (
                                                         <Tooltip>
-                                                            <TooltipTrigger asChild>
+                                                            <TooltipTrigger
+                                                                asChild
+                                                            >
                                                                 <button
-                                                                    id={clearButtonId}
+                                                                    id={
+                                                                        clearButtonId
+                                                                    }
                                                                     type="button"
                                                                     onClick={
                                                                         handleClearInput
@@ -785,15 +823,27 @@ export default function FormatterPage({
                                                                 </button>
                                                             </TooltipTrigger>
                                                             <TooltipContent>
-                                                                <p>Clear input ({getShortcutDisplay(commonShortcuts.clear)})</p>
+                                                                <p>
+                                                                    Clear input
+                                                                    (
+                                                                    {getShortcutDisplay(
+                                                                        commonShortcuts.clear,
+                                                                    )}
+                                                                    )
+                                                                </p>
                                                             </TooltipContent>
                                                         </Tooltip>
                                                     )}
                                                 </div>
 
                                                 {/* Character and Line Counter */}
-                                                <div id={statsCounterId} className="flex justify-between text-xs text-muted-foreground">
-                                                    <span id={characterCounterId}>
+                                                <div
+                                                    id={statsCounterId}
+                                                    className="flex justify-between text-xs text-muted-foreground"
+                                                >
+                                                    <span
+                                                        id={characterCounterId}
+                                                    >
                                                         {getCharacterCount()}{' '}
                                                         characters •{' '}
                                                         {getLineCount()} lines
@@ -823,28 +873,79 @@ export default function FormatterPage({
                                                 )}
                                             </div>
 
-                                            <div id={buttonsContainerId} className="mt-auto flex flex-col gap-3">
+                                            <div
+                                                id={buttonsContainerId}
+                                                className="mt-auto flex flex-col gap-3"
+                                            >
                                                 <div className="flex flex-col gap-2">
-                                                    <div id={modelTimerContainerId} className="flex items-center justify-between">
-                                                        <span id={modelLabelId} className="text-xs font-bold text-muted-foreground">
-                                                            Model: <span id={modelDisplayId}>{preferences.llmModel}</span>
+                                                    <div
+                                                        id={
+                                                            modelTimerContainerId
+                                                        }
+                                                        className="flex items-center justify-between"
+                                                    >
+                                                        <span
+                                                            id={modelLabelId}
+                                                            className="text-xs font-bold text-muted-foreground"
+                                                        >
+                                                            Model:{' '}
+                                                            <span
+                                                                id={
+                                                                    modelDisplayId
+                                                                }
+                                                            >
+                                                                {
+                                                                    preferences.llmModel
+                                                                }
+                                                            </span>
                                                         </span>
-                                                        {formattingDuration !== null && !processing && (
-                                                            <span id={formattingCompletedId} className="text-xs text-emerald-600 dark:text-emerald-400">
-                                                                ✓ Completed in {(formattingDuration / 1000).toFixed(2)}s
-                                                            </span>
-                                                        )}
-                                                        {timerRunning && processing && (
-                                                            <span id={formattingTimerId} className="text-xs text-muted-foreground">
-                                                                {(elapsedTime / 1000).toFixed(2)}s
-                                                            </span>
-                                                        )}
+                                                        {formattingDuration !==
+                                                            null &&
+                                                            !processing && (
+                                                                <span
+                                                                    id={
+                                                                        formattingCompletedId
+                                                                    }
+                                                                    className="text-xs text-emerald-600 dark:text-emerald-400"
+                                                                >
+                                                                    ✓ Completed
+                                                                    in{' '}
+                                                                    {(
+                                                                        formattingDuration /
+                                                                        1000
+                                                                    ).toFixed(
+                                                                        2,
+                                                                    )}
+                                                                    s
+                                                                </span>
+                                                            )}
+                                                        {timerRunning &&
+                                                            processing && (
+                                                                <span
+                                                                    id={
+                                                                        formattingTimerId
+                                                                    }
+                                                                    className="text-xs text-muted-foreground"
+                                                                >
+                                                                    {(
+                                                                        elapsedTime /
+                                                                        1000
+                                                                    ).toFixed(
+                                                                        2,
+                                                                    )}
+                                                                    s
+                                                                </span>
+                                                            )}
                                                     </div>
                                                     <Tooltip>
                                                         <TooltipTrigger asChild>
                                                             <Button
-                                                                id={formatButtonId}
-                                                                data-testid={formatButtonTestId}
+                                                                id={
+                                                                    formatButtonId
+                                                                }
+                                                                data-testid={
+                                                                    formatButtonTestId
+                                                                }
                                                                 type="submit"
                                                                 disabled={
                                                                     processing ||
@@ -864,7 +965,13 @@ export default function FormatterPage({
                                                             </Button>
                                                         </TooltipTrigger>
                                                         <TooltipContent>
-                                                            <p>Format log ({getShortcutDisplay(commonShortcuts.submit)})</p>
+                                                            <p>
+                                                                Format log (
+                                                                {getShortcutDisplay(
+                                                                    commonShortcuts.submit,
+                                                                )}
+                                                                )
+                                                            </p>
                                                         </TooltipContent>
                                                     </Tooltip>
                                                 </div>
@@ -881,15 +988,26 @@ export default function FormatterPage({
                                             'animate-in fade-in slide-in-from-right-4',
                                     )}
                                 >
-                                    <CardHeader id={outputCardHeaderId} className="flex flex-col gap-2 text-left">
+                                    <CardHeader
+                                        id={outputCardHeaderId}
+                                        className="flex flex-col gap-2 text-left"
+                                    >
                                         <div>
-                                            <CardTitle id={outputCardTitleId}>Converted Log</CardTitle>
-                                            <p id={outputCardSubtitleId} className="text-sm text-muted-foreground">
+                                            <CardTitle id={outputCardTitleId}>
+                                                Converted Log
+                                            </CardTitle>
+                                            <p
+                                                id={outputCardSubtitleId}
+                                                className="text-sm text-muted-foreground"
+                                            >
                                                 Structured output preview
                                             </p>
                                         </div>
                                     </CardHeader>
-                                    <CardContent id={outputCardContentId} className="flex flex-1 flex-col gap-4 overflow-hidden">
+                                    <CardContent
+                                        id={outputCardContentId}
+                                        className="flex flex-1 flex-col gap-4 overflow-hidden"
+                                    >
                                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                             <p
                                                 id={outputPreviewDescId}
@@ -907,7 +1025,10 @@ export default function FormatterPage({
                                             aria-busy={processing}
                                             className="flex h-[60vh] flex-col overflow-hidden rounded-lg border border-border/40 bg-background/80 text-sm leading-6"
                                         >
-                                            <div id={outputToolbarId} className="flex flex-shrink-0 justify-end gap-2 bg-background/95 px-4 py-3 shadow-sm backdrop-blur">
+                                            <div
+                                                id={outputToolbarId}
+                                                className="flex flex-shrink-0 justify-end gap-2 bg-background/95 px-4 py-3 shadow-sm backdrop-blur"
+                                            >
                                                 <Button
                                                     id={copyOutputButtonId}
                                                     type="button"
@@ -928,7 +1049,8 @@ export default function FormatterPage({
                                                             <Check className="h-4 w-4" />
                                                             Copied!
                                                         </>
-                                                    ) : copyStatus === 'error' ? (
+                                                    ) : copyStatus ===
+                                                      'error' ? (
                                                         <>
                                                             <ClipboardCopy className="h-4 w-4" />
                                                             Copy Failed
@@ -956,7 +1078,10 @@ export default function FormatterPage({
                                                     View Full Output
                                                 </Button>
                                             </div>
-                                            <div id={outputContentWrapperId} className="flex-1 overflow-auto px-4 pb-4">
+                                            <div
+                                                id={outputContentWrapperId}
+                                                className="flex-1 overflow-auto px-4 pb-4"
+                                            >
                                                 {renderOutputContent()}
                                             </div>
                                         </div>
@@ -969,7 +1094,9 @@ export default function FormatterPage({
 
                 <footer id={footerId} className="border-t py-6">
                     <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-                        <p id={footerTextId}>Powered by Laravel + React + Prism</p>
+                        <p id={footerTextId}>
+                            Powered by Laravel + React + Prism
+                        </p>
                     </div>
                 </footer>
             </div>
@@ -979,7 +1106,7 @@ export default function FormatterPage({
                 variant="secondary"
                 size="lg"
                 onClick={() => setPreferencesOpen(true)}
-                className="focus-ring fixed bottom-4 right-4 z-50 inline-flex h-11 gap-2 px-5 shadow-lg sm:bottom-6 sm:right-6"
+                className="focus-ring fixed right-4 bottom-4 z-50 inline-flex h-11 gap-2 px-5 shadow-lg sm:right-6 sm:bottom-6"
                 aria-label="Open formatting preferences"
             >
                 <Settings className="h-4 w-4" />
@@ -996,7 +1123,6 @@ export default function FormatterPage({
                 onClearHistory={clearHistory}
                 onExportHistory={exportHistory}
                 recentEntries={recentEntries}
-                savedEntries={savedEntries}
                 isProcessing={historyLoading}
                 canManage={canManage}
             />
@@ -1013,29 +1139,37 @@ export default function FormatterPage({
                 onOpenChange={setShortcutsOpen}
             />
 
-            <Dialog
-                open={isInputModalOpen}
-                onOpenChange={setInputModalOpen}
-            >
-                <DialogContent id={inputModalId} className="sm:max-w-[min(80vw,1200px)]">
+            <Dialog open={isInputModalOpen} onOpenChange={setInputModalOpen}>
+                <DialogContent
+                    id={inputModalId}
+                    className="sm:max-w-[min(80vw,1200px)]"
+                >
                     <DialogHeader>
-                        <DialogTitle id={inputModalTitleId}>Raw Log Input</DialogTitle>
+                        <DialogTitle id={inputModalTitleId}>
+                            Raw Log Input
+                        </DialogTitle>
                         <DialogDescription id={inputModalDescId}>
                             Review the full raw log text and copy it if needed.
                         </DialogDescription>
                     </DialogHeader>
-                    <ScrollArea id={inputModalScrollAreaId} className="max-h-[70vh] rounded-md border border-border/40">
+                    <ScrollArea
+                        id={inputModalScrollAreaId}
+                        className="max-h-[70vh] rounded-md border border-border/40"
+                    >
                         {data.raw_log.trim() ? (
                             <pre
                                 id={inputModalPreId}
-                                className="whitespace-pre p-4 text-sm leading-6"
+                                className="p-4 text-sm leading-6 whitespace-pre"
                             >
                                 {data.raw_log}
                             </pre>
                         ) : (
-                            <div id={inputModalEmptyId} className="p-4 text-sm text-muted-foreground">
-                                No input text is available yet. Enter log text to
-                                view it here.
+                            <div
+                                id={inputModalEmptyId}
+                                className="p-4 text-sm text-muted-foreground"
+                            >
+                                No input text is available yet. Enter log text
+                                to view it here.
                             </div>
                         )}
                         <ScrollBar orientation="horizontal" />
@@ -1053,7 +1187,9 @@ export default function FormatterPage({
                             id={inputModalCopyButtonId}
                             type="button"
                             variant={
-                                inputCopyStatus === 'error' ? 'destructive' : 'default'
+                                inputCopyStatus === 'error'
+                                    ? 'destructive'
+                                    : 'default'
                             }
                             onClick={handleCopyInput}
                             disabled={!data.raw_log.trim()}
@@ -1080,29 +1216,37 @@ export default function FormatterPage({
                 </DialogContent>
             </Dialog>
 
-            <Dialog
-                open={isOutputModalOpen}
-                onOpenChange={setOutputModalOpen}
-            >
-                <DialogContent id={outputModalId} className="sm:max-w-[min(80vw,1200px)]">
+            <Dialog open={isOutputModalOpen} onOpenChange={setOutputModalOpen}>
+                <DialogContent
+                    id={outputModalId}
+                    className="sm:max-w-[min(80vw,1200px)]"
+                >
                     <DialogHeader>
-                        <DialogTitle id={outputModalTitleId}>Formatted JSON Output</DialogTitle>
+                        <DialogTitle id={outputModalTitleId}>
+                            Formatted JSON Output
+                        </DialogTitle>
                         <DialogDescription id={outputModalDescId}>
                             Review the full transformed log and copy it for your
                             workflow.
                         </DialogDescription>
                     </DialogHeader>
-                    <ScrollArea id={outputModalScrollAreaId} className="max-h-[70vh] rounded-md border border-border/40">
+                    <ScrollArea
+                        id={outputModalScrollAreaId}
+                        className="max-h-[70vh] rounded-md border border-border/40"
+                    >
                         {formattedOutput ? (
                             <pre
                                 id={outputModalPreId}
-                                className="whitespace-pre p-4 text-sm leading-6"
+                                className="p-4 text-sm leading-6 whitespace-pre"
                                 dangerouslySetInnerHTML={{
                                     __html: highlightedOutput,
                                 }}
                             />
                         ) : (
-                            <div id={outputModalEmptyId} className="p-4 text-sm text-muted-foreground">
+                            <div
+                                id={outputModalEmptyId}
+                                className="p-4 text-sm text-muted-foreground"
+                            >
                                 No formatted output is available yet. Run the
                                 formatter to generate a preview.
                             </div>
@@ -1122,7 +1266,9 @@ export default function FormatterPage({
                             id={outputModalCopyButtonId}
                             type="button"
                             variant={
-                                copyStatus === 'error' ? 'destructive' : 'default'
+                                copyStatus === 'error'
+                                    ? 'destructive'
+                                    : 'default'
                             }
                             onClick={handleCopyOutput}
                             disabled={!formattedOutput}

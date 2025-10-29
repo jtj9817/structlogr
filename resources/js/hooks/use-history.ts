@@ -12,7 +12,6 @@ interface HistoryRoutes {
 
 interface HistoryStatePayload {
     recent: HistoryEntry[];
-    saved: HistoryEntry[];
 }
 
 interface UseHistoryOptions {
@@ -80,9 +79,6 @@ export function useHistory({ initialHistory, routes }: UseHistoryOptions = {}) {
     const [recentEntries, setRecentEntries] = useState<HistoryEntry[]>(
         initialHistory?.recent ?? [],
     );
-    const [savedEntries, setSavedEntries] = useState<HistoryEntry[]>(
-        initialHistory?.saved ?? [],
-    );
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
@@ -91,7 +87,6 @@ export function useHistory({ initialHistory, routes }: UseHistoryOptions = {}) {
         }
 
         setRecentEntries(initialHistory.recent);
-        setSavedEntries(initialHistory.saved);
     }, [initialHistory]);
 
     const canManage = useMemo(() => Boolean(routes), [routes]);
@@ -102,7 +97,6 @@ export function useHistory({ initialHistory, routes }: UseHistoryOptions = {}) {
         }
 
         setRecentEntries(payload.recent);
-        setSavedEntries(payload.saved);
     }, []);
 
     const loadEntry = useCallback(
@@ -200,7 +194,6 @@ export function useHistory({ initialHistory, routes }: UseHistoryOptions = {}) {
 
     return {
         recentEntries,
-        savedEntries,
         loadEntry,
         removeEntry,
         toggleSaved,

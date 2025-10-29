@@ -7,7 +7,6 @@ import {
     SheetHeader,
     SheetTitle,
 } from '@/components/ui/sheet';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { HistoryEntry } from '@/types/history';
 import { Download, History, Trash2 } from 'lucide-react';
 
@@ -21,7 +20,6 @@ interface HistorySidebarProps {
     onClearHistory: () => Promise<void>;
     onExportHistory: () => void;
     recentEntries: HistoryEntry[];
-    savedEntries: HistoryEntry[];
     isProcessing?: boolean;
     canManage: boolean;
 }
@@ -36,7 +34,6 @@ export function HistorySidebar({
     onClearHistory,
     onExportHistory,
     recentEntries,
-    savedEntries,
     isProcessing = false,
     canManage,
 }: HistorySidebarProps) {
@@ -69,9 +66,6 @@ export function HistorySidebar({
     const recentEmptyMessage = canManage
         ? 'No recent entries yet'
         : 'Log in to start building history.';
-    const savedEmptyMessage = canManage
-        ? 'No saved entries yet'
-        : 'Mark entries as saved to pin them here.';
 
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
@@ -81,85 +75,37 @@ export function HistorySidebar({
                 className="flex w-full max-w-lg flex-col gap-6 px-4 py-6 sm:px-6 lg:max-w-2xl"
             >
                 <SheetHeader className="text-left">
-                    <SheetTitle id="history-sidebar-title" className="text-xl font-semibold">
+                    <SheetTitle
+                        id="history-sidebar-title"
+                        className="text-xl font-semibold"
+                    >
                         History
                     </SheetTitle>
                 </SheetHeader>
 
-                <Tabs
-                    id="history-tabs"
-                    defaultValue="recent"
-                    className="flex flex-1 flex-col gap-4 overflow-hidden"
-                >
-                    <TabsList id="history-tabs-list" className="grid grid-cols-2 gap-2 rounded-lg bg-muted p-1">
-                        <TabsTrigger id="history-tab-recent" value="recent">Recent</TabsTrigger>
-                        <TabsTrigger id="history-tab-saved" value="saved">Saved</TabsTrigger>
-                    </TabsList>
-
-                    <TabsContent
-                        id="history-recent-content"
-                        value="recent"
-                        className="flex flex-1 flex-col overflow-hidden"
-                    >
-                        <ScrollArea className="h-full min-h-0 rounded-lg border border-border/40 bg-background/80 pr-4">
-                            {recentEntries.length === 0 ? (
-                                <EmptyState message={recentEmptyMessage} />
-                            ) : (
-                                <div className="space-y-2 p-3">
-                                    {recentEntries.map((entry) => (
-                                        <HistoryEntryCard
-                                            key={entry.id}
-                                            entry={entry}
-                                            onLoad={() =>
-                                                handleLoadEntry(entry)
-                                            }
-                                            onDelete={() =>
-                                                onRemoveEntry(entry.id)
-                                            }
-                                            onToggleSave={() =>
-                                                onToggleSaved(entry.id)
-                                            }
-                                            onCopy={() => onCopyEntry(entry.id)}
-                                            disabled={
-                                                isProcessing || !canManage
-                                            }
-                                        />
-                                    ))}
-                                </div>
-                            )}
-                        </ScrollArea>
-                    </TabsContent>
-
-                    <TabsContent id="history-saved-content" value="saved" className="flex flex-1 flex-col overflow-hidden">
-                        <ScrollArea className="h-full min-h-0 rounded-lg border border-border/40 bg-background/80 pr-4">
-                            {savedEntries.length === 0 ? (
-                                <EmptyState message={savedEmptyMessage} />
-                            ) : (
-                                <div className="space-y-2 p-3">
-                                    {savedEntries.map((entry) => (
-                                        <HistoryEntryCard
-                                            key={entry.id}
-                                            entry={entry}
-                                            onLoad={() =>
-                                                handleLoadEntry(entry)
-                                            }
-                                            onDelete={() =>
-                                                onRemoveEntry(entry.id)
-                                            }
-                                            onToggleSave={() =>
-                                                onToggleSaved(entry.id)
-                                            }
-                                            onCopy={() => onCopyEntry(entry.id)}
-                                            disabled={
-                                                isProcessing || !canManage
-                                            }
-                                        />
-                                    ))}
-                                </div>
-                            )}
-                        </ScrollArea>
-                    </TabsContent>
-                </Tabs>
+                <div className="flex flex-1 flex-col gap-4 overflow-hidden">
+                    <ScrollArea className="h-full min-h-0 rounded-lg border border-border/40 bg-background/80 pr-4">
+                        {recentEntries.length === 0 ? (
+                            <EmptyState message={recentEmptyMessage} />
+                        ) : (
+                            <div className="space-y-2 p-3">
+                                {recentEntries.map((entry) => (
+                                    <HistoryEntryCard
+                                        key={entry.id}
+                                        entry={entry}
+                                        onLoad={() => handleLoadEntry(entry)}
+                                        onDelete={() => onRemoveEntry(entry.id)}
+                                        onToggleSave={() =>
+                                            onToggleSaved(entry.id)
+                                        }
+                                        onCopy={() => onCopyEntry(entry.id)}
+                                        disabled={isProcessing || !canManage}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </ScrollArea>
+                </div>
 
                 <div className="flex flex-col gap-2 border-t border-border/40 pt-4 sm:flex-row sm:items-center">
                     <Button
