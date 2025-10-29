@@ -21,8 +21,8 @@ import { useInitials } from '@/hooks/use-initials';
 import { useScrollShadow } from '@/hooks/use-scroll-shadow';
 import { cn } from '@/lib/utils';
 import { home as formatterHome, login, register } from '@/routes';
-import { edit as profileSettingsRoute } from '@/routes/profile';
 import historyRoutes from '@/routes/history';
+import { edit as profileSettingsRoute } from '@/routes/profile';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import {
@@ -37,7 +37,13 @@ import {
     Settings,
     Sparkles,
 } from 'lucide-react';
-import { type ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+    type ReactNode,
+    useCallback,
+    useEffect,
+    useMemo,
+    useState,
+} from 'react';
 
 const primaryNavItems: NavItem[] = [
     {
@@ -107,7 +113,10 @@ export function AppHeader({
     const getInitials = useInitials();
     const isScrolled = useScrollShadow();
     const [searchOpen, setSearchOpen] = useState(false);
-    const defaultSearchEndpoint = useMemo(() => historyRoutes.search?.url?.(), []);
+    const defaultSearchEndpoint = useMemo(
+        () => historyRoutes.search?.url?.(),
+        [],
+    );
     const searchEndpoint = searchRoute ?? defaultSearchEndpoint ?? null;
     const canSearch = Boolean(user && searchEndpoint);
 
@@ -208,9 +217,17 @@ export function AppHeader({
     const upgradeHref = '/pricing';
 
     const desktopGuestCtas = (
-        <div id="desktop-guest-ctas" className="hidden min-w-[210px] flex-col items-stretch gap-1 md:flex">
+        <div
+            id="desktop-guest-ctas"
+            className="hidden min-w-[210px] flex-col items-stretch gap-1 md:flex"
+        >
             <div className="flex items-center gap-2">
-                <Button id="desktop-login-button" variant="ghost" size="sm" asChild>
+                <Button
+                    id="desktop-login-button"
+                    variant="ghost"
+                    size="sm"
+                    asChild
+                >
                     <Link href={login()}>Log in</Link>
                 </Button>
                 <Button
@@ -227,7 +244,6 @@ export function AppHeader({
             </span>
         </div>
     );
-
 
     const desktopCreditsBadge = credits ? (
         <Link
@@ -251,8 +267,15 @@ export function AppHeader({
     const mobileUserSection = user ? (
         <div id="mobile-user-section" className="flex items-center gap-3">
             <Avatar id="mobile-user-avatar" className="size-10 rounded-lg">
-                <AvatarImage id="mobile-user-avatar-image" src={user.avatar} alt={user.name} />
-                <AvatarFallback id="mobile-user-avatar-fallback" className="rounded-lg bg-neutral-200 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-100">
+                <AvatarImage
+                    id="mobile-user-avatar-image"
+                    src={user.avatar}
+                    alt={user.name}
+                />
+                <AvatarFallback
+                    id="mobile-user-avatar-fallback"
+                    className="rounded-lg bg-neutral-200 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-100"
+                >
                     {getInitials(user.name)}
                 </AvatarFallback>
             </Avatar>
@@ -300,11 +323,19 @@ export function AppHeader({
                     </span>
                 </Link>
             )}
-            <AppearanceToggleDropdown id="mobile-appearance-toggle-auth" className="flex justify-start rounded-md border border-border/80 px-3" />
+            <AppearanceToggleDropdown
+                id="mobile-appearance-toggle-auth"
+                className="flex justify-start rounded-md border border-border/80 px-3"
+            />
         </div>
     ) : (
         <div id="mobile-guest-ctas" className="space-y-2">
-            <Button id="mobile-login-button" variant="ghost" className="w-full justify-center" asChild>
+            <Button
+                id="mobile-login-button"
+                variant="ghost"
+                className="w-full justify-center"
+                asChild
+            >
                 <Link href={login()}>Log in</Link>
             </Button>
             <Button
@@ -317,7 +348,10 @@ export function AppHeader({
             <p className="text-center text-xs text-muted-foreground">
                 or continue without account
             </p>
-            <AppearanceToggleDropdown id="mobile-appearance-toggle-guest" className="flex justify-start rounded-md border border-border/80 px-3" />
+            <AppearanceToggleDropdown
+                id="mobile-appearance-toggle-guest"
+                className="flex justify-start rounded-md border border-border/80 px-3"
+            />
         </div>
     );
 
@@ -330,8 +364,14 @@ export function AppHeader({
                     isScrolled && 'shadow-md',
                 )}
             >
-                <div id="app-header-container" className="mx-auto flex h-16 items-center gap-3 px-4 sm:px-6 md:max-w-7xl lg:px-8">
-                    <div id="mobile-nav-wrapper" className="flex items-center gap-2 lg:hidden">
+                <div
+                    id="app-header-container"
+                    className="mx-auto flex h-16 items-center gap-3 px-4 sm:px-6 md:max-w-7xl lg:px-8"
+                >
+                    <div
+                        id="mobile-nav-wrapper"
+                        className="flex items-center gap-2 lg:hidden"
+                    >
                         <MobileNavigation
                             mainLinks={primaryNavItems}
                             secondaryLinks={resourceNavItems}
@@ -349,9 +389,24 @@ export function AppHeader({
                         <AppLogo />
                     </Link>
 
-                    <div id="header-actions" className="ml-auto flex items-center gap-2">
+                    <div
+                        id="header-actions"
+                        className="ml-auto flex items-center gap-2"
+                    >
                         {desktopCreditsBadge}
-                        <AppearanceToggleDropdown id="desktop-appearance-toggle" className="hidden sm:block" />
+                        <TooltipProvider delayDuration={0}>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <AppearanceToggleDropdown
+                                        id="desktop-appearance-toggle"
+                                        className="hidden sm:block"
+                                    />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>Toggle theme</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                         {onShortcutsOpen && (
                             <TooltipProvider delayDuration={0}>
                                 <Tooltip>
@@ -445,7 +500,11 @@ export function AppHeader({
                                         size="icon"
                                         className="hidden h-9 w-9 md:inline-flex"
                                         onClick={openSearch}
-                                        aria-label={canSearch ? 'Search history' : 'Sign in to search history'}
+                                        aria-label={
+                                            canSearch
+                                                ? 'Search history'
+                                                : 'Sign in to search history'
+                                        }
                                         aria-expanded={searchOpen}
                                         disabled={!canSearch}
                                     >
@@ -454,7 +513,9 @@ export function AppHeader({
                                 </TooltipTrigger>
                                 <TooltipContent>
                                     <p>
-                                        {canSearch ? 'Search history (⌘K / Ctrl+K)' : 'Sign in to search history'}
+                                        {canSearch
+                                            ? 'Search history (⌘K / Ctrl+K)'
+                                            : 'Sign in to search history'}
                                     </p>
                                 </TooltipContent>
                             </Tooltip>
@@ -468,13 +529,19 @@ export function AppHeader({
                                         className="flex h-10 items-center gap-2 rounded-full px-2 md:px-3"
                                         aria-label="User menu"
                                     >
-                                        <Avatar id="desktop-user-avatar" className="size-9 rounded-full">
+                                        <Avatar
+                                            id="desktop-user-avatar"
+                                            className="size-9 rounded-full"
+                                        >
                                             <AvatarImage
                                                 id="desktop-user-avatar-image"
                                                 src={user.avatar}
                                                 alt={user.name}
                                             />
-                                            <AvatarFallback id="desktop-user-avatar-fallback" className="rounded-full bg-neutral-200 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-100">
+                                            <AvatarFallback
+                                                id="desktop-user-avatar-fallback"
+                                                className="rounded-full bg-neutral-200 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-100"
+                                            >
                                                 {getInitials(user.name)}
                                             </AvatarFallback>
                                         </Avatar>
@@ -505,8 +572,14 @@ export function AppHeader({
                 onSelectResult={onSearchResultSelect}
             />
             {breadcrumbs.length > 1 && (
-                <div id="breadcrumbs-wrapper" className="flex w-full border-b border-border/70">
-                    <div id="breadcrumbs-container" className="mx-auto flex h-12 w-full items-center justify-start px-4 text-neutral-500 sm:px-6 md:max-w-7xl lg:px-8">
+                <div
+                    id="breadcrumbs-wrapper"
+                    className="flex w-full border-b border-border/70"
+                >
+                    <div
+                        id="breadcrumbs-container"
+                        className="mx-auto flex h-12 w-full items-center justify-start px-4 text-neutral-500 sm:px-6 md:max-w-7xl lg:px-8"
+                    >
                         <Breadcrumbs breadcrumbs={breadcrumbs} />
                     </div>
                 </div>
