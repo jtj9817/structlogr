@@ -16,10 +16,9 @@ import {
 } from '@/components/ui/sheet';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useAppearance } from '@/hooks/use-appearance';
 import { useFontSize } from '@/hooks/use-font-size';
 import { useSettings } from '@/hooks/use-settings';
-import { Monitor, Moon, RotateCcw, Save, Settings, Sun } from 'lucide-react';
+import { RotateCcw, Save, Settings } from 'lucide-react';
 
 interface SettingsPanelProps {
     open: boolean;
@@ -28,7 +27,6 @@ interface SettingsPanelProps {
 
 export function SettingsPanel({ open, onOpenChange }: SettingsPanelProps) {
     const { settings, updateSetting, resetSettings } = useSettings();
-    const { appearance, updateAppearance } = useAppearance();
     const { fontSize: currentFontSize, updateFontSize: setFontSize } =
         useFontSize();
 
@@ -293,61 +291,6 @@ export function SettingsPanel({ open, onOpenChange }: SettingsPanelProps) {
                             </h3>
 
                             <div className="flex flex-col gap-6">
-                                {/* Theme */}
-                                <section className="flex flex-col gap-4 rounded-lg border border-gray-200 p-5 shadow-sm transition-colors hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600">
-                                    <Label className="font-medium">Theme</Label>
-                                    <RadioGroup
-                                        className="flex flex-wrap gap-4"
-                                        value={appearance}
-                                        onValueChange={(
-                                            value: 'light' | 'dark' | 'system',
-                                        ) => updateAppearance(value)}
-                                    >
-                                        <div className="flex items-center gap-2">
-                                            <RadioGroupItem
-                                                value="light"
-                                                id="theme-light"
-                                            />
-                                            <Label
-                                                htmlFor="theme-light"
-                                                className="flex items-center gap-2"
-                                            >
-                                                <Sun className="h-4 w-4" />
-                                                Light
-                                            </Label>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <RadioGroupItem
-                                                value="dark"
-                                                id="theme-dark"
-                                            />
-                                            <Label
-                                                htmlFor="theme-dark"
-                                                className="flex items-center gap-2"
-                                            >
-                                                <Moon className="h-4 w-4" />
-                                                Dark
-                                            </Label>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <RadioGroupItem
-                                                value="system"
-                                                id="theme-system"
-                                            />
-                                            <Label
-                                                htmlFor="theme-system"
-                                                className="flex items-center gap-2"
-                                            >
-                                                <Monitor className="h-4 w-4" />
-                                                System
-                                            </Label>
-                                        </div>
-                                    </RadioGroup>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                                        Choose your preferred color theme
-                                    </p>
-                                </section>
-
                                 {/* Font Size */}
                                 <section className="flex flex-col gap-3 rounded-lg border border-gray-200 p-5 shadow-sm transition-colors hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600">
                                     <div className="flex flex-col gap-2.5">
