@@ -22,15 +22,18 @@ StructLogr follows a modern full-stack architecture with clear separation betwee
 **Architecture Layers:**
 
 **Client Browser Layer:**
+
 - React 19 + TypeScript application
 - Component-based UI (Pages, Components, Hooks)
 - Inertia.js 2.0 Client for SPA functionality
 
 **Communication:**
+
 - HTTP/HTTPS with Inertia Protocol
 - JSON data exchange
 
 **Laravel 12 Backend Layer:**
+
 - Routes handle incoming requests
 - Middleware processes requests
 - Controllers coordinate business logic
@@ -39,6 +42,7 @@ StructLogr follows a modern full-stack architecture with clear separation betwee
 - LLM Providers (DeepSeek, OpenAI, Anthropic, etc.)
 
 **Database Layer:**
+
 - MySQL 8.0 Database
 - Tables: users, formatted_logs, cache, sessions, jobs
 
@@ -104,14 +108,16 @@ The main controller for log formatting functionality.
 **Location**: `app/Http/Controllers/LogFormatterController.php`
 
 **Methods**:
+
 - `show()`: Renders the FormatterPage Inertia component
-- `format(Request $request, LogFormatterService $service)`: 
-  - Validates raw log input
-  - Calls `LogFormatterService` to process with LLM
-  - Saves result to database
-  - Returns formatted log to frontend
+- `format(Request $request, LogFormatterService $service)`:
+    - Validates raw log input
+    - Calls `LogFormatterService` to process with LLM
+    - Saves result to database
+    - Returns formatted log to frontend
 
 **Routes**:
+
 ```php
 Route::get('/', [LogFormatterController::class, 'show'])->name('formatter.show');
 Route::post('/format', [LogFormatterController::class, 'format'])->name('formatter.format');
@@ -143,10 +149,12 @@ User settings management under `app/Http/Controllers/Settings/`:
 **Location**: `app/Http/Controllers/Settings/PreferencesController.php`
 
 **Methods**:
+
 - `index()`: Returns user's current preferences
 - `update(Request $request)`: Updates user preferences with validation
 
 **Validation Rules**:
+
 - `outputFormat`: Must be 'json', 'yaml', or 'xml'
 - `jsonIndentation`: Integer between 0 and 8
 - `autoCopyResults`: Boolean
@@ -161,6 +169,7 @@ User settings management under `app/Http/Controllers/Settings/`:
 - `timeoutSeconds`: Integer between 5 and 300
 
 **Routes**:
+
 ```php
 Route::middleware('auth')->group(function () {
     Route::get('/settings/preferences', [PreferencesController::class, 'index'])->name('preferences.index');
@@ -173,6 +182,7 @@ Route::middleware('auth')->group(function () {
 **Location**: `app/Http/Controllers/HistoryController.php`
 
 **Methods**:
+
 - `index()`: Returns user's history (recent and saved entries)
 - `show(FormattedLog $formattedLog)`: Retrieves specific history entry
 - `search(HistorySearchRequest $request)`: Performs full-text search on history
@@ -182,6 +192,7 @@ Route::middleware('auth')->group(function () {
 - `export()`: Exports history as JSON file
 
 **Routes**:
+
 ```php
 Route::middleware('auth')->group(function () {
     Route::get('/history', [HistoryController::class, 'index'])->name('history.index');
@@ -201,6 +212,7 @@ Route::middleware('auth')->group(function () {
 **Location**: `app/Services/HistoryService.php`
 
 **Responsibilities**:
+
 - Retrieves user-specific history entries
 - Formats history data for frontend consumption
 - Separates recent vs saved entries
@@ -212,6 +224,7 @@ Route::middleware('auth')->group(function () {
 ```php
 public function entriesForUser(User $user, int $limit = 50): Collection
 ```
+
 - Fetches latest formatted logs for user
 - Orders by created_at descending
 - Limits results for performance
@@ -219,6 +232,7 @@ public function entriesForUser(User $user, int $limit = 50): Collection
 ```php
 public function payloadForUser(User $user, int $limit = 50): array
 ```
+
 - Returns structured payload with `recent` and `saved` arrays
 - Each entry includes: id, summary, preview, createdAt, detectedLogType, fieldCount, isSaved
 - Preview text is sanitized (120 char limit, newlines removed)
@@ -226,12 +240,13 @@ public function payloadForUser(User $user, int $limit = 50): array
 ```php
 public function search(User $user, string $query, int $limit = 20, string $scope = 'all'): Collection
 ```
+
 - Performs MySQL full-text search using `MATCH ... AGAINST` syntax
 - Searches across: `title`, `summary`, `raw_log`, `detected_log_type` columns
 - Supports three search scopes:
-  - `'all'`: Searches all user history entries
-  - `'recent'`: Searches only unsaved entries (`is_saved = false`)
-  - `'saved'`: Searches only bookmarked entries (`is_saved = true`)
+    - `'all'`: Searches all user history entries
+    - `'recent'`: Searches only unsaved entries (`is_saved = false`)
+    - `'saved'`: Searches only bookmarked entries (`is_saved = true`)
 - Returns results ordered by relevance score, then creation date (DESC)
 - User-scoped queries ensure privacy isolation
 - Query sanitization via `HistorySearchRequest` validation
@@ -241,6 +256,7 @@ public function search(User $user, string $query, int $limit = 20, string $scope
 **Location**: `app/Services/LogFormatterService.php`
 
 **Responsibilities**:
+
 - Encapsulates Prism SDK integration
 - Defines LLM system prompt for log parsing
 - Defines JSON schema for structured output
@@ -256,28 +272,30 @@ public function search(User $user, string $query, int $limit = 20, string $scope
 ```php
 public function format(string $rawLog, ?string $llmModel = null, ?array $preferences = null, int $maxRetries = 3): array
 ```
+
 - Accepts raw log text, optional LLM model selection, user preferences, and retry configuration
 - Uses Prism structured generation with provider-specific schema conversion
 - Supports multiple LLM providers:
-  - DeepSeek (deepseek-chat) - default
-  - Google Gemini (gemini-2.5-flash)
-  - Moonshot AI (kimi-k2-turbo-preview) via OpenRouter
-  - ZhipuAI (GLM-4.5-Air, GLM-4.6) via OpenRouter
+    - DeepSeek (deepseek-chat) - default
+    - Google Gemini (gemini-2.5-flash)
+    - Moonshot AI (kimi-k2-turbo-preview) via OpenRouter
+    - ZhipuAI (GLM-4.5-Air, GLM-4.6) via OpenRouter
 - Implements retry logic with exponential backoff (default: 3 attempts)
 - Comprehensive logging at all stages (info, debug, warning, error, critical)
 - Times API requests and logs duration
 - Validates structured output against schema requirements
 - Returns structured array with fields:
-  - `detected_log_type`: High-level classification such as `test_runner`, `application_error`, or `http_access`
-  - `summary`: Object containing `status`, `headline`, optional `primary_subject`, `key_points`, `duration`, and `timestamp`
-  - `entities`: Array of `{ type, identifier, details? }` extracted from the log
-  - `metrics`: Array of numeric metrics `{ name, value?, unit?, description? }`
-  - `sections`: Array of structured sections with `section_type`, optional `title`/`description`, optional `items`, and a flexible `data` object for type-specific payloads
-  - Optional additional data may be included inside section `data` objects to capture domain-specific structures
+    - `detected_log_type`: High-level classification such as `test_runner`, `application_error`, or `http_access`
+    - `summary`: Object containing `status`, `headline`, optional `primary_subject`, `key_points`, `duration`, and `timestamp`
+    - `entities`: Array of `{ type, identifier, details? }` extracted from the log
+    - `metrics`: Array of numeric metrics `{ name, value?, unit?, description? }`
+    - `sections`: Array of structured sections with `section_type`, optional `title`/`description`, optional `items`, and a flexible `data` object for type-specific payloads
+    - Optional additional data may be included inside section `data` objects to capture domain-specific structures
 
 ```php
 public function saveLog(string $rawLog, array $formattedLog, ?User $user = null): ?FormattedLog
 ```
+
 - Persists raw and formatted logs to database
 - Accepts optional User parameter
 - Returns `null` for guest users (no database save)
@@ -290,6 +308,7 @@ private function configureGemini($builder, ObjectSchema $schema): void
 private function configureMoonshot($builder, ObjectSchema $schema): void
 private function configureGLM($builder, ObjectSchema $schema, string $model): void
 ```
+
 - Provider-specific configuration methods
 - Handle different response format requirements
 - Convert schemas to provider-specific formats
@@ -298,6 +317,7 @@ private function configureGLM($builder, ObjectSchema $schema, string $model): vo
 ```php
 private function validateStructuredOutput(array $data): void
 ```
+
 - Validates required fields in structured output
 - Ensures schema compliance
 - Throws exceptions with detailed error messages
@@ -306,6 +326,7 @@ private function validateStructuredOutput(array $data): void
 ```php
 private function applyPreferences(array $formattedLog, array $preferences): array
 ```
+
 - Applies user preferences to formatted log
 - Supports timestamp transformation (ISO8601, Unix, Custom)
 - Supports log level normalization
@@ -347,6 +368,7 @@ Prism::structured()
 **Location**: `app/Models/FormattedLog.php`
 
 **Schema**:
+
 ```php
 $fillable = [
     'user_id',
@@ -365,6 +387,7 @@ $casts = [
 ```
 
 **Relationships**:
+
 ```php
 public function user(): BelongsTo
 {
@@ -373,6 +396,7 @@ public function user(): BelongsTo
 ```
 
 **Database Table**: `formatted_logs`
+
 - `id`: Primary key
 - `user_id`: Foreign key to users (nullable)
 - `raw_log`: TEXT - Original unstructured log
@@ -391,6 +415,7 @@ public function user(): BelongsTo
 Standard Laravel User model with Fortify two-factor authentication traits and user preferences support.
 
 **Database Table**: `users`
+
 - `id`: Primary key
 - `name`: User full name
 - `email`: Email address (unique)
@@ -422,6 +447,7 @@ The User model includes a `getPreferencesAttribute()` accessor that merges store
 ```
 
 **Casts**:
+
 ```php
 'preferences' => 'array',  // Automatic JSON encoding/decoding
 ```
@@ -435,6 +461,7 @@ The User model includes a `getPreferencesAttribute()` accessor that merges store
 **Purpose**: Share global data with all Inertia pages
 
 **Shared Data**:
+
 ```php
 [
     'auth' => [
@@ -463,6 +490,7 @@ User preferences are automatically shared with all Inertia pages when authentica
 Prism SDK configuration with support for multiple LLM providers:
 
 **Supported Providers**:
+
 - OpenAI (GPT models)
 - Anthropic (Claude models)
 - DeepSeek (default in LogFormatterService)
@@ -482,6 +510,7 @@ Each provider configured via environment variables (API keys, URLs).
 Laravel Fortify authentication configuration:
 
 **Features Enabled**:
+
 - Registration
 - Password reset
 - Email verification
@@ -494,6 +523,7 @@ Laravel Fortify authentication configuration:
 Inertia.js configuration:
 
 **SSR Settings**:
+
 - SSR enabled: true
 - SSR URL: http://localhost:13714
 
@@ -679,6 +709,7 @@ resources/js/
 **Purpose**: Main log formatting interface
 
 **Features**:
+
 - Textarea for raw log input
 - Form validation via Inertia `useForm`
 - Submit button with loading state (spinner)
@@ -687,6 +718,7 @@ resources/js/
 - Navigation links to login/register for guests
 
 **Props Interface**:
+
 ```typescript
 interface FormatterPageProps {
     formattedLog?: {
@@ -701,6 +733,7 @@ interface FormatterPageProps {
 ```
 
 **Form Submission**:
+
 ```typescript
 const { data, setData, post, processing, errors } = useForm({
     raw_log: '',
@@ -740,6 +773,7 @@ Located in `resources/js/pages/settings/`:
 Located in `resources/js/components/ui/`, built with Radix UI:
 
 **Form Components**:
+
 - `input.tsx`: Text input field
 - `textarea.tsx`: Multi-line text input
 - `label.tsx`: Form label
@@ -748,29 +782,34 @@ Located in `resources/js/components/ui/`, built with Radix UI:
 - `button.tsx`: Button with variants (default, destructive, outline, ghost, link)
 
 **Layout Components**:
+
 - `card.tsx`: Card container (CardHeader, CardTitle, CardContent, CardFooter)
 - `separator.tsx`: Visual separator
 - `sidebar.tsx`: Collapsible sidebar navigation
 - `sheet.tsx`: Slide-out panel
 
 **Feedback Components**:
+
 - `alert.tsx`: Alert messages
 - `spinner.tsx`: Loading indicator
 - `skeleton.tsx`: Loading placeholder
 - `badge.tsx`: Status badges
 
 **Overlay Components**:
+
 - `dialog.tsx`: Modal dialog
 - `dropdown-menu.tsx`: Dropdown menu
 - `tooltip.tsx`: Hover tooltip
 
 **Navigation Components**:
+
 - `navigation-menu.tsx`: Navigation menu
 - `breadcrumb.tsx`: Breadcrumb trail
 
 #### Application Components
 
 **Shell Components**:
+
 - `app-shell.tsx`: Main application shell
 - `app-header.tsx`: Top navigation bar with user display and accessibility IDs
 - `app-sidebar.tsx`: Sidebar navigation with sections
@@ -778,6 +817,7 @@ Located in `resources/js/components/ui/`, built with Radix UI:
 - `app-footer.tsx`: Application footer
 
 **Formatter Components** (`components/formatter/`):
+
 - `history-sidebar.tsx`: History panel with recent and saved tabs
 - `history-entry-card.tsx`: Individual history entry card with title display
 - `empty-state.tsx`: Empty history state with illustration
@@ -788,6 +828,7 @@ Located in `resources/js/components/ui/`, built with Radix UI:
 - `onboarding-tour.tsx`: Interactive onboarding tour
 
 **Utility Components**:
+
 - `input-error.tsx`: Form validation error display
 - `alert-error.tsx`: Error alert with icon
 - `keyboard-shortcuts-modal.tsx`: Dynamic keyboard shortcuts help (NEW - October 2025)
@@ -800,9 +841,11 @@ Located in `resources/js/components/ui/`, built with Radix UI:
 - `user-menu-content.tsx`: User dropdown menu content
 
 **Animation Components** (`components/animations/`):
+
 - `success-checkmark.tsx`: Success animation for completed actions
 
 **Illustration Components** (`components/illustrations/`):
+
 - `empty-log-illustration.tsx`: SVG illustration for empty states
 
 ### Layouts
@@ -814,6 +857,7 @@ Located in `resources/js/components/ui/`, built with Radix UI:
 **Purpose**: Default layout for authenticated pages
 
 **Features**:
+
 - App shell with header and sidebar
 - Responsive design
 - Navigation menu
@@ -826,6 +870,7 @@ Located in `resources/js/components/ui/`, built with Radix UI:
 **Purpose**: Layout for authentication pages
 
 **Variants**:
+
 - `auth-card-layout.tsx`: Centered card design
 - `auth-simple-layout.tsx`: Minimal design
 - `auth-split-layout.tsx`: Split screen with branding
@@ -837,6 +882,7 @@ Located in `resources/js/components/ui/`, built with Radix UI:
 **Purpose**: Settings page layout with tabbed navigation
 
 **Tabs**:
+
 - Profile
 - Password
 - Two-Factor Authentication
@@ -851,11 +897,28 @@ Located in `resources/js/components/ui/`, built with Radix UI:
 **Purpose**: Manage theme preferences (light/dark/system)
 
 **API**:
+
 ```typescript
 const { appearance, setAppearance } = useAppearance();
 ```
 
 **Storage**: Cookie-based persistence via `HandleAppearance` middleware
+
+#### useFontSize
+
+**Location**: `resources/js/hooks/use-font-size.ts`
+
+**Purpose**: Manage font size preferences (small/medium/large)
+
+**API**:
+
+```typescript
+const { fontSize, updateFontSize } = useFontSize();
+```
+
+**Storage**: Synced with useSettings hook, applied via data-font-size attribute
+
+**CSS Integration**: Uses CSS custom properties to scale typography globally
 
 #### useTwoFactorAuth
 
@@ -864,6 +927,7 @@ const { appearance, setAppearance } = useAppearance();
 **Purpose**: Two-factor authentication state management
 
 **Features**:
+
 - Enable/disable 2FA
 - Generate QR code
 - Display recovery codes
@@ -876,6 +940,7 @@ const { appearance, setAppearance } = useAppearance();
 **Purpose**: Copy to clipboard functionality
 
 **API**:
+
 ```typescript
 const { copy, copied } = useClipboard();
 ```
@@ -887,14 +952,17 @@ const { copy, copied } = useClipboard();
 **Purpose**: Track and display formatting request duration
 
 **Features**:
+
 - Real-time elapsed time tracking
 - Millisecond precision
 - Automatic start/stop/reset
 - Integrates with formatting state
 
 **API**:
+
 ```typescript
-const { elapsedTime, isRunning, startTimer, stopTimer, resetTimer } = useFormattingTimer();
+const { elapsedTime, isRunning, startTimer, stopTimer, resetTimer } =
+    useFormattingTimer();
 ```
 
 #### useLLMModel
@@ -904,24 +972,27 @@ const { elapsedTime, isRunning, startTimer, stopTimer, resetTimer } = useFormatt
 **Purpose**: Manage LLM model selection and persistence
 
 **Features**:
+
 - Model selection with localStorage persistence
 - Available models list
 - Default model configuration
 - Reactive model updates
 
 **API**:
+
 ```typescript
 const { model, setModel, availableModels } = useLLMModel();
 ```
 
 **Available Models**:
+
 ```typescript
 const availableModels = [
-  { value: 'deepseek-chat', label: 'DeepSeek Chat' },
-  { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash' },
-  { value: 'kimi-k2-turbo-preview', label: 'Kimi K2 Turbo' },
-  { value: 'GLM-4.5-Air', label: 'GLM-4.5-Air' },
-  { value: 'GLM-4.6', label: 'GLM-4.6' },
+    { value: 'deepseek-chat', label: 'DeepSeek Chat' },
+    { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash' },
+    { value: 'kimi-k2-turbo-preview', label: 'Kimi K2 Turbo' },
+    { value: 'GLM-4.5-Air', label: 'GLM-4.5-Air' },
+    { value: 'GLM-4.6', label: 'GLM-4.6' },
 ];
 ```
 
@@ -932,6 +1003,7 @@ const availableModels = [
 **Purpose**: Centralized keyboard shortcut management with platform-aware key combinations
 
 **Features**:
+
 - Cross-platform keyboard shortcut handling (Cmd on Mac, Ctrl elsewhere)
 - Centralized shortcut registry with type safety
 - Dynamic shortcut documentation generation
@@ -939,6 +1011,7 @@ const availableModels = [
 - Tooltips for action buttons
 
 **API**:
+
 ```typescript
 const { shortcuts, getShortcuts } = useKeyboardShortcuts({
     onFormat: () => handleFormat(),
@@ -948,12 +1021,13 @@ const { shortcuts, getShortcuts } = useKeyboardShortcuts({
 ```
 
 **Shortcut Registry**:
+
 ```typescript
 const shortcuts = [
-  { key: 'Ctrl+Enter', action: 'Format log', callback: onFormat },
-  { key: 'Ctrl+K', action: 'Toggle history', callback: onToggleHistory },
-  { key: 'Ctrl+L', action: 'Clear input', callback: onClear },
-  { key: '?', action: 'Show shortcuts', callback: showHelp },
+    { key: 'Ctrl+Enter', action: 'Format log', callback: onFormat },
+    { key: 'Ctrl+K', action: 'Toggle history', callback: onToggleHistory },
+    { key: 'Ctrl+L', action: 'Clear input', callback: onClear },
+    { key: '?', action: 'Show shortcuts', callback: showHelp },
 ];
 ```
 
@@ -964,6 +1038,7 @@ const shortcuts = [
 **Purpose**: History management for formatted logs
 
 **Features**:
+
 - Fetch user's history entries (recent and saved)
 - Load specific history entry
 - Delete history entries
@@ -973,6 +1048,7 @@ const shortcuts = [
 - Real-time updates
 
 **API**:
+
 ```typescript
 const {
     history,
@@ -986,6 +1062,7 @@ const {
 ```
 
 **History Entry Type**:
+
 ```typescript
 interface HistoryEntry {
     id: number;
@@ -1006,24 +1083,27 @@ interface HistoryEntry {
 **Purpose**: Manage user formatting preferences with backend persistence
 
 **Features**:
+
 - Backend synchronization via PreferencesController API
 - LocalStorage fallback for guest users
 - Automatic sync on preference changes
 - Optimistic UI updates
 - 12 configurable settings:
-  - Output format, JSON indentation
-  - Auto-copy results, line numbers
-  - History saving, analytics
-  - Sensitive data handling
-  - Font size, animations
-  - Custom API endpoint, API key, timeout
+    - Output format, JSON indentation
+    - Auto-copy results, line numbers
+    - History saving, analytics
+    - Sensitive data handling
+    - Font size, animations
+    - Custom API endpoint, API key, timeout
 
 **API**:
+
 ```typescript
 const { settings, updateSettings, isLoading } = useSettings();
 ```
 
 **Backend Integration**:
+
 - Authenticated users: Preferences persist to database via PATCH `/settings/preferences`
 - Guest users: Preferences stored in localStorage only
 - Automatic merge with server preferences on mount
@@ -1036,6 +1116,7 @@ const { settings, updateSettings, isLoading } = useSettings();
 **Purpose**: Full-text search functionality for history entries
 
 **Features**:
+
 - Debounced query execution (250ms default delay)
 - Search scope filtering (all, recent, saved)
 - Automatic request cancellation for stale queries
@@ -1045,6 +1126,7 @@ const { settings, updateSettings, isLoading } = useSettings();
 - User-friendly error handling
 
 **API**:
+
 ```typescript
 const {
     query,
@@ -1069,6 +1151,7 @@ const {
 ```
 
 **Search Result Type**:
+
 ```typescript
 interface SearchResult {
     id: number;
@@ -1084,6 +1167,7 @@ interface SearchResult {
 ```
 
 **Backend Integration**:
+
 - Queries MySQL full-text search via GET `/history/search`
 - Query validation: 2-100 characters, trimmed whitespace
 - Scope filtering: 'all', 'recent' (unsaved), 'saved' (bookmarked)
@@ -1099,19 +1183,21 @@ interface SearchResult {
 ```typescript
 wayfinder({
     formVariants: true,
-})
+});
 ```
 
 **Generated Files**:
+
 - `resources/js/actions/`: Server action helpers (3,325 lines generated)
-  - Auth actions (login, register, password reset, email verification)
-  - Settings actions (profile, password, 2FA, preferences)
-  - History actions (CRUD, toggle save, export)
-  - Formatter actions (format logs)
+    - Auth actions (login, register, password reset, email verification)
+    - Settings actions (profile, password, 2FA, preferences)
+    - History actions (CRUD, toggle save, export)
+    - Formatter actions (format logs)
 - `resources/js/routes/`: Route helper functions
 - `resources/js/wayfinder/index.ts`: Core routing utilities
 
 **Usage**:
+
 ```typescript
 import { login, register } from '@/routes';
 import { preferences } from '@/routes/preferences';
@@ -1121,7 +1207,8 @@ import { preferences } from '@/routes/preferences';
 <Link href={preferences.index()}>Preferences</Link>
 ```
 
-**Type Safety**: 
+**Type Safety**:
+
 - Full TypeScript support for route parameters and query strings
 - Form variant support for POST/PATCH/DELETE actions
 - Inertia FormData type compatibility with type assertions
@@ -1153,6 +1240,7 @@ CREATE TABLE users (
 ```
 
 **Preferences JSON Structure**:
+
 ```json
 {
     "outputFormat": "json",
@@ -1194,6 +1282,7 @@ CREATE TABLE formatted_logs (
 ```
 
 **Key Columns**:
+
 - `user_id`: Foreign key to users table (null for guest users)
 - `raw_log`: Original unstructured log text
 - `formatted_log`: Structured JSON output from LLM
@@ -1204,6 +1293,7 @@ CREATE TABLE formatted_logs (
 - `is_saved`: User-saved status for quick access
 
 **Formatted Log JSON Structure**:
+
 ```json
 {
     "detected_log_type": "application_error",
@@ -1215,9 +1305,7 @@ CREATE TABLE formatted_logs (
     "entities": [
         { "type": "service", "identifier": "Database", "details": "MySQL 8.0" }
     ],
-    "metrics": [
-        { "name": "timeout", "value": 30, "unit": "seconds" }
-    ],
+    "metrics": [{ "name": "timeout", "value": 30, "unit": "seconds" }],
     "sections": [
         {
             "section_type": "error_details",
@@ -1255,6 +1343,7 @@ Laravel session storage (database driver).
 **Provider**: `app/Providers/FortifyServiceProvider.php`
 
 **Features Enabled**:
+
 - Registration with email verification
 - Login with remember me
 - Password reset via email
@@ -1276,11 +1365,13 @@ Laravel session storage (database driver).
 8. User saves recovery codes
 
 **Models**:
+
 - Secret stored in `users.two_factor_secret` (encrypted)
 - Recovery codes in `users.two_factor_recovery_codes` (encrypted)
 - Confirmation timestamp in `users.two_factor_confirmed_at`
 
 **Login Flow with 2FA**:
+
 1. User enters email/password
 2. If 2FA enabled, redirect to two-factor challenge
 3. User enters TOTP code or recovery code
@@ -1291,6 +1382,7 @@ Laravel session storage (database driver).
 **Middleware**: `verified`
 
 **Flow**:
+
 1. New user registers
 2. Backend sends verification email
 3. User clicks verification link
@@ -1308,12 +1400,14 @@ Laravel session storage (database driver).
 StructLogr uses Inertia.js, which operates over HTTP/HTTPS but with a custom protocol:
 
 **Request Headers**:
+
 ```
 X-Inertia: true
 X-Inertia-Version: <asset-version>
 ```
 
 **Response Format**:
+
 ```json
 {
     "component": "FormatterPage",
@@ -1330,14 +1424,20 @@ X-Inertia-Version: <asset-version>
 ### Form Submissions
 
 **Standard POST Request**:
+
 ```typescript
 post('/format', {
-    onSuccess: () => { /* handle success */ },
-    onError: () => { /* handle errors */ },
+    onSuccess: () => {
+        /* handle success */
+    },
+    onError: () => {
+        /* handle errors */
+    },
 });
 ```
 
 **Inertia Form Helper**:
+
 ```typescript
 const { data, setData, post, processing, errors } = useForm({
     raw_log: '',
@@ -1357,6 +1457,7 @@ post('/format');
 **Location**: `app/Http/Middleware/HandleInertiaRequests.php`
 
 **Shared Props**:
+
 ```php
 [
     'auth' => [
@@ -1370,6 +1471,7 @@ post('/format');
 ```
 
 **Access in Components**:
+
 ```typescript
 const { auth, flash } = usePage<SharedData>().props;
 ```
@@ -1385,6 +1487,7 @@ const { auth, flash } = usePage<SharedData>().props;
 ### Persistent Storage
 
 **Cookies**:
+
 - `appearance`: Theme preference (light/dark/system)
 - `sidebar_state`: Sidebar collapsed/expanded state
 
@@ -1397,12 +1500,14 @@ const { auth, flash } = usePage<SharedData>().props;
 ### Development
 
 **Start Services**:
+
 ```bash
 ./vendor/bin/sail up -d     # Laravel + MySQL
 npm run dev                  # Vite dev server
 ```
 
 **Ports**:
+
 - App: http://localhost:8001
 - Vite HMR: http://localhost:5175
 - MySQL: localhost:3308
@@ -1410,15 +1515,18 @@ npm run dev                  # Vite dev server
 ### Production Build
 
 **Build Frontend Assets**:
+
 ```bash
 npm run build
 ```
 
 **Output**:
+
 - `public/build/manifest.json`: Asset manifest
 - `public/build/assets/`: Compiled JS/CSS with content hashing
 
 **Laravel Optimization**:
+
 ```bash
 php artisan config:cache
 php artisan route:cache
@@ -1429,11 +1537,13 @@ php artisan optimize
 ### SSR (Server-Side Rendering)
 
 **Build SSR Bundle**:
+
 ```bash
 npm run build:ssr
 ```
 
 **Start SSR Server**:
+
 ```bash
 php artisan inertia:start-ssr
 ```
@@ -1443,19 +1553,20 @@ php artisan inertia:start-ssr
 ### Docker Deployment
 
 **Production Compose**:
+
 ```yaml
 services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    environment:
-      APP_ENV: production
-      APP_DEBUG: false
-  mysql:
-    image: mysql:8.0
-  nginx:
-    image: nginx:alpine
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        environment:
+            APP_ENV: production
+            APP_DEBUG: false
+    mysql:
+        image: mysql:8.0
+    nginx:
+        image: nginx:alpine
 ```
 
 ### CI/CD
@@ -1463,11 +1574,13 @@ services:
 **GitHub Actions Workflows**:
 
 **`.github/workflows/lint.yml`**:
+
 - ESLint (JavaScript/TypeScript)
 - Laravel Pint (PHP)
 - Prettier check
 
 **`.github/workflows/tests.yml`**:
+
 - PHPUnit tests
 - Database migrations
 - Pest test runner
@@ -1478,35 +1591,35 @@ services:
 
 ### Backend
 
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| PHP | 8.2+ | Language |
-| Laravel | 12.x | Framework |
-| Prism | Latest | LLM integration |
-| Laravel Fortify | Latest | Authentication |
-| Laravel Sail | Latest | Docker environment |
-| MySQL | 8.0 | Database |
+| Technology      | Version | Purpose            |
+| --------------- | ------- | ------------------ |
+| PHP             | 8.2+    | Language           |
+| Laravel         | 12.x    | Framework          |
+| Prism           | Latest  | LLM integration    |
+| Laravel Fortify | Latest  | Authentication     |
+| Laravel Sail    | Latest  | Docker environment |
+| MySQL           | 8.0     | Database           |
 
 ### Frontend
 
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| React | 19.x | UI library |
-| TypeScript | 5.7+ | Type safety |
-| Inertia.js | 2.0 | SPA framework |
-| Tailwind CSS | 4.0 | Styling |
-| Radix UI | Latest | Component primitives |
-| Lucide React | Latest | Icons |
-| Vite | 7.x | Build tool |
+| Technology   | Version | Purpose              |
+| ------------ | ------- | -------------------- |
+| React        | 19.x    | UI library           |
+| TypeScript   | 5.7+    | Type safety          |
+| Inertia.js   | 2.0     | SPA framework        |
+| Tailwind CSS | 4.0     | Styling              |
+| Radix UI     | Latest  | Component primitives |
+| Lucide React | Latest  | Icons                |
+| Vite         | 7.x     | Build tool           |
 
 ### Development Tools
 
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| Laravel Pint | Latest | PHP linting |
-| ESLint | 9.x | JS/TS linting |
-| Prettier | 3.x | Code formatting |
-| TypeScript ESLint | 8.x | TS linting rules |
+| Technology        | Version | Purpose          |
+| ----------------- | ------- | ---------------- |
+| Laravel Pint      | Latest  | PHP linting      |
+| ESLint            | 9.x     | JS/TS linting    |
+| Prettier          | 3.x     | Code formatting  |
+| TypeScript ESLint | 8.x     | TS linting rules |
 
 ---
 
@@ -1613,19 +1726,23 @@ class LogFormatterService {
 ### Common Issues
 
 **Vite Connection Refused**:
+
 - Ensure `npm run dev` is running
 - Check `vite.config.ts` server port (5175)
 
 **Inertia Version Mismatch**:
+
 - Clear browser cache
 - Run `npm run build`
 - Hard refresh (Ctrl+Shift+R)
 
 **2FA Not Working**:
+
 - Verify server time is synchronized (TOTP requires accurate time)
 - Check `two_factor_secret` is encrypted in database
 
 **SSR Errors**:
+
 - Ensure SSR server is running: `php artisan inertia:start-ssr`
 - Check SSR URL in `config/inertia.php`
 

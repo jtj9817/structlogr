@@ -141,6 +141,28 @@
         border-color 0.3s ease !important;
 }
 
+/* Font size variants */
+:root {
+    --font-size-base: 1rem; /* 16px */
+    --font-size-scale: 1;
+}
+
+html[data-font-size='small'] {
+    --font-size-scale: 0.875; /* 14px base */
+}
+
+html[data-font-size='medium'] {
+    --font-size-scale: 1; /* 16px base - default */
+}
+
+html[data-font-size='large'] {
+    --font-size-scale: 1.125; /* 18px base */
+}
+
+body {
+    font-size: calc(var(--font-size-base) * var(--font-size-scale));
+}
+
 @layer base {
     * {
         @apply border-border;

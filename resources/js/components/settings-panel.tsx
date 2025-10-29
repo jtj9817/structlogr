@@ -17,6 +17,7 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAppearance } from '@/hooks/use-appearance';
+import { useFontSize } from '@/hooks/use-font-size';
 import { useSettings } from '@/hooks/use-settings';
 import { Monitor, Moon, RotateCcw, Save, Settings, Sun } from 'lucide-react';
 
@@ -28,6 +29,8 @@ interface SettingsPanelProps {
 export function SettingsPanel({ open, onOpenChange }: SettingsPanelProps) {
     const { settings, updateSetting, resetSettings } = useSettings();
     const { appearance, updateAppearance } = useAppearance();
+    const { fontSize: currentFontSize, updateFontSize: setFontSize } =
+        useFontSize();
 
     const handleReset = () => {
         if (
@@ -355,15 +358,13 @@ export function SettingsPanel({ open, onOpenChange }: SettingsPanelProps) {
                                             Font Size
                                         </Label>
                                         <Select
-                                            value={settings.fontSize}
+                                            value={currentFontSize}
                                             onValueChange={(
                                                 value:
                                                     | 'small'
                                                     | 'medium'
                                                     | 'large',
-                                            ) =>
-                                                updateSetting('fontSize', value)
-                                            }
+                                            ) => setFontSize(value)}
                                         >
                                             <SelectTrigger id="font-size">
                                                 <SelectValue placeholder="Select font size" />
