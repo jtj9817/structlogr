@@ -45,7 +45,7 @@ export function HistoryEntryCard({
     return (
         <Card
             id={`history-entry-${entry.id}`}
-            className="group cursor-pointer p-3 transition-all hover:scale-[1.01] hover:shadow-md active:scale-[0.99]"
+            className="group cursor-pointer p-3 transition-all hover:scale-[1.01] hover:shadow-md active:scale-[0.99] overflow-hidden"
             onClick={(e) => {
                 if (disabled) return;
                 const target = e.target as HTMLElement;
@@ -54,13 +54,13 @@ export function HistoryEntryCard({
                 }
             }}
         >
-            <div className="flex items-start gap-2">
+            <div className="flex items-start gap-2 min-w-0">
                 <FileText
                     id={`history-entry-icon-${entry.id}`}
                     className="mt-0.5 h-4 w-4 flex-shrink-0 text-muted-foreground"
                 />
 
-                <div className="min-w-0 flex-1">
+                <div className="min-w-0 flex-1 overflow-hidden">
                     <p
                         id={`history-entry-headline-${entry.id}`}
                         className="truncate text-sm font-medium text-foreground"
@@ -69,24 +69,24 @@ export function HistoryEntryCard({
                     </p>
                     <div
                         id={`history-entry-metadata-${entry.id}`}
-                        className="mt-0.5 flex flex-wrap items-center gap-1 text-xs text-muted-foreground"
+                        className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground overflow-hidden"
                     >
                         <Clock
                             id={`history-entry-clock-${entry.id}`}
                             className="h-3 w-3"
                         />
-                        <span id={`history-entry-date-${entry.id}`}>
+                        <span id={`history-entry-date-${entry.id}`} className="flex-shrink-0">
                             {formatDate(entry.createdAt)}
                         </span>
-                        <span className="text-muted-foreground/50">•</span>
+                        <span className="text-muted-foreground/50 flex-shrink-0">•</span>
                         <span
                             id={`history-entry-type-${entry.id}`}
-                            className="tracking-wide uppercase"
+                            className="tracking-wide uppercase truncate"
                         >
                             {logTypeLabel}
                         </span>
-                        <span className="text-muted-foreground/50">•</span>
-                        <span id={`history-entry-fields-${entry.id}`}>
+                        <span className="text-muted-foreground/50 flex-shrink-0">•</span>
+                        <span id={`history-entry-fields-${entry.id}`} className="flex-shrink-0">
                             {entry.fieldCount ?? 0} fields
                         </span>
                     </div>
