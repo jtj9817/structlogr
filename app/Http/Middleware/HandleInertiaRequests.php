@@ -38,6 +38,35 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
+        // CSRF Debug Information
+        $csrfDebug = [
+            'token_available' => !empty(csrf_token()),
+            'session_encrypted' => config('session.encrypt'),
+            'session_id' => session()->getId(),
+            'token_length' => strlen(csrf_token()),
+            'token_preview' => substr(csrf_token(), 0, 8) . '...',
+            'session_cookie' => config('session.cookie'),
+            'has_csrf_header' => $request->headers->has('X-CSRF-TOKEN'),
+            'has_x_requested_with' => $request->headers->has('X-Requested-With'),
+        ];
+
+        // Debug logging for CSRF validation
+        if (config('app.debug')) {
+            \Log::debug('CSRF Debug Info', [
+                'request_path' => $request->path(),
+                'method' => $request->method(),
+                'csrf_token_available' => !empty(csrf_token()),
+                'session_encrypted' => config('session.encrypt'),
+                'session_id' => session()->getId(),
+                'has_csrf_header' => $request->headers->has('X-CSRF-TOKEN'),
+                'has_csrf_cookie' => $request->cookies->has(config('session.cookie')),
+                'session_cookie_name' => config('session.cookie'),
+                'is_ajax' => $request->ajax(),
+                'wants_json' => $request->wantsJson(),
+                'timestamp' => now()->toIso8601String(),
+            ]);
+        }
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
@@ -56,6 +85,7 @@ class HandleInertiaRequests extends Middleware
                 ] : null,
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'csrf_debug' => $csrfDebug, // For frontend debugging
         ];
     }
 }
