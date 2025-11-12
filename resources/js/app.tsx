@@ -3,6 +3,7 @@ import '../css/app.css';
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
+import axios from 'axios';
 import { ErrorBoundary } from './components/error-boundary';
 import { initializeTheme } from './hooks/use-appearance';
 import { initializeFontSize } from './hooks/use-font-size';
@@ -18,6 +19,24 @@ createInertiaApp({
         ),
     setup({ el, App, props }) {
         const root = createRoot(el);
+
+        // Configure CSRF token for all requests
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        if (csrfToken) {
+            // Set default header for axios (used by Inertia)
+            axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken;
+
+            // Also set for fetch API if used
+            const originalFetch = window.fetch;
+            window.fetch = (url, options = {}) => {
+                if (options.headers) {
+                    options.headers['X-CSRF-TOKEN'] = csrfToken;
+                } else {
+                    options.headers = { 'X-CSRF-TOKEN': csrfToken };
+                }
+                return originalFetch(url, options);
+            };
+        }
 
         root.render(
             <ErrorBoundary>

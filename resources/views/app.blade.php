@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
         <meta name="description" content="Transform raw logs into structured JSON with AI-powered parsing. Support for Apache, Nginx, Docker, Kubernetes, and more.">
         <meta name="keywords" content="log formatting, JSON, AI, parsing, structured logs, DevOps">
         <meta name="author" content="StructLogr">
@@ -40,6 +41,11 @@
                     }
                 }
             })();
+        </script>
+
+        {{-- CSRF Token for JavaScript access --}}
+        <script>
+            window.csrfToken = '{{ csrf_token() }}';
         </script>
 
         {{-- Inline style to set the HTML background color based on our theme in app.css --}}
