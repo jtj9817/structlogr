@@ -35,7 +35,7 @@ import { usePreferences } from '@/hooks/use-preferences';
 import { cn } from '@/lib/utils';
 import { type SharedData } from '@/types';
 import type { HistoryEntry } from '@/types/history';
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, useForm, usePage, router } from '@inertiajs/react';
 import { Check, ClipboardCopy, Maximize2, Settings } from 'lucide-react';
 import {
     FormEventHandler,
@@ -308,6 +308,8 @@ export default function FormatterPage({
             timezone: preferences.timezone,
             dateFormat: preferences.dateFormat,
         },
+        // Add CSRF token for extra protection
+        _token: document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
     });
 
     const formattedOutput = useMemo(() => {
@@ -461,10 +463,27 @@ export default function FormatterPage({
             onError: (errors) => {
                 stopTimer();
                 setFormattingDuration(null);
+
+                // Handle CSRF token expiration specifically
+                if (errors.response?.status === 419) {
+                    console.error('CSRF token expired during form submission');
+                    setStatusMessage('Session expired. Please try again...');
+
+                    // The global CSRF handler will take care of reloading
+                    // Just show a clear message to the user
+                    setTimeout(() => {
+                        setStatusMessage('');
+                    }, 5000);
+                    return;
+                }
+
+                // Handle other validation errors
                 const errorMessage =
                     errors.raw_log ||
                     errors.llm_model ||
+                    errors.response?.data?.message ||
                     'Error formatting log';
+
                 setStatusMessage(errorMessage);
                 setTimeout(() => setStatusMessage(''), 3000);
                 setTimeout(() => errorRef.current?.focus(), 100);
@@ -475,6 +494,29 @@ export default function FormatterPage({
     const handleHistoryOpen = () => {
         setHistoryOpen(true);
     };
+
+    /**
+     * Manually refresh CSRF token by reloading the current page
+     * This can be called when token expiration is detected
+     */
+    const refreshCSRFToken = useCallback(() => {
+        console.log('Manually refreshing CSRF token...');
+        setStatusMessage('Refreshing session...');
+
+        // Use Inertia to visit current page to get fresh CSRF token
+        router.visit(window.location.pathname, {
+            preserveState: true,
+            preserveScroll: true,
+            onSuccess: () => {
+                setStatusMessage('Session refreshed successfully');
+                setTimeout(() => setStatusMessage(''), 2000);
+            },
+            onError: () => {
+                setStatusMessage('Failed to refresh session');
+                setTimeout(() => setStatusMessage(''), 3000);
+            }
+        });
+    }, []);
 
     const handleLoadHistoryEntry = async (entryId: number) => {
         try {
