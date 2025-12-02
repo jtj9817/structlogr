@@ -1,4 +1,3 @@
-import { router } from '@inertiajs/react';
 import { useEffect } from 'react';
 
 interface CSRFErrorHandlerOptions {
@@ -9,14 +8,16 @@ interface CSRFErrorHandlerOptions {
   showNotifications?: boolean;
 }
 
-interface CSRFError extends Error {
-  response?: {
-    status: number;
-    data?: {
-      message?: string;
-      error?: string;
-    };
+interface CSRFResponse {
+  status: number;
+  data?: {
+    message?: string;
+    error?: string;
   };
+}
+
+interface CSRFError extends Error {
+  response?: CSRFResponse;
 }
 
 /**
@@ -210,10 +211,7 @@ declare global {
 
   interface CustomEvent {
     detail?: {
-      response?: {
-        status: number;
-        data?: any;
-      };
+      response?: CSRFResponse;
     };
   }
 }

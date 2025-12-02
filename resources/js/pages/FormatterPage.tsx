@@ -35,7 +35,7 @@ import { usePreferences } from '@/hooks/use-preferences';
 import { cn } from '@/lib/utils';
 import { type SharedData } from '@/types';
 import type { HistoryEntry } from '@/types/history';
-import { Head, useForm, usePage, router } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
 import { Check, ClipboardCopy, Maximize2, Settings } from 'lucide-react';
 import {
     FormEventHandler,
@@ -494,29 +494,6 @@ export default function FormatterPage({
     const handleHistoryOpen = () => {
         setHistoryOpen(true);
     };
-
-    /**
-     * Manually refresh CSRF token by reloading the current page
-     * This can be called when token expiration is detected
-     */
-    const refreshCSRFToken = useCallback(() => {
-        console.log('Manually refreshing CSRF token...');
-        setStatusMessage('Refreshing session...');
-
-        // Use Inertia to visit current page to get fresh CSRF token
-        router.visit(window.location.pathname, {
-            preserveState: true,
-            preserveScroll: true,
-            onSuccess: () => {
-                setStatusMessage('Session refreshed successfully');
-                setTimeout(() => setStatusMessage(''), 2000);
-            },
-            onError: () => {
-                setStatusMessage('Failed to refresh session');
-                setTimeout(() => setStatusMessage(''), 3000);
-            }
-        });
-    }, []);
 
     const handleLoadHistoryEntry = async (entryId: number) => {
         try {

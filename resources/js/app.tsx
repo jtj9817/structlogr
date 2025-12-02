@@ -2,6 +2,7 @@ import '../css/app.css';
 
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import type { ComponentProps } from 'react';
 import { createRoot } from 'react-dom/client';
 import axios from 'axios';
 import { ErrorBoundary } from './components/error-boundary';
@@ -40,7 +41,7 @@ createInertiaApp({
         }
 
         // Component with CSRF error handling
-        function AppWithCSRFHandler(componentProps: any) {
+        function AppWithCSRFHandler(componentProps: ComponentProps<typeof App>) {
             useCSRFHandler({
                 enableAutoReload: true,
                 reloadDelay: 1000,
@@ -50,7 +51,7 @@ createInertiaApp({
                 },
                 onTokenRefreshed: () => {
                     console.log('Token recovery completed successfully');
-                }
+                },
             });
 
             return <App {...componentProps} />;
