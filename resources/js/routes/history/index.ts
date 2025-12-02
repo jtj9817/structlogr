@@ -247,7 +247,7 @@ exportMethod.form = exportMethodForm
 * @see app/Http/Controllers/HistoryController.php:43
 * @route '/history/{formattedLog}'
 */
-export const show = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+export const show = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     url: show.url(args, options),
     method: 'get',
 })
@@ -262,7 +262,7 @@ show.definition = {
 * @see app/Http/Controllers/HistoryController.php:43
 * @route '/history/{formattedLog}'
 */
-show.url = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
+show.url = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { formattedLog: args }
     }
@@ -295,7 +295,7 @@ show.url = (args: { formattedLog: number | { id: number } } | [formattedLog: num
 * @see app/Http/Controllers/HistoryController.php:43
 * @route '/history/{formattedLog}'
 */
-show.get = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+show.get = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     url: show.url(args, options),
     method: 'get',
 })
@@ -305,7 +305,7 @@ show.get = (args: { formattedLog: number | { id: number } } | [formattedLog: num
 * @see app/Http/Controllers/HistoryController.php:43
 * @route '/history/{formattedLog}'
 */
-show.head = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+show.head = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     url: show.url(args, options),
     method: 'head',
 })
@@ -315,7 +315,7 @@ show.head = (args: { formattedLog: number | { id: number } } | [formattedLog: nu
 * @see app/Http/Controllers/HistoryController.php:43
 * @route '/history/{formattedLog}'
 */
-const showForm = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+const showForm = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
     action: show.url(args, options),
     method: 'get',
 })
@@ -325,7 +325,7 @@ const showForm = (args: { formattedLog: number | { id: number } } | [formattedLo
 * @see app/Http/Controllers/HistoryController.php:43
 * @route '/history/{formattedLog}'
 */
-showForm.get = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+showForm.get = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
     action: show.url(args, options),
     method: 'get',
 })
@@ -335,7 +335,7 @@ showForm.get = (args: { formattedLog: number | { id: number } } | [formattedLog:
 * @see app/Http/Controllers/HistoryController.php:43
 * @route '/history/{formattedLog}'
 */
-showForm.head = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+showForm.head = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
     action: show.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'HEAD',
@@ -352,7 +352,7 @@ show.form = showForm
 * @see app/Http/Controllers/HistoryController.php:64
 * @route '/history/{formattedLog}/toggle-save'
 */
-export const toggleSave = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
+export const toggleSave = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
     url: toggleSave.url(args, options),
     method: 'patch',
 })
@@ -367,7 +367,7 @@ toggleSave.definition = {
 * @see app/Http/Controllers/HistoryController.php:64
 * @route '/history/{formattedLog}/toggle-save'
 */
-toggleSave.url = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
+toggleSave.url = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { formattedLog: args }
     }
@@ -400,7 +400,7 @@ toggleSave.url = (args: { formattedLog: number | { id: number } } | [formattedLo
 * @see app/Http/Controllers/HistoryController.php:64
 * @route '/history/{formattedLog}/toggle-save'
 */
-toggleSave.patch = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
+toggleSave.patch = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
     url: toggleSave.url(args, options),
     method: 'patch',
 })
@@ -410,7 +410,7 @@ toggleSave.patch = (args: { formattedLog: number | { id: number } } | [formatted
 * @see app/Http/Controllers/HistoryController.php:64
 * @route '/history/{formattedLog}/toggle-save'
 */
-const toggleSaveForm = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+const toggleSaveForm = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: toggleSave.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PATCH',
@@ -425,7 +425,7 @@ const toggleSaveForm = (args: { formattedLog: number | { id: number } } | [forma
 * @see app/Http/Controllers/HistoryController.php:64
 * @route '/history/{formattedLog}/toggle-save'
 */
-toggleSaveForm.patch = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+toggleSaveForm.patch = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: toggleSave.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PATCH',
@@ -442,7 +442,7 @@ toggleSave.form = toggleSaveForm
 * @see app/Http/Controllers/HistoryController.php:56
 * @route '/history/{formattedLog}'
 */
-export const destroy = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
+export const destroy = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
     url: destroy.url(args, options),
     method: 'delete',
 })
@@ -457,7 +457,7 @@ destroy.definition = {
 * @see app/Http/Controllers/HistoryController.php:56
 * @route '/history/{formattedLog}'
 */
-destroy.url = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
+destroy.url = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { formattedLog: args }
     }
@@ -490,7 +490,7 @@ destroy.url = (args: { formattedLog: number | { id: number } } | [formattedLog: 
 * @see app/Http/Controllers/HistoryController.php:56
 * @route '/history/{formattedLog}'
 */
-destroy.delete = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
+destroy.delete = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
     url: destroy.url(args, options),
     method: 'delete',
 })
@@ -500,7 +500,7 @@ destroy.delete = (args: { formattedLog: number | { id: number } } | [formattedLo
 * @see app/Http/Controllers/HistoryController.php:56
 * @route '/history/{formattedLog}'
 */
-const destroyForm = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+const destroyForm = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: destroy.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'DELETE',
@@ -515,7 +515,7 @@ const destroyForm = (args: { formattedLog: number | { id: number } } | [formatte
 * @see app/Http/Controllers/HistoryController.php:56
 * @route '/history/{formattedLog}'
 */
-destroyForm.delete = (args: { formattedLog: number | { id: number } } | [formattedLog: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+destroyForm.delete = (args: { formattedLog: string | number | { id: string | number } } | [formattedLog: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: destroy.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'DELETE',
