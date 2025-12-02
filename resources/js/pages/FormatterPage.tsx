@@ -163,6 +163,15 @@ interface FormatterPageProps {
     historyRoutes?: HistoryRoutesConfig | null;
 }
 
+type SubmissionErrorBag = Record<string, string> & {
+    response?: {
+        status?: number;
+        data?: {
+            message?: string;
+        };
+    };
+};
+
 export default function FormatterPage({
     formattedLog,
     history,
@@ -460,12 +469,12 @@ export default function FormatterPage({
                 setTimeout(() => setStatusMessage(''), 3000);
                 setTimeout(() => outputRef.current?.focus(), 100);
             },
-            onError: (errors) => {
+            onError: (submissionErrors: SubmissionErrorBag) => {
                 stopTimer();
                 setFormattingDuration(null);
 
                 // Handle CSRF token expiration specifically
-                if (errors.response?.status === 419) {
+                if (submissionErrors.response?.status === 419) {
                     console.error('CSRF token expired during form submission');
                     setStatusMessage('Session expired. Please try again...');
 
@@ -479,9 +488,9 @@ export default function FormatterPage({
 
                 // Handle other validation errors
                 const errorMessage =
-                    errors.raw_log ||
-                    errors.llm_model ||
-                    errors.response?.data?.message ||
+                    submissionErrors.raw_log ||
+                    submissionErrors.llm_model ||
+                    submissionErrors.response?.data?.message ||
                     'Error formatting log';
 
                 setStatusMessage(errorMessage);

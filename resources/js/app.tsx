@@ -29,14 +29,18 @@ createInertiaApp({
             axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken;
 
             // Also set for fetch API if used
-            const originalFetch = window.fetch;
-            window.fetch = (url, options = {}) => {
-                if (options.headers) {
-                    options.headers['X-CSRF-TOKEN'] = csrfToken;
-                } else {
-                    options.headers = { 'X-CSRF-TOKEN': csrfToken };
-                }
-                return originalFetch(url, options);
+            const originalFetch: typeof window.fetch = window.fetch;
+            window.fetch = (
+                input: Parameters<typeof fetch>[0],
+                init: RequestInit = {},
+            ) => {
+                const headers = new Headers(init.headers ?? undefined);
+                headers.set('X-CSRF-TOKEN', csrfToken);
+
+                return originalFetch(input, {
+                    ...init,
+                    headers,
+                });
             };
         }
 

@@ -20,6 +20,10 @@ interface CSRFError extends Error {
   response?: CSRFResponse;
 }
 
+type CSRFEventDetail = {
+  response?: CSRFResponse;
+};
+
 /**
  * CSRF Error Handler Hook
  *
@@ -39,7 +43,7 @@ export function useCSRFHandler(options: CSRFErrorHandlerOptions = {}) {
     /**
      * Handle CSRF token expiration errors
      */
-    const handleCSRFError = (event: CustomEvent) => {
+    const handleCSRFError = (event: CustomEvent<CSRFEventDetail>) => {
       const { detail } = event;
       const error = detail?.response;
 
@@ -129,10 +133,10 @@ export function useCSRFHandler(options: CSRFErrorHandlerOptions = {}) {
     /**
      * Handle Inertia error events
      */
-    const handleInertiaError = (event: CustomEvent) => {
-      const { detail } = event;
-      if (detail?.response?.status === 419 || detail?.response?.status === 401) {
-        handleCSRFError(event);
+    const handleInertiaError = (event: Event) => {
+      const csrfEvent = event as CustomEvent<CSRFEventDetail>;
+      if (csrfEvent.detail?.response?.status === 419 || csrfEvent.detail?.response?.status === 401) {
+        handleCSRFError(csrfEvent);
       }
     };
 
@@ -144,7 +148,7 @@ export function useCSRFHandler(options: CSRFErrorHandlerOptions = {}) {
       // Check if this is a network error that might be CSRF related
       const error = event.error as CSRFError;
       if (error?.response?.status === 419 || error?.response?.status === 401) {
-        handleCSRFError(new CustomEvent('csrf-error', { detail: { response: error.response } }));
+        handleCSRFError(new CustomEvent<CSRFEventDetail>('csrf-error', { detail: { response: error.response } }));
       }
     };
 
@@ -207,12 +211,6 @@ declare global {
   interface Window {
     csrfToken?: string;
     jwtToken?: string;
-  }
-
-  interface CustomEvent {
-    detail?: {
-      response?: CSRFResponse;
-    };
   }
 }
 
