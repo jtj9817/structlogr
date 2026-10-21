@@ -19,10 +19,57 @@ export type ShortcutDefinition = {
     altKey?: boolean;
 };
 
+type ShortcutDefinitionKeys = Pick<
+    ShortcutDefinition,
+    'key' | 'ctrlKey' | 'metaKey' | 'shiftKey' | 'altKey'
+>;
+
+type KeyboardShortcutEvent = Pick<
+    KeyboardEvent,
+    'key' | 'ctrlKey' | 'metaKey' | 'shiftKey' | 'altKey'
+>;
+
 interface KeyboardShortcutsOptions {
     enabled?: boolean;
     preventDefault?: boolean;
 }
+
+export const isMacPlatform = (): boolean => {
+    if (typeof window === 'undefined') {
+        return false;
+    }
+
+    return /Mac|iPhone|iPad|iPod/.test(window.navigator.platform);
+};
+
+export const matchesKeyboardShortcut = (
+    event: KeyboardShortcutEvent,
+    shortcut: ShortcutDefinitionKeys,
+    isMac = isMacPlatform(),
+): boolean => {
+    const keyMatches =
+        event.key.toLowerCase() === shortcut.key.toLowerCase();
+    let modifierMatches = false;
+
+    if (shortcut.ctrlKey && shortcut.metaKey) {
+        // Explicitly requesting both modifiers keeps their physical meanings.
+        modifierMatches = event.ctrlKey && event.metaKey;
+    } else if (shortcut.ctrlKey) {
+        modifierMatches = isMac
+            ? event.metaKey && !event.ctrlKey
+            : event.ctrlKey && !event.metaKey;
+    } else {
+        modifierMatches =
+            !event.ctrlKey && (!!shortcut.metaKey === event.metaKey);
+    }
+
+    return (
+        keyMatches &&
+        modifierMatches &&
+        !!shortcut.shiftKey === event.shiftKey &&
+        !!shortcut.altKey === event.altKey
+    );
+};
 
 export function useKeyboardShortcuts(
     shortcuts: KeyboardShortcut[],
@@ -33,22 +80,10 @@ export function useKeyboardShortcuts(
     useEffect(() => {
         if (!enabled) return;
 
+        const isMac = isMacPlatform();
         const handleKeyDown = (event: KeyboardEvent) => {
             for (const shortcut of shortcuts) {
-                const keyMatches =
-                    event.key.toLowerCase() === shortcut.key.toLowerCase();
-                const ctrlMatches = !!shortcut.ctrlKey === event.ctrlKey;
-                const metaMatches = !!shortcut.metaKey === event.metaKey;
-                const shiftMatches = !!shortcut.shiftKey === event.shiftKey;
-                const altMatches = !!shortcut.altKey === event.altKey;
-
-                if (
-                    keyMatches &&
-                    ctrlMatches &&
-                    metaMatches &&
-                    shiftMatches &&
-                    altMatches
-                ) {
+                if (matchesKeyboardShortcut(event, shortcut, isMac)) {
                     if (preventDefault) {
                         event.preventDefault();
                     }
@@ -89,13 +124,16 @@ export const getModifierKey = (isMac: boolean): string => {
 };
 
 export const getShortcutDisplay = (
-    shortcut: Pick<ShortcutDefinition, 'key' | 'ctrlKey' | 'metaKey' | 'shiftKey' | 'altKey'>,
+    shortcut: ShortcutDefinitionKeys,
+    isMac = isMacPlatform(),
 ): string => {
-    const isMac = typeof window !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(window.navigator.platform);
     const keys: string[] = [];
-    
-    if (shortcut.ctrlKey || shortcut.metaKey) {
+
+    if (shortcut.ctrlKey) {
         keys.push(getModifierKey(isMac));
+    }
+    if (shortcut.metaKey) {
+        keys.push(isMac ? 'Ctrl' : 'Cmd');
     }
     if (shortcut.altKey) {
         keys.push('Alt');
@@ -104,7 +142,7 @@ export const getShortcutDisplay = (
         keys.push('Shift');
     }
     keys.push(getKeyDisplayName(shortcut.key));
-    
+
     return keys.join('+');
 };
 

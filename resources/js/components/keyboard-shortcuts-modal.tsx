@@ -8,22 +8,15 @@ import {
 import { Keyboard } from 'lucide-react';
 import { forwardRef, useMemo } from 'react';
 import {
+    getShortcutDisplay,
+    isMacPlatform,
     shortcutDefinitions,
-    getKeyDisplayName,
-    getModifierKey,
 } from '@/hooks/use-keyboard-shortcuts';
 
 interface KeyboardShortcutsModalProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
 }
-
-const useIsMac = () => {
-    return useMemo(() => {
-        if (typeof window === 'undefined') return false;
-        return /Mac|iPhone|iPad|iPod/.test(window.navigator.platform);
-    }, []);
-};
 
 const KeyBadge = forwardRef<HTMLSpanElement, { children: string }>(
     ({ children }, ref) => (
@@ -41,28 +34,13 @@ export default function KeyboardShortcutsModal({
     open,
     onOpenChange,
 }: KeyboardShortcutsModalProps) {
-    const isMac = useIsMac();
+    const isMac = isMacPlatform();
 
     const displayShortcuts = useMemo(() => {
-        return shortcutDefinitions.map((shortcut) => {
-            const keys: string[] = [];
-            
-            if (shortcut.ctrlKey || shortcut.metaKey) {
-                keys.push(getModifierKey(isMac));
-            }
-            if (shortcut.altKey) {
-                keys.push('Alt');
-            }
-            if (shortcut.shiftKey) {
-                keys.push('Shift');
-            }
-            keys.push(getKeyDisplayName(shortcut.key));
-            
-            return {
-                keys,
-                description: shortcut.description,
-            };
-        });
+        return shortcutDefinitions.map((shortcut) => ({
+            keys: getShortcutDisplay(shortcut, isMac).split('+'),
+            description: shortcut.description,
+        }));
     }, [isMac]);
 
     return (

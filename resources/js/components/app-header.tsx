@@ -17,6 +17,7 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { UserMenuContent } from '@/components/user-menu-content';
+import { matchesKeyboardShortcut } from '@/hooks/use-keyboard-shortcuts';
 import { useInitials } from '@/hooks/use-initials';
 import { useScrollShadow } from '@/hooks/use-scroll-shadow';
 import { cn } from '@/lib/utils';
@@ -87,6 +88,7 @@ const resourceNavItems: NavItem[] = [
         external: true,
     },
 ];
+const searchHistoryShortcut = { key: 'k', ctrlKey: true } as const;
 
 interface AppHeaderProps {
     breadcrumbs?: BreadcrumbItem[];
@@ -136,8 +138,7 @@ export function AppHeader({
         }
 
         const handleKeyDown = (event: KeyboardEvent) => {
-            const isModifier = event.metaKey || event.ctrlKey;
-            if (!isModifier || event.key.toLowerCase() !== 'k') {
+            if (!matchesKeyboardShortcut(event, searchHistoryShortcut)) {
                 return;
             }
 
