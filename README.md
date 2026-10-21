@@ -448,6 +448,31 @@ php artisan route:cache
 php artisan view:cache
 ```
 
+### Interim PHP Security Mitigation
+
+Pending the critical PHP security release of 2026-10-21 (two CVEs), session
+upload-progress tracking is disabled with `session.upload_progress.enabled = Off`:
+
+- `public/.user.ini` (committed) — covers PHP-FPM/CGI deployments, the only
+  SAPI that reads `.user.ini` files. `public/` is this app's web root, so
+  the whole HTTP surface is covered there.
+- `docker/8.4/php.ini` (local, gitignored Sail scaffolding) — apply the
+  same directive here as well. Sail copies this file into the container as
+  `/etc/php/8.4/cli/conf.d/99-sail.ini`, covering the PHP built-in web
+  server (`php artisan serve`) that Sail uses. Because `/docker` is in
+  `.gitignore`, this edit must be re-applied on each checkout.
+
+Notes:
+
+- The directive is `PHP_INI_PERDIR`; `ini_set()` cannot change it at
+  runtime. It must arrive via `php.ini`, a `conf.d` file, an FPM pool
+  setting, or `.user.ini`.
+- The PHP built-in web server and Apache `mod_php` ignore `.user.ini`
+  files. If this app is ever served by `mod_php`, set the same directive in
+  the server `php.ini` (`.htaccess` `php_flag` also works there).
+- Follow-up: once the patched PHP release is deployed, remove the
+  directives above and delete this note.
+
 ### Environment Variables
 
 Ensure production environment variables are set:
