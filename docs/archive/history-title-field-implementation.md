@@ -1,4 +1,8 @@
 # Implementation Plan: History Entry Title Field
+[Home](../Home.md) › [Archive](index.md) › History Entry Title Field
+
+> Plan for adding the title column to history entries; completed 2025-10-23.
+
 
 > **STATUS: ✅ COMPLETED - October 23, 2025**  
 > This implementation plan has been fully executed. All phases completed successfully.  

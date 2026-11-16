@@ -1,4 +1,8 @@
 # Search Button Implementation Plan
+[Home](../Home.md) › [Archive](index.md) › Search Button Implementation Plan
+
+> Phase 1 plan for the header search button; feature shipped.
+
 
 ## Phase 1 – Define Search Behaviour & Data Contract
 GOAL: Establish what the search experience should return so the backend contract matches the existing UI expectations.

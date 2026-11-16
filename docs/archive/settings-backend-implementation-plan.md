@@ -1,9 +1,13 @@
 # Settings Backend Implementation Plan
+[Home](../Home.md) › [Archive](index.md) › Settings Backend Implementation Plan
+
+> Plan for backend-persisted user preferences; completed 2025-10-27.
+
 
 > **Implementation Status: ✅ COMPLETED (October 27, 2025)**
 > 
 > All 9 phases have been successfully implemented with comprehensive test coverage (981 test lines).
-> See [CHANGELOG.md](CHANGELOG.md#october-27-2025---user-preferences-backend--type-safety-enhancements) for detailed changes.
+> See [CHANGELOG.md](../CHANGELOG.md#october-27-2025---user-preferences-backend--type-safety-enhancements) for detailed changes.
 
 ## Overview
 

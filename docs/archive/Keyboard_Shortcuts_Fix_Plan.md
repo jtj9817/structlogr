@@ -1,4 +1,8 @@
 # Keyboard Shortcuts Implementation Fix Plan
+[Home](../Home.md) › [Archive](index.md) › Keyboard Shortcuts Fix Plan
+
+> Fix plan for the gaps found in the keyboard shortcuts implementation; plan executed.
+
 
 ## Overview
 

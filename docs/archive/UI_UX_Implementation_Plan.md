@@ -1,4 +1,8 @@
 # StructLogr UI/UX Implementation Plan
+[Home](../Home.md) › [Archive](index.md) › UI/UX Implementation Plan
+
+> Step-by-step implementation plan for the UI/UX overhaul; executed.
+
 
 This document provides a comprehensive, step-by-step implementation plan for all UI/UX improvements outlined in `UI_UX_Improvements.md`. Each phase includes specific files to modify, exact changes to make, and Laravel/Inertia/React considerations.
 

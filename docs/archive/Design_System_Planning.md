@@ -1,4 +1,8 @@
 # Design System Planning
+[Home](../Home.md) › [Archive](index.md) › Design System Planning
+
+> Planning guidelines for the StructLogr design system, written before the UI/UX work began; the work is done.
+
 
 This document defines the design system fundamentals for StructLogr UI/UX implementation. These are planning guidelines for decision-making, not detailed implementation specifications.
 

@@ -1,4 +1,8 @@
 # Architecture Overview
+[Home](../Home.md) › [Archive](index.md) › Architecture Overview (archived)
+
+> Point-in-time architecture description from the initial build; contains outdated claims — superseded by ../architecture/overview.md.
+
 
 This document provides a comprehensive overview of StructLogr's architecture, including backend structure, frontend organization, data flow, and key design decisions.
 

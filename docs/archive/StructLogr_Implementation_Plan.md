@@ -1,4 +1,8 @@
 # Development Plan: Log Formatting Web Application
+[Home](../Home.md) › [Archive](index.md) › StructLogr Implementation Plan
+
+> Original solo-developer build plan for StructLogr; all phases completed as of October 2025.
+
 
 This document outlines the development plan for a minimal web application that uses the `Prism` package to reformat raw log text into structured JSON. The application will be built with Laravel, React, and Inertia.js. This plan is designed for a solo developer, prioritizing simplicity and rapid implementation.
 

@@ -1,4 +1,8 @@
 # History Feature Documentation
+[Home](../Home.md) › [Archive](index.md) › History Feature Documentation
+
+> Build-time documentation of the history system as implemented in October 2025; superseded by ../backend/history.md.
+
 
 This document provides a comprehensive overview of the History Management system in StructLogr, including architecture, implementation details, and usage patterns.
 
@@ -972,4 +976,4 @@ The History Management system provides a robust, user-friendly way to track and 
 For more information, see:
 - [Architecture Overview](./architecture-overview.md)
 - [UI/UX Improvements](./UI_UX_Improvements.md)
-- [CHANGELOG](./CHANGELOG.md)
+- [CHANGELOG](../CHANGELOG.md)

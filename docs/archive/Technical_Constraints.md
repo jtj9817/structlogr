@@ -1,4 +1,8 @@
 # Technical Constraints
+[Home](../Home.md) › [Archive](index.md) › Technical Constraints
+
+> UI/UX implementation constraints and mandatory requirements recorded before the redesign.
+
 
 This document outlines the technical constraints, limitations, and mandatory requirements for implementing UI/UX improvements in StructLogr. These constraints must be respected during planning and implementation.
 

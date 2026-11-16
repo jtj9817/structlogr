@@ -1,4 +1,8 @@
 # Search Button Phase 1 Specification
+[Home](../Home.md) › [Archive](index.md) › Search Feature Specification
+
+> Phase 1 spec for the history search contract (query, scope, limit); feature shipped.
+
 
 This document captures the outcomes from Phase 1 of the search-button plan. It defines the behaviour, server contract, validation rules, and UX fallbacks needed to complete the feature using the current Laravel + Inertia stack.
 

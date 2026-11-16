@@ -1,4 +1,8 @@
 # UI/UX Improvement Suggestions for StructLogr
+[Home](../Home.md) › [Archive](index.md) › UI/UX Improvements
+
+> Catalogue of UI/UX improvement suggestions for the formatter, history and settings surfaces.
+
 
 ## Overview
 
