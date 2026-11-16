@@ -61,7 +61,7 @@ The header search dialog is `window` keydown in `app-header.tsx`, active only fo
 
 - [API surface](../backend/api.md) — the endpoints these hooks call
 - [Log format](../domain/log-format.md) — the JSON rendered in the output pane
-- [Keyboard shortcut defect](../tickets/SLOG-007-ctrl-k-conflict.md) — known conflict on the main chord
+- [Keyboard shortcut defect](../tickets/SLOG-007-ctrl-cmd-k-both-clears-the.md) — known conflict on the main chord
 
 ## Backlinks
 
