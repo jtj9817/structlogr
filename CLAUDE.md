@@ -295,3 +295,5 @@ HTTP_CONNECT_TIMEOUT=60
 
 # ABSOLUTE
 DO NOT READ THE USER'S `.env` FILE.
+
+**Branch policy:** Under no circumstances should you create a new Git branch unless the work is a multi-phase implementation of a feature, bug fix, or refactoring.
