@@ -682,3 +682,11 @@ This design system provides:
 - Refer to `Technical_Constraints.md` for technical limitations
 - Refer to `architecture-overview.md` for system architecture
 - Check existing components for implementation patterns
+
+## Backlinks
+
+<!-- wiki:backlinks:start -->
+| Page | Summary |
+| --- | --- |
+| [Archive](index.md) | Historical planning documents for the UI/UX overhaul and feature work, October 2025 — kept for reference, no longer maintained. |
+<!-- wiki:backlinks:end -->

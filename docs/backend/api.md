@@ -74,4 +74,13 @@ Guest routes: register, login, forgot/reset password. Authenticated: `verify-ema
 ## Backlinks
 
 <!-- wiki:backlinks:start -->
+| Page | Summary |
+| --- | --- |
+| [StructLogr wiki](../Home.md) | StructLogr turns raw log text into structured JSON with an LLM; this wiki is its map — what exists, where it lives, and what's known-broken. |
+| [Architecture overview](../architecture/overview.md) | The runtime shape of StructLogr — components, the format request flow, who owns what data, and how it deploys. |
+| [How formatting works](formatter.md) | What happens between pasting a log and seeing structured JSON — schema, prompt, provider call, validation, retry, persistence. |
+| [History](history.md) | How formatted logs are stored, listed, searched, bookmarked, exported and cleared — and why search behaves the way it does. |
+| [Database schema](schema.md) | Tables, columns, indexes and access patterns — what persists each request and what doesn't. |
+| [Frontend](../frontend/index.md) | The React 19 + Inertia single-page UI — pages, hooks, shared data, and how it talks to the backend. |
+| [Frontend overview](../frontend/overview.md) | How the React/Inertia UI is organized — pages, data flow, hooks, keyboard shortcuts, and CSRF handling. |
 <!-- wiki:backlinks:end -->

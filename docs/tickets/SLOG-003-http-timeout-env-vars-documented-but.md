@@ -10,7 +10,6 @@ assignee: Unassigned
 reporter: Claude
 created: 2026-11-16
 updated: 2026-11-16
-parent:
 blocks: []
 blocked_by: []
 relates_to: []
@@ -41,4 +40,8 @@ One of:
 ## Backlinks
 
 <!-- wiki:backlinks:start -->
+| Page | Summary |
+| --- | --- |
+| [LLM providers](../backend/llm-providers.md) | Which LLM providers StructLogr calls, how each is configured, and how to debug a provider failure. |
+| [Logging and debugging](../backend/logging.md) | How StructLogr logs the formatting pipeline — levels, lifecycle statements, where logs live, and how to debug a failing format request. |
 <!-- wiki:backlinks:end -->

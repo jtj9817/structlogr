@@ -10,7 +10,6 @@ assignee: Unassigned
 reporter: Claude
 created: 2026-11-16
 updated: 2026-11-16
-parent:
 blocks: []
 blocked_by: []
 relates_to: [SLOG-002]
@@ -61,4 +60,10 @@ The routes do not exist in production (gated by `app.debug` or removed), and ses
 ## Backlinks
 
 <!-- wiki:backlinks:start -->
+| Page | Summary |
+| --- | --- |
+| [Architecture overview](../architecture/overview.md) | The runtime shape of StructLogr — components, the format request flow, who owns what data, and how it deploys. |
+| [API surface](../backend/api.md) | Every HTTP route in the app — who can call it, what it takes, what it returns. |
+| [SLOG-002: csrf_debug shared on every Inertia response (session id, token preview)](SLOG-002-csrf-debug-shared-on-every-inertia.md) | Bug · Open |
+| [SLOG-004: Security audit in .gemini_security TODO never run; draft report is 0 bytes](SLOG-004-security-audit-in-gemini-security-todo.md) | Task · Open |
 <!-- wiki:backlinks:end -->

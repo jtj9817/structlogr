@@ -69,4 +69,11 @@ Relationships: `FormattedLog::belongsTo(User)`, `User::hasMany(FormattedLog)`. Q
 ## Backlinks
 
 <!-- wiki:backlinks:start -->
+| Page | Summary |
+| --- | --- |
+| [StructLogr wiki](../Home.md) | StructLogr turns raw log text into structured JSON with an LLM; this wiki is its map — what exists, where it lives, and what's known-broken. |
+| [API surface](api.md) | Every HTTP route in the app — who can call it, what it takes, what it returns. |
+| [History](history.md) | How formatted logs are stored, listed, searched, bookmarked, exported and cleared — and why search behaves the way it does. |
+| [Log format](../domain/log-format.md) | The structured-JSON contract between the LLM, the database, and the UI — and what is actually enforced where. |
+| [SLOG-005: raw_log_preview written to application logs at INFO](../tickets/SLOG-005-raw-log-preview-written-to-application.md) | Bug · Open |
 <!-- wiki:backlinks:end -->

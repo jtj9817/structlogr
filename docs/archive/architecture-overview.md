@@ -1763,3 +1763,12 @@ StructLogr's architecture emphasizes:
 5. **Maintainability**: Clean separation of concerns
 
 This architecture provides a solid foundation for future enhancements while maintaining code quality and performance.
+
+## Backlinks
+
+<!-- wiki:backlinks:start -->
+| Page | Summary |
+| --- | --- |
+| [History Feature Documentation](history-feature.md) | Build-time documentation of the history system as implemented in October 2025; superseded by ../backend/history.md. |
+| [Archive](index.md) | Historical planning documents for the UI/UX overhaul and feature work, October 2025 — kept for reference, no longer maintained. |
+<!-- wiki:backlinks:end -->

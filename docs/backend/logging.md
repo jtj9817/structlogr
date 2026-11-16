@@ -693,4 +693,9 @@ When debugging issues:
 ## Backlinks
 
 <!-- wiki:backlinks:start -->
+| Page | Summary |
+| --- | --- |
+| [StructLogr wiki](../Home.md) | StructLogr turns raw log text into structured JSON with an LLM; this wiki is its map — what exists, where it lives, and what's known-broken. |
+| [How formatting works](formatter.md) | What happens between pasting a log and seeing structured JSON — schema, prompt, provider call, validation, retry, persistence. |
+| [LLM providers](llm-providers.md) | Which LLM providers StructLogr calls, how each is configured, and how to debug a provider failure. |
 <!-- wiki:backlinks:end -->

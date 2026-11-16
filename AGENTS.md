@@ -93,7 +93,7 @@ npm run types         # TypeScript type checking
 - `HandleInertiaRequests` - Shares global data with Inertia
 
 **Configuration:**
-Cookies `appearance` and `sidebar_state` are not encrypted (see `bootstrap/app.php`).
+Only the `appearance` cookie is excepted from encryption (`bootstrap/app.php`); `sidebar_state` is encrypted like every other cookie.
 
 ### Frontend Structure
 

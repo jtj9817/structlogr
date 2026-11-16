@@ -132,3 +132,11 @@ export interface SearchResponse {
 2. **Devise a plan**: Chose a minimal route, validation rules, and `LIKE`-based search compatible with current MySQL setup.
 3. **Carry out**: This spec provides the blueprint for Phase 2 & 3 implementation, ensuring backend and frontend align.
 4. **Review**: Before coding, compare upcoming implementations against this document to confirm all constraints (auth scope, typing, UX) are respected; adjust if new requirements appear.
+
+## Backlinks
+
+<!-- wiki:backlinks:start -->
+| Page | Summary |
+| --- | --- |
+| [Archive](index.md) | Historical planning documents for the UI/UX overhaul and feature work, October 2025 — kept for reference, no longer maintained. |
+<!-- wiki:backlinks:end -->

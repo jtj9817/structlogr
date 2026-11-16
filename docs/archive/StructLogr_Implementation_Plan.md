@@ -288,3 +288,11 @@ All planned phases are complete. Future enhancements may include:
    - Log formatting statistics
    - Usage metrics
    - Error tracking
+
+## Backlinks
+
+<!-- wiki:backlinks:start -->
+| Page | Summary |
+| --- | --- |
+| [Archive](index.md) | Historical planning documents for the UI/UX overhaul and feature work, October 2025 — kept for reference, no longer maintained. |
+<!-- wiki:backlinks:end -->

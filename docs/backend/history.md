@@ -62,4 +62,11 @@ All endpoints 404 (not 403) for entries owned by someone else. There is no `veri
 ## Backlinks
 
 <!-- wiki:backlinks:start -->
+| Page | Summary |
+| --- | --- |
+| [StructLogr wiki](../Home.md) | StructLogr turns raw log text into structured JSON with an LLM; this wiki is its map — what exists, where it lives, and what's known-broken. |
+| [Architecture overview](../architecture/overview.md) | The runtime shape of StructLogr — components, the format request flow, who owns what data, and how it deploys. |
+| [Archive](../archive/index.md) | Historical planning documents for the UI/UX overhaul and feature work, October 2025 — kept for reference, no longer maintained. |
+| [API surface](api.md) | Every HTTP route in the app — who can call it, what it takes, what it returns. |
+| [Database schema](schema.md) | Tables, columns, indexes and access patterns — what persists each request and what doesn't. |
 <!-- wiki:backlinks:end -->

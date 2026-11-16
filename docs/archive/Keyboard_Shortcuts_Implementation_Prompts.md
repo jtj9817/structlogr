@@ -52,3 +52,11 @@ CONTEXT:
 REFERENCE DOCUMENTATION: `docs/Keyboard_Shortcuts_Fix_Plan.md`
   TASK:
   Implement the `Phase 5: Testing and Verification` of the plan.
+
+## Backlinks
+
+<!-- wiki:backlinks:start -->
+| Page | Summary |
+| --- | --- |
+| [Archive](index.md) | Historical planning documents for the UI/UX overhaul and feature work, October 2025 — kept for reference, no longer maintained. |
+<!-- wiki:backlinks:end -->

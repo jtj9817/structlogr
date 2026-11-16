@@ -10,7 +10,6 @@ assignee: Unassigned
 reporter: Claude
 created: 2026-11-16
 updated: 2026-11-16
-parent:
 blocks: []
 blocked_by: []
 relates_to: [SLOG-004]
@@ -61,4 +60,7 @@ Logs include metadata only (model, length, attempt) — no raw input content —
 ## Backlinks
 
 <!-- wiki:backlinks:start -->
+| Page | Summary |
+| --- | --- |
+| [SLOG-004: Security audit in .gemini_security TODO never run; draft report is 0 bytes](SLOG-004-security-audit-in-gemini-security-todo.md) | Task · Open |
 <!-- wiki:backlinks:end -->

@@ -66,4 +66,7 @@ The header search dialog is `window` keydown in `app-header.tsx`, active only fo
 ## Backlinks
 
 <!-- wiki:backlinks:start -->
+| Page | Summary |
+| --- | --- |
+| [Frontend](index.md) | The React 19 + Inertia single-page UI — pages, hooks, shared data, and how it talks to the backend. |
 <!-- wiki:backlinks:end -->

@@ -870,3 +870,11 @@ const headline = entry.summary ?? entry.preview;
 - Updated TypeScript types in `resources/js/types/history.ts`
 - Updated `history-entry-card.tsx` component
 - This implementation document in `docs/`
+
+## Backlinks
+
+<!-- wiki:backlinks:start -->
+| Page | Summary |
+| --- | --- |
+| [Archive](index.md) | Historical planning documents for the UI/UX overhaul and feature work, October 2025 — kept for reference, no longer maintained. |
+<!-- wiki:backlinks:end -->

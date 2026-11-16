@@ -2841,3 +2841,11 @@ The plan is organized to allow incremental implementation, starting with high-im
 5. Gather user feedback and iterate
 
 This plan provides a clear roadmap for transforming StructLogr into a polished, professional, and delightful log formatting tool.
+
+## Backlinks
+
+<!-- wiki:backlinks:start -->
+| Page | Summary |
+| --- | --- |
+| [Archive](index.md) | Historical planning documents for the UI/UX overhaul and feature work, October 2025 — kept for reference, no longer maintained. |
+<!-- wiki:backlinks:end -->

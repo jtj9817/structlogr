@@ -404,3 +404,11 @@ These changes would break existing functionality and are **prohibited**:
 - Refer to architecture-overview.md
 - Ask before introducing new dependencies
 - Prefer simplicity over complexity
+
+## Backlinks
+
+<!-- wiki:backlinks:start -->
+| Page | Summary |
+| --- | --- |
+| [Archive](index.md) | Historical planning documents for the UI/UX overhaul and feature work, October 2025 — kept for reference, no longer maintained. |
+<!-- wiki:backlinks:end -->

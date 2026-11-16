@@ -45,4 +45,10 @@ Every step logs (`=== START ===`, per-attempt, `SUCCESS`/`FAILED`/`CRITICAL`). S
 ## Backlinks
 
 <!-- wiki:backlinks:start -->
+| Page | Summary |
+| --- | --- |
+| [StructLogr wiki](../Home.md) | StructLogr turns raw log text into structured JSON with an LLM; this wiki is its map — what exists, where it lives, and what's known-broken. |
+| [Architecture overview](../architecture/overview.md) | The runtime shape of StructLogr — components, the format request flow, who owns what data, and how it deploys. |
+| [LLM providers](llm-providers.md) | Which LLM providers StructLogr calls, how each is configured, and how to debug a provider failure. |
+| [Log format](../domain/log-format.md) | The structured-JSON contract between the LLM, the database, and the UI — and what is actually enforced where. |
 <!-- wiki:backlinks:end -->

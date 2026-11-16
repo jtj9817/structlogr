@@ -10,7 +10,6 @@ assignee: Unassigned
 reporter: Claude
 created: 2026-11-16
 updated: 2026-11-16
-parent:
 blocks: []
 blocked_by: []
 relates_to: []
@@ -43,4 +42,8 @@ The only routes rendering Inertia pages:
 ## Backlinks
 
 <!-- wiki:backlinks:start -->
+| Page | Summary |
+| --- | --- |
+| [Frontend overview](../frontend/overview.md) | How the React/Inertia UI is organized — pages, data flow, hooks, keyboard shortcuts, and CSRF handling. |
+| [SLOG-007: Ctrl/Cmd+K both clears the formatter textarea and opens search](SLOG-007-ctrl-cmd-k-both-clears-the.md) | Bug · Open |
 <!-- wiki:backlinks:end -->

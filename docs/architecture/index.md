@@ -10,9 +10,16 @@ HTTP surface see [Backend](../backend/index.md), for UI structure see
 [Domain](../domain/index.md).
 
 <!-- wiki:pages:start -->
+| Page | Summary |
+| --- | --- |
+| [Architecture overview](overview.md) | The runtime shape of StructLogr — components, the format request flow, who owns what data, and how it deploys. |
 <!-- wiki:pages:end -->
 
 ## Backlinks
 
 <!-- wiki:backlinks:start -->
+| Page | Summary |
+| --- | --- |
+| [StructLogr wiki](../Home.md) | StructLogr turns raw log text into structured JSON with an LLM; this wiki is its map — what exists, where it lives, and what's known-broken. |
+| [Architecture overview](overview.md) | The runtime shape of StructLogr — components, the format request flow, who owns what data, and how it deploys. |
 <!-- wiki:backlinks:end -->

@@ -101,4 +101,11 @@ Qualitative guidance only — this repository contains no benchmark data:
 ## Backlinks
 
 <!-- wiki:backlinks:start -->
+| Page | Summary |
+| --- | --- |
+| [StructLogr wiki](../Home.md) | StructLogr turns raw log text into structured JSON with an LLM; this wiki is its map — what exists, where it lives, and what's known-broken. |
+| [Architecture overview](../architecture/overview.md) | The runtime shape of StructLogr — components, the format request flow, who owns what data, and how it deploys. |
+| [How formatting works](formatter.md) | What happens between pasting a log and seeing structured JSON — schema, prompt, provider call, validation, retry, persistence. |
+| [Logging and debugging](logging.md) | How StructLogr logs the formatting pipeline — levels, lifecycle statements, where logs live, and how to debug a failing format request. |
+| [Log format](../domain/log-format.md) | The structured-JSON contract between the LLM, the database, and the UI — and what is actually enforced where. |
 <!-- wiki:backlinks:end -->

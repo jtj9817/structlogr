@@ -1853,3 +1853,12 @@ This comprehensive list of UI/UX improvements will transform StructLogr from a f
 ---
 
 *Last Updated: 2025-01-15*
+
+## Backlinks
+
+<!-- wiki:backlinks:start -->
+| Page | Summary |
+| --- | --- |
+| [History Feature Documentation](history-feature.md) | Build-time documentation of the history system as implemented in October 2025; superseded by ../backend/history.md. |
+| [Archive](index.md) | Historical planning documents for the UI/UX overhaul and feature work, October 2025 — kept for reference, no longer maintained. |
+<!-- wiki:backlinks:end -->

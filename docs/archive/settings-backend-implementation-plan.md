@@ -769,3 +769,11 @@ Implementation is complete when:
 - ✅ Guest users still use localStorage
 - ✅ All manual tests pass
 - ✅ Documentation is updated
+
+## Backlinks
+
+<!-- wiki:backlinks:start -->
+| Page | Summary |
+| --- | --- |
+| [Archive](index.md) | Historical planning documents for the UI/UX overhaul and feature work, October 2025 — kept for reference, no longer maintained. |
+<!-- wiki:backlinks:end -->

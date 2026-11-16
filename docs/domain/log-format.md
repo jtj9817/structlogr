@@ -49,4 +49,13 @@ Old example output in the README showing top-level `summary` / `entities` / `met
 ## Backlinks
 
 <!-- wiki:backlinks:start -->
+| Page | Summary |
+| --- | --- |
+| [StructLogr wiki](../Home.md) | StructLogr turns raw log text into structured JSON with an LLM; this wiki is its map — what exists, where it lives, and what's known-broken. |
+| [How formatting works](../backend/formatter.md) | What happens between pasting a log and seeing structured JSON — schema, prompt, provider call, validation, retry, persistence. |
+| [Logging and debugging](../backend/logging.md) | How StructLogr logs the formatting pipeline — levels, lifecycle statements, where logs live, and how to debug a failing format request. |
+| [Database schema](../backend/schema.md) | Tables, columns, indexes and access patterns — what persists each request and what doesn't. |
+| [Domain](index.md) | The one business concept this project has — what a "formatted log" is. |
+| [Frontend](../frontend/index.md) | The React 19 + Inertia single-page UI — pages, hooks, shared data, and how it talks to the backend. |
+| [Frontend overview](../frontend/overview.md) | How the React/Inertia UI is organized — pages, data flow, hooks, keyboard shortcuts, and CSRF handling. |
 <!-- wiki:backlinks:end -->

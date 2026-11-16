@@ -10,7 +10,6 @@ assignee: Unassigned
 reporter: Claude
 created: 2026-11-16
 updated: 2026-11-16
-parent:
 blocks: []
 blocked_by: []
 relates_to: [SLOG-001]
@@ -66,4 +65,10 @@ Anyone able to execute script in the page (XSS, browser extension context) or re
 ## Backlinks
 
 <!-- wiki:backlinks:start -->
+| Page | Summary |
+| --- | --- |
+| [Architecture overview](../architecture/overview.md) | The runtime shape of StructLogr — components, the format request flow, who owns what data, and how it deploys. |
+| [Frontend overview](../frontend/overview.md) | How the React/Inertia UI is organized — pages, data flow, hooks, keyboard shortcuts, and CSRF handling. |
+| [SLOG-001: Unauthenticated /debug/* routes leak session id and CSRF data](SLOG-001-unauthenticated-debug-routes-leak-session-id.md) | Bug · Open |
+| [SLOG-004: Security audit in .gemini_security TODO never run; draft report is 0 bytes](SLOG-004-security-audit-in-gemini-security-todo.md) | Task · Open |
 <!-- wiki:backlinks:end -->

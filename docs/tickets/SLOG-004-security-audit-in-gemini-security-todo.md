@@ -10,7 +10,6 @@ assignee: Unassigned
 reporter: Claude
 created: 2026-11-16
 updated: 2026-11-16
-parent:
 blocks: []
 blocked_by: []
 relates_to: [SLOG-001, SLOG-002]
@@ -48,4 +47,7 @@ Scope candidates with existing evidence: the `/debug/*` routes (SLOG-001), `csrf
 ## Backlinks
 
 <!-- wiki:backlinks:start -->
+| Page | Summary |
+| --- | --- |
+| [SLOG-005: raw_log_preview written to application logs at INFO](SLOG-005-raw-log-preview-written-to-application.md) | Bug · Open |
 <!-- wiki:backlinks:end -->

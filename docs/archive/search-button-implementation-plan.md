@@ -60,3 +60,11 @@ REQUIREMENTS
 GUIDELINES:
 - Use Polya’s final review stage: re-evaluate assumptions, compare outcomes with original goals, and log follow-up tasks if gaps remain.
 - Provide clear commit guidance (summary line, testing notes) for future PRs.
+
+## Backlinks
+
+<!-- wiki:backlinks:start -->
+| Page | Summary |
+| --- | --- |
+| [Archive](index.md) | Historical planning documents for the UI/UX overhaul and feature work, October 2025 — kept for reference, no longer maintained. |
+<!-- wiki:backlinks:end -->

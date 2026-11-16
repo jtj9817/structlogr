@@ -138,84 +138,62 @@ The application will be available at **http://localhost:8001**
 Authenticated users can:
 - **View History**: Access all formatted logs via the History sidebar
 - **Save Entries**: Mark important entries as saved for quick access
-- **Search History**: Full-text search across titles, summaries, raw logs, and log types
+- **Search History**: Keyword (substring) search across titles, summaries, raw logs, and log types
 - **Filter by Scope**: Search within All, Recent (unsaved), or Saved entries
 - **Export**: Download entire history as JSON file
 - **Clear**: Remove all or individual history entries
 
 ### Search Feature
 
-The search system provides fast, full-text search across your history:
+The search system provides keyword (substring) search across your history:
 
-- **Search Trigger**: `Cmd+K` (Mac) or `Ctrl+K` (Windows/Linux) to open search dialog
+- **Search Trigger**: `Cmd+K` (Mac) or `Ctrl+K` (Windows/Linux) to open search dialog (authenticated users; ignored while focus is in an input)
 - **Search Scopes**: Filter results by All entries, Recent only, or Saved only
 - **Live Results**: Debounced search updates results as you type (250ms delay)
 - **Result Preview**: See title, summary, preview text, and metadata for each match
 - **Quick Navigation**: Click any result to view the full formatted log
-- **Backend**: MySQL full-text search with `MATCH ... AGAINST` syntax
+- **Backend**: Substring `LIKE '%…%'` match across `title`, `summary`, `detected_log_type`, `raw_log` — no full-text index (see [docs/backend/history.md](docs/backend/history.md))
 - **Privacy**: All searches are user-scoped for data isolation
 
 ### Keyboard Shortcuts
 
-- `Ctrl+Enter` or `Cmd+Enter`: Format log
-- `Ctrl+K` or `Cmd+K`: Open search dialog
-- `Ctrl+H` or `Cmd+H`: Toggle history sidebar
-- `Ctrl+L` or `Cmd+L`: Clear input
-- `?`: Show keyboard shortcuts help
+- `Ctrl+Enter` / `Cmd+Enter`: Format log
+- `Ctrl+K` / `Cmd+K`: Open search dialog (authenticated users; also clears the formatter input — known conflict, see SLOG-007)
+- `Ctrl+/` / `Cmd+/`: Show keyboard shortcuts help
+- `Alt+I`: Focus input field
+- `Alt+O`: Focus output area
+- `Escape`: Close any open panel
 
-**Tip**: Action buttons display keyboard shortcuts in tooltips. Press `?` to view all available shortcuts in the help modal.
+**Tip**: Action buttons display keyboard shortcuts in tooltips. Press `Ctrl+/` to view all available shortcuts in the help modal.
 
 Example input:
 ```
 2024-10-15 14:23:45 [ERROR] Database connection failed - timeout after 30s
 ```
 
-Example output:
+Example output (abbreviated to a valid contract — `title` is extracted to the history column and omitted):
 ```json
 {
   "detected_log_type": "application_error",
-  "summary": {
+  "results_summary": {
     "status": "ERROR",
-    "headline": "Database connection failed after timing out at 30s",
-    "primary_subject": "Database",
-    "key_points": [
-      "Connection attempt exceeded 30s timeout",
-      "Severity recorded as ERROR level"
-    ],
     "duration": "30s",
     "timestamp": "2024-10-15 14:23:45"
   },
-  "entities": [
+  "errors": [
     {
-      "type": "service",
-      "identifier": "Database"
-    }
-  ],
-  "metrics": [
-    {
-      "name": "timeout_seconds",
-      "value": 30,
-      "unit": "seconds",
-      "description": "Declared timeout before the connection aborted"
-    }
-  ],
-  "sections": [
-    {
-      "section_type": "errors",
-      "title": "Error Events",
-      "items": [
-        {
-          "name": "Database connection failed",
-          "status": "ERROR",
-          "details": {
-            "message": "Database connection failed - timeout after 30s"
-          }
-        }
-      ]
+      "error_type": "connection_timeout",
+      "message": "Database connection failed - timeout after 30s",
+      "file": null,
+      "line": null,
+      "stack_trace": null,
+      "timestamp": "2024-10-15 14:23:45"
     }
   ]
 }
 ```
+
+See [docs/domain/log-format.md](docs/domain/log-format.md) for the full machine-enforced contract.
 
 ### Authentication Features
 
@@ -321,8 +299,7 @@ structlogr/
 │       ├── pages/                  # Inertia pages
 │       │   ├── auth/               # Authentication pages
 │       │   ├── settings/           # Settings pages
-│       │   ├── FormatterPage.tsx   # Log formatter page (at /)
-│       │   └── welcome.tsx         # Landing page
+│       │   └── FormatterPage.tsx   # Log formatter page (at /)
 │       ├── routes/                 # Wayfinder route helpers
 │       └── types/                  # TypeScript types
 │           ├── search.ts           # Search types
@@ -410,11 +387,7 @@ ANTHROPIC_API_KEY=your_key
 ANTHROPIC_API_VERSION=2023-06-01
 ```
 
-**HTTP Timeout Configuration**:
-```env
-HTTP_TIMEOUT=600
-HTTP_CONNECT_TIMEOUT=60
-```
+**HTTP Timeouts** (LLM requests): not configurable via environment today. The code uses `config('services.http.timeout', 600)` and `config('services.http.connect_timeout', 60)` and `config/services.php` defines no `http` key, so the 600s / 60s fallbacks always apply. Setting `HTTP_TIMEOUT` has no effect (tracked in SLOG-003).
 
 **Supported Models**:
 - `deepseek-chat` - DeepSeek (default)
@@ -423,7 +396,7 @@ HTTP_CONNECT_TIMEOUT=60
 - `GLM-4.5-Air` - ZhipuAI GLM-4.5-Air (via OpenRouter)
 - `GLM-4.6` - ZhipuAI GLM-4.6 (via OpenRouter)
 
-See `config/prism.php` for all supported providers and `docs/llm-providers.md` for detailed configuration guide.
+See `config/prism.php` for provider credentials and [docs/backend/llm-providers.md](docs/backend/llm-providers.md) for the full configuration guide.
 
 ### Port Configuration
 
@@ -484,14 +457,18 @@ Ensure production environment variables are set:
 
 ## Documentation
 
-- **[Implementation Plan](docs/StructLogr_Implementation_Plan.md)**: Development phases and roadmap
-- **[Architecture Overview](docs/architecture-overview.md)**: Detailed system architecture
-- **[History Feature](docs/history-feature.md)**: History management system guide
-- **[LLM Providers Guide](docs/llm-providers.md)**: Comprehensive LLM provider configuration
-- **[Logging and Debugging](docs/logging-and-debugging.md)**: Logging system and debugging guide
-- **[UI/UX Improvements](docs/UI_UX_Improvements.md)**: Design system and component guide
-- **[CHANGELOG](docs/CHANGELOG.md)**: Version history and updates
-- **[CLAUDE.md](CLAUDE.md)**: Instructions for Claude Code assistant
+The project wiki lives in [**docs/Home.md**](docs/Home.md) — start there:
+
+- Architecture, request flow, data ownership, and sharp edges: [architecture/overview.md](docs/architecture/overview.md)
+- API routes, database schema, the LLM formatting pipeline, history/search, logging: [backend/](docs/backend/index.md)
+- React/Inertia pages, hooks, keyboard shortcuts, CSRF handling: [frontend/](docs/frontend/index.md)
+- The machine-enforced output contract: [domain/log-format.md](docs/domain/log-format.md)
+- Open bugs and tasks with evidence: [ticket board](docs/tickets/index.md)
+- Version history: [docs/CHANGELOG.md](docs/CHANGELOG.md)
+- Historical plans/specs (point-in-time records): [docs/archive/](docs/archive/index.md)
+- Point-in-time agent instructions: [CLAUDE.md](CLAUDE.md)
+
+Each page names its source files and the commit it was verified against.
 
 ## Contributing
 

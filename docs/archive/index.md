@@ -25,8 +25,32 @@ historical pages honest.
 | [UI/UX Implementation Plan](UI_UX_Implementation_Plan.md) | Execution plan for the UI/UX overhaul; only the subset of components that exists landed |
 | [Keyboard Shortcuts Fix Plan](Keyboard_Shortcuts_Fix_Plan.md) | Fix plan for keyboard shortcut gaps; the planned behaviour ships, details differ |
 | [Keyboard Shortcuts Implementation Prompts](Keyboard_Shortcuts_Implementation_Prompts.md) | Prompt scripts for the shortcut fix phases |
+| [Design System Planning](Design_System_Planning.md) | Planning guidelines for the StructLogr design system, written before the UI/UX work began; the work is done. |
+| [Search Button Implementation Plan](search-button-implementation-plan.md) | Phase 1 plan for the header search button; feature shipped. |
+| [Search Feature Specification](search-feature-spec.md) | Phase 1 spec for the history search contract (query, scope, limit); feature shipped. |
+| [History Feature Documentation](history-feature.md) | Build-time documentation of the history system as implemented in October 2025; superseded by [backend/history.md](../backend/history.md). |
+| [History Entry Title Field](history-title-field-implementation.md) | Plan for adding the title column to history entries; completed 2025-10-23. |
+| [Settings Backend Implementation Plan](settings-backend-implementation-plan.md) | Plan for backend-persisted user preferences; completed 2025-10-27. |
 
 ## Backlinks
 
 <!-- wiki:backlinks:start -->
+| Page | Summary |
+| --- | --- |
+| [StructLogr wiki](../Home.md) | StructLogr turns raw log text into structured JSON with an LLM; this wiki is its map — what exists, where it lives, and what's known-broken. |
+| [Design System Planning](Design_System_Planning.md) | Planning guidelines for the StructLogr design system, written before the UI/UX work began; the work is done. |
+| [Keyboard Shortcuts Implementation Fix Plan](Keyboard_Shortcuts_Fix_Plan.md) | Fix plan for the gaps found in the keyboard shortcuts implementation; plan executed. |
+| [Keyboard Shortcuts Implementation Prompts](Keyboard_Shortcuts_Implementation_Prompts.md) | Prompt scripts used to drive the keyboard shortcuts fix phases. |
+| [Phase Dependencies and Implementation Prompts](Phase_Dependencies_and_Prompts.md) | Phase dependency map and ready-to-use implementation prompts for the UI/UX overhaul. |
+| [Development Plan: Log Formatting Web Application](StructLogr_Implementation_Plan.md) | Original solo-developer build plan for StructLogr; all phases completed as of October 2025. |
+| [Technical Constraints](Technical_Constraints.md) | UI/UX implementation constraints and mandatory requirements recorded before the redesign. |
+| [StructLogr UI/UX Implementation Plan](UI_UX_Implementation_Plan.md) | Step-by-step implementation plan for the UI/UX overhaul; executed. |
+| [UI/UX Improvement Suggestions for StructLogr](UI_UX_Improvements.md) | Catalogue of UI/UX improvement suggestions for the formatter, history and settings surfaces. |
+| [Architecture Overview](architecture-overview.md) | Point-in-time architecture description from the initial build; contains outdated claims — superseded by ../architecture/overview.md. |
+| [History Feature Documentation](history-feature.md) | Build-time documentation of the history system as implemented in October 2025; superseded by ../backend/history.md. |
+| [Implementation Plan: History Entry Title Field](history-title-field-implementation.md) | Plan for adding the title column to history entries; completed 2025-10-23. |
+| [Search Button Implementation Plan](search-button-implementation-plan.md) | Phase 1 plan for the header search button; feature shipped. |
+| [Search Button Phase 1 Specification](search-feature-spec.md) | Phase 1 spec for the history search contract (query, scope, limit); feature shipped. |
+| [Settings Backend Implementation Plan](settings-backend-implementation-plan.md) | Plan for backend-persisted user preferences; completed 2025-10-27. |
+| [LLM providers](../backend/llm-providers.md) | Which LLM providers StructLogr calls, how each is configured, and how to debug a provider failure. |
 <!-- wiki:backlinks:end -->
