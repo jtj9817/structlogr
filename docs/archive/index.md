@@ -21,16 +21,10 @@ historical pages honest.
 | [Phase Dependencies and Implementation Prompts](Phase_Dependencies_and_Prompts.md) | Dependency map and prompts for the UI/UX overhaul phases |
 | [Architecture Overview](architecture-overview.md) | Point-in-time architecture; superseded by [architecture/overview.md](../architecture/overview.md) |
 | [Technical Constraints](Technical_Constraints.md) | Mandatory UI/UX implementation constraints |
-| [Design System Planning](Design_System_Planning.md) | Design system fundamentals; implemented |
-| [UI/UX Improvement Suggestions](UI_UX_Improvements.md) | Improvement catalogue for formatter, history and settings |
-| [UI/UX Implementation Plan](UI_UX_Implementation_Plan.md) | Step-by-step UI/UX execution plan; executed |
-| [Keyboard Shortcuts Fix Plan](Keyboard_Shortcuts_Fix_Plan.md) | Fix plan for keyboard shortcut gaps; executed |
+| [UI/UX Improvement Suggestions](UI_UX_Improvements.md) | Improvement catalogue for formatter, history and settings; most items never shipped |
+| [UI/UX Implementation Plan](UI_UX_Implementation_Plan.md) | Execution plan for the UI/UX overhaul; only the subset of components that exists landed |
+| [Keyboard Shortcuts Fix Plan](Keyboard_Shortcuts_Fix_Plan.md) | Fix plan for keyboard shortcut gaps; the planned behaviour ships, details differ |
 | [Keyboard Shortcuts Implementation Prompts](Keyboard_Shortcuts_Implementation_Prompts.md) | Prompt scripts for the shortcut fix phases |
-| [Search Button Implementation Plan](search-button-implementation-plan.md) | Phase 1 plan for the header search button |
-| [Search Feature Specification](search-feature-spec.md) | Phase 1 spec for the history search contract |
-| [History Feature Documentation](history-feature.md) | Build-time history system documentation; superseded by [backend/history.md](../backend/history.md) |
-| [History Entry Title Field](history-title-field-implementation.md) | Plan for the history title column; completed 2025-10-23 |
-| [Settings Backend Implementation Plan](settings-backend-implementation-plan.md) | Plan for backend-persisted preferences; completed 2025-10-27 |
 
 ## Backlinks
 

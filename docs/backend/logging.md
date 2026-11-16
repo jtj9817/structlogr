@@ -1,4 +1,15 @@
-# Logging and Debugging Guide
+# Logging and debugging
+[Home](../Home.md) › [Backend](index.md) › Logging and debugging
+
+> How StructLogr logs the formatting pipeline — levels, lifecycle statements, where logs live, and how to debug a failing format request.
+
+| | |
+| --- | --- |
+| **Source** | `app/Services/LogFormatterService.php`, `config/logging.php` |
+| **Owner** | backend |
+| **Last verified** | 2026-11-16 against `e89b491` |
+| **Open tickets** | SLOG-003 |
+
 
 This document provides comprehensive guidance on StructLogr's logging system and debugging capabilities.
 
@@ -194,7 +205,9 @@ The `LogFormatterService` class (`app/Services/LogFormatterService.php`) provide
     'model' => 'deepseek-chat',
     'attempt' => 0,
     'detected_log_type' => 'application_error',
-    'sections_count' => 1,
+    'failed_tests_count' => 0,
+    'passed_tests_count' => 0,
+    'title' => 'Database connection failed after timing out at 30s',
 ]);
 ```
 
@@ -202,7 +215,8 @@ The `LogFormatterService` class (`app/Services/LogFormatterService.php`) provide
 - LLM model used
 - Attempt number (shows if retries occurred)
 - Detected log type
-- Number of sections extracted
+- Failed/passed test counts (for test-runner logs)
+- The LLM-generated title (stored in the `title` column)
 
 ### Error Logging
 
@@ -596,13 +610,10 @@ local.WARNING: [Exception] Structured output attempt 1 failed {"error":"cURL err
 - Network latency
 
 **Solution**:
-- Increase timeout in `.env`:
-  ```env
-  HTTP_TIMEOUT=900
-  HTTP_CONNECT_TIMEOUT=90
-  ```
-- Reduce input size
-- Switch to faster provider
+- The LLM HTTP timeout is **not** configurable via environment in this app: the code reads `config('services.http.timeout', 600)` and `config('services.http.connect_timeout', 60)`, and `config/services.php` has no `http` key, so the defaults (600s / 60s) always apply. There is nothing to set in `.env` today.
+- Reduce input size (large `raw_log` columns make requests slow)
+- Switch to a faster provider (see [LLM Providers](llm-providers.md))
+- Tracked in SLOG-003
 
 #### 5. Infinite Retry Loop (Critical)
 
@@ -674,8 +685,12 @@ When debugging issues:
 
 ## Additional Resources
 
-- [Laravel Logging Documentation](https://laravel.com/docs/12.x/logging)
-- [PSR-3 Logger Interface](https://www.php-fig.org/psr/psr-3/)
-- [Prism SDK Documentation](https://github.com/your-repo/prism)
-- [StructLogr Architecture Overview](./architecture-overview.md)
-- [LLM Providers Guide](./llm-providers.md)
+- [Laravel logging documentation](https://laravel.com/docs/12.x/logging) — log channels, levels, stacks
+- `config/logging.php` and `config/prism.php` — log channel configuration in this app
+- [LLM Providers](llm-providers.md) — provider-specific configuration and troubleshooting
+- [Understand the log format](../domain/log-format.md) — the structured JSON the formatter produces
+
+## Backlinks
+
+<!-- wiki:backlinks:start -->
+<!-- wiki:backlinks:end -->
