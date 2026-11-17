@@ -124,6 +124,7 @@ drivers/geckodriver
 drivers/chromedriver
 
 *.lock
+!composer.lock
 
 docker-bkup.zip
 
