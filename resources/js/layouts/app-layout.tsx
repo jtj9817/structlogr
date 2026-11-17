@@ -1,6 +1,6 @@
+import { useDesign } from '@/hooks/use-design';
 import AppHeaderLayout from '@/layouts/app/app-header-layout';
 import AppLayoutTemplate from '@/layouts/app/app-sidebar-layout';
-import { useDesign } from '@/hooks/use-design';
 import { type BreadcrumbItem } from '@/types';
 import { type ReactNode } from 'react';
 

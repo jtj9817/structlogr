@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [LogFormatterController::class, 'show'])->name('home');
 Route::post('/format', [LogFormatterController::class, 'format'])->name('formatter.format');
+Route::get('/designs', fn () => inertia('Designs/Gallery'))->name('designs.gallery');
 
 // CSRF test routes for debugging and validation
 Route::prefix('debug')->middleware('web')->group(function () {

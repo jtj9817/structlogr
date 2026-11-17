@@ -1,5 +1,11 @@
 import { type Design } from '@/hooks/use-design';
-import { type LucideIcon, Globe, Newspaper, Rocket, Terminal } from 'lucide-react';
+import {
+    type LucideIcon,
+    Globe,
+    Newspaper,
+    Rocket,
+    Terminal,
+} from 'lucide-react';
 
 export interface DesignMeta {
     id: Design;

@@ -1,7 +1,7 @@
+import { useDesign } from '@/hooks/use-design';
 import AuthCardLayout from '@/layouts/auth/auth-card-layout';
 import AuthLayoutTemplate from '@/layouts/auth/auth-simple-layout';
 import AuthSplitLayout from '@/layouts/auth/auth-split-layout';
-import { useDesign } from '@/hooks/use-design';
 
 export default function AuthLayout({
     children,
