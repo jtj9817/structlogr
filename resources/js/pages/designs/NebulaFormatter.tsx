@@ -583,9 +583,7 @@ export default function NebulaFormatter({
                                                     variant="ghost"
                                                     size="icon"
                                                     onClick={() =>
-                                                        setPreferencesOpen(
-                                                            true,
-                                                        )
+                                                        setPreferencesOpen(true)
                                                     }
                                                     aria-label="Open formatting preferences"
                                                     className="size-8 text-muted-foreground hover:text-cyan-200"
@@ -606,12 +604,11 @@ export default function NebulaFormatter({
                                             aria-label="Load a sample log"
                                             defaultValue=""
                                             onChange={(e) => {
-                                                const sample =
-                                                    sampleLogs.find(
-                                                        (log) =>
-                                                            log.id ===
-                                                            e.target.value,
-                                                    );
+                                                const sample = sampleLogs.find(
+                                                    (log) =>
+                                                        log.id ===
+                                                        e.target.value,
+                                                );
                                                 if (sample) {
                                                     setData(
                                                         'raw_log',

@@ -530,8 +530,8 @@ html[data-design='lumen'] pre,
 html[data-design='lumen'] code,
 html[data-design='lumen'] kbd,
 html[data-design='lumen'] samp {
-    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo,
-        monospace;
+    font-family:
+        'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 html[data-design='lumen'] ::selection {
@@ -650,8 +650,8 @@ html[data-design='nebula'] pre,
 html[data-design='nebula'] code,
 html[data-design='nebula'] kbd,
 html[data-design='nebula'] samp {
-    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo,
-        monospace;
+    font-family:
+        'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 html[data-design='nebula'] ::selection {
