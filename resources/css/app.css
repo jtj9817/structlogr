@@ -770,3 +770,38 @@ html[data-design='phosphor'] .bg-zinc-900 {
 html[data-design='nebula'] .app-logo-icon {
     color: #f8f7ff;
 }
+
+/* ------------------------------------------------------------
+   Classic appearance-matched logo badge
+   ------------------------------------------------------------
+   The tab icon follows the site's appearance mode (light →
+   Verdant, dark → Ultraviolet, default / system → Glacier).
+   Classic follows suit; phosphor/lumen/nebula re-theme the badge
+   themselves above. Keyed off `data-appearance` on <html>.
+   ------------------------------------------------------------ */
+html:not([data-design])[data-appearance='light'] .app-logo-badge {
+    background: linear-gradient(135deg, #34d399, #10b981 50%, #a3e635);
+    box-shadow: 0 0 14px rgba(16, 185, 129, 0.35);
+}
+
+html:not([data-design])[data-appearance='light'] .app-logo-badge svg {
+    color: #04140d;
+}
+
+html:not([data-design])[data-appearance='dark'] .app-logo-badge {
+    background: linear-gradient(135deg, #f0abfc, #c084fc 50%, #7c3aed);
+    box-shadow: 0 0 16px rgba(192, 132, 252, 0.4);
+}
+
+html:not([data-design])[data-appearance='dark'] .app-logo-badge svg {
+    color: #ffffff;
+}
+
+html:not([data-design])[data-appearance='system'] .app-logo-badge {
+    background: linear-gradient(135deg, #f1f5f9, #94a3b8 50%, #475569);
+    box-shadow: 0 0 14px rgba(148, 163, 184, 0.35);
+}
+
+html:not([data-design])[data-appearance='system'] .app-logo-badge svg {
+    color: #0b1220;
+}

@@ -88,6 +88,7 @@ const applyTheme = (appearance: Appearance) => {
     // Add transition class for smooth theme change
     document.documentElement.classList.add('theme-transition');
 
+    document.documentElement.setAttribute('data-appearance', appearance);
     document.documentElement.classList.toggle('dark', isDark);
     document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
 
