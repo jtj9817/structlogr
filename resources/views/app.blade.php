@@ -61,8 +61,17 @@
 
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
+        @php
+            // Themed favicon: light → Verdant, dark → Ultraviolet,
+            // anything else (system/default, no JS) → Glacier (/favicon.svg).
+            $faviconHref = match ($appearance ?? 'system') {
+                'light' => '/favicons/favicon-02-verdant.svg',
+                'dark' => '/favicons/favicon-05-ultraviolet.svg',
+                default => '/favicon.svg',
+            };
+        @endphp
         <link rel="icon" href="/favicon.ico" sizes="any">
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+        <link rel="icon" href="{{ $faviconHref }}" type="image/svg+xml">
         <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
         <link rel="preconnect" href="https://fonts.bunny.net">

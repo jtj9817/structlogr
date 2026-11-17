@@ -2,7 +2,6 @@ import AppLogo from '@/components/app-logo';
 import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import DesignDropdown from '@/components/design-dropdown';
-import { FaviconPicker } from '@/components/favicon-picker';
 import { MobileNavigation } from '@/components/mobile-navigation';
 import { SearchDialog } from '@/components/search/search-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -341,10 +340,6 @@ export function AppHeader({
                     id="mobile-design-toggle-auth"
                     className="flex justify-start rounded-md border border-border/80 px-3"
                 />
-                <FaviconPicker
-                    id="mobile-favicon-picker-auth"
-                    className="flex justify-start rounded-md border border-border/80 px-1"
-                />
             </div>
         </div>
     ) : (
@@ -375,10 +370,6 @@ export function AppHeader({
                 <DesignDropdown
                     id="mobile-design-toggle-guest"
                     className="flex justify-start rounded-md border border-border/80 px-3"
-                />
-                <FaviconPicker
-                    id="mobile-favicon-picker-guest"
-                    className="flex justify-start rounded-md border border-border/80 px-1"
                 />
             </div>
         </div>
@@ -423,19 +414,6 @@ export function AppHeader({
                         className="ml-auto flex items-center gap-2"
                     >
                         {desktopCreditsBadge}
-                        <TooltipProvider delayDuration={0}>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <FaviconPicker
-                                        id="desktop-favicon-picker"
-                                        className="hidden sm:block"
-                                    />
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>Favicon picker</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
                         <TooltipProvider delayDuration={0}>
                             <Tooltip>
                                 <TooltipTrigger asChild>

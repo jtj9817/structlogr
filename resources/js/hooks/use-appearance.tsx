@@ -19,6 +19,68 @@ const setCookie = (name: string, value: string, days = 365) => {
     document.cookie = `${name}=${value};path=/;max-age=${maxAge};SameSite=Lax`;
 };
 
+const getCookie = (name: string) => {
+    if (typeof document === 'undefined') {
+        return null;
+    }
+
+    const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+
+    return match ? decodeURIComponent(match[1]) : null;
+};
+
+const isAppearance = (value: unknown): value is Appearance =>
+    value === 'light' || value === 'dark' || value === 'system';
+
+/**
+ * Single source of truth for the stored appearance: localStorage first,
+ * then the SSR cookie, then 'system'. Keeps the blade-rendered favicon
+ * (cookie-derived) and the JS resolution (localStorage) in agreement.
+ */
+const getStoredAppearance = (): Appearance => {
+    if (typeof window === 'undefined') {
+        return 'system';
+    }
+
+    const stored = localStorage.getItem('appearance');
+    if (isAppearance(stored)) {
+        return stored;
+    }
+
+    const cookie = getCookie('appearance');
+    return isAppearance(cookie) ? cookie : 'system';
+};
+
+/**
+ * Themed favicon: light → Verdant, dark → Ultraviolet,
+ * anything else (system/default) → Glacier (/favicon.svg).
+ * The blade renders the same mapping for first paint.
+ */
+const FAVICON_HREF: Record<Appearance, string> = {
+    light: '/favicons/favicon-02-verdant.svg',
+    dark: '/favicons/favicon-05-ultraviolet.svg',
+    system: '/favicon.svg',
+};
+
+const applyFavicon = (appearance: Appearance) => {
+    if (typeof document === 'undefined') {
+        return;
+    }
+
+    let link = document.querySelector<HTMLLinkElement>(
+        'link[rel="icon"][type="image/svg+xml"]',
+    );
+
+    if (!link) {
+        link = document.createElement('link');
+        link.rel = 'icon';
+        link.type = 'image/svg+xml';
+        document.head.appendChild(link);
+    }
+
+    link.href = FAVICON_HREF[appearance] ?? FAVICON_HREF.system;
+};
+
 const applyTheme = (appearance: Appearance) => {
     const isDark =
         appearance === 'dark' || (appearance === 'system' && prefersDark());
@@ -28,6 +90,8 @@ const applyTheme = (appearance: Appearance) => {
 
     document.documentElement.classList.toggle('dark', isDark);
     document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+
+    applyFavicon(appearance);
 
     // Remove transition class after animation completes
     setTimeout(() => {
@@ -44,15 +108,11 @@ const mediaQuery = () => {
 };
 
 const handleSystemThemeChange = () => {
-    const currentAppearance = localStorage.getItem('appearance') as Appearance;
-    applyTheme(currentAppearance || 'system');
+    applyTheme(getStoredAppearance());
 };
 
 export function initializeTheme() {
-    const savedAppearance =
-        (localStorage.getItem('appearance') as Appearance) || 'system';
-
-    applyTheme(savedAppearance);
+    applyTheme(getStoredAppearance());
 
     // Add the event listener for system theme changes...
     mediaQuery()?.addEventListener('change', handleSystemThemeChange);
@@ -74,10 +134,7 @@ export function useAppearance() {
     }, []);
 
     useEffect(() => {
-        const savedAppearance = localStorage.getItem(
-            'appearance',
-        ) as Appearance | null;
-        updateAppearance(savedAppearance || 'system');
+        updateAppearance(getStoredAppearance());
 
         return () =>
             mediaQuery()?.removeEventListener(
