@@ -141,3 +141,38 @@ export function createFormIds(
         testId: generateTestId(page, component, element),
     };
 }
+
+/**
+ * Sanitizes and syntax-highlights a JSON string for display.
+ * Returns HTML with spans colored by token type (keys, strings,
+ * booleans, null, numbers). Shared by all formatter designs.
+ */
+export const syntaxHighlightJson = (json: string) => {
+    const sanitized = json
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+    return sanitized.replace(
+        /("(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)/g,
+        (match) => {
+            let className = 'text-muted-foreground';
+
+            if (match.startsWith('"')) {
+                if (match.endsWith(':')) {
+                    className = 'text-sky-500 dark:text-sky-300';
+                } else {
+                    className = 'text-emerald-500 dark:text-emerald-300';
+                }
+            } else if (match === 'true' || match === 'false') {
+                className = 'text-amber-500 dark:text-amber-300';
+            } else if (match === 'null') {
+                className = 'text-rose-500 dark:text-rose-300';
+            } else {
+                className = 'text-indigo-500 dark:text-indigo-300';
+            }
+
+            return `<span class="${className}">${match}</span>`;
+        },
+    );
+};

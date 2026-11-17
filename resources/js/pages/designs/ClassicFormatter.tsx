@@ -32,7 +32,7 @@ import {
     useKeyboardShortcuts,
 } from '@/hooks/use-keyboard-shortcuts';
 import { usePreferences } from '@/hooks/use-preferences';
-import { cn } from '@/lib/utils';
+import { cn, syntaxHighlightJson } from '@/lib/utils';
 import { type SharedData } from '@/types';
 import type { HistoryEntry } from '@/types/history';
 import { Head, useForm, usePage } from '@inertiajs/react';
@@ -107,37 +107,7 @@ const dummyFormattedPreview = `{
   ]
 }`;
 
-const syntaxHighlightJson = (json: string) => {
-    const sanitized = json
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-
-    return sanitized.replace(
-        /("(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)/g,
-        (match) => {
-            let className = 'text-muted-foreground';
-
-            if (match.startsWith('"')) {
-                if (match.endsWith(':')) {
-                    className = 'text-sky-500 dark:text-sky-300';
-                } else {
-                    className = 'text-emerald-500 dark:text-emerald-300';
-                }
-            } else if (match === 'true' || match === 'false') {
-                className = 'text-amber-500 dark:text-amber-300';
-            } else if (match === 'null') {
-                className = 'text-rose-500 dark:text-rose-300';
-            } else {
-                className = 'text-indigo-500 dark:text-indigo-300';
-            }
-
-            return `<span class="${className}">${match}</span>`;
-        },
-    );
-};
-
-type HistoryPayload = {
+export type HistoryPayload = {
     recent: HistoryEntry[];
 };
 
@@ -150,7 +120,7 @@ type HistoryRoutesConfig = {
     search: string;
 };
 
-interface FormatterPageProps {
+export interface FormatterPageProps {
     formattedLog?: {
         timestamp?: string;
         level?: string;
@@ -172,7 +142,7 @@ type SubmissionErrorBag = Record<string, string> & {
     };
 };
 
-export default function FormatterPage({
+export default function ClassicFormatter({
     formattedLog,
     history,
     historyRoutes,
