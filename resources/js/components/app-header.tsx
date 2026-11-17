@@ -1,6 +1,7 @@
 import AppLogo from '@/components/app-logo';
 import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 import { Breadcrumbs } from '@/components/breadcrumbs';
+import DesignDropdown from '@/components/design-dropdown';
 import { MobileNavigation } from '@/components/mobile-navigation';
 import { SearchDialog } from '@/components/search/search-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -17,8 +18,8 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { UserMenuContent } from '@/components/user-menu-content';
-import { matchesKeyboardShortcut } from '@/hooks/use-keyboard-shortcuts';
 import { useInitials } from '@/hooks/use-initials';
+import { matchesKeyboardShortcut } from '@/hooks/use-keyboard-shortcuts';
 import { useScrollShadow } from '@/hooks/use-scroll-shadow';
 import { cn } from '@/lib/utils';
 import { home as formatterHome, login, register } from '@/routes';
@@ -330,10 +331,16 @@ export function AppHeader({
                     </span>
                 </Link>
             )}
-            <AppearanceToggleDropdown
-                id="mobile-appearance-toggle-auth"
-                className="flex justify-start rounded-md border border-border/80 px-3"
-            />
+            <div className="flex gap-2">
+                <AppearanceToggleDropdown
+                    id="mobile-appearance-toggle-auth"
+                    className="flex justify-start rounded-md border border-border/80 px-3"
+                />
+                <DesignDropdown
+                    id="mobile-design-toggle-auth"
+                    className="flex justify-start rounded-md border border-border/80 px-3"
+                />
+            </div>
         </div>
     ) : (
         <div id="mobile-guest-ctas" className="space-y-2">
@@ -355,10 +362,16 @@ export function AppHeader({
             <p className="text-center text-xs text-muted-foreground">
                 or continue without account
             </p>
-            <AppearanceToggleDropdown
-                id="mobile-appearance-toggle-guest"
-                className="flex justify-start rounded-md border border-border/80 px-3"
-            />
+            <div className="flex gap-2">
+                <AppearanceToggleDropdown
+                    id="mobile-appearance-toggle-guest"
+                    className="flex justify-start rounded-md border border-border/80 px-3"
+                />
+                <DesignDropdown
+                    id="mobile-design-toggle-guest"
+                    className="flex justify-start rounded-md border border-border/80 px-3"
+                />
+            </div>
         </div>
     );
 
@@ -401,6 +414,19 @@ export function AppHeader({
                         className="ml-auto flex items-center gap-2"
                     >
                         {desktopCreditsBadge}
+                        <TooltipProvider delayDuration={0}>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <DesignDropdown
+                                        id="desktop-design-toggle"
+                                        className="hidden sm:block"
+                                    />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>Switch design</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                         <TooltipProvider delayDuration={0}>
                             <Tooltip>
                                 <TooltipTrigger asChild>
