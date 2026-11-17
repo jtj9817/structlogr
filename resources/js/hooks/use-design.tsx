@@ -27,6 +27,13 @@ export function initializeDesign() {
         return;
     }
 
+    // A valid ?design= URL parameter wins and is persisted —
+    // handy for sharing direct links to a design.
+    const param = new URLSearchParams(window.location.search).get('design');
+    if (isDesign(param)) {
+        localStorage.setItem(STORAGE_KEY, param);
+    }
+
     const saved = localStorage.getItem(STORAGE_KEY);
     applyDesign(isDesign(saved) ? saved : 'classic');
 

@@ -406,6 +406,10 @@ html[data-design='phosphor'] .app-logo-badge svg {
     color: #03140a;
 }
 
+html[data-design='phosphor'] .app-logo-wordmark {
+    color: #a9f5b4;
+}
+
 html[data-design='phosphor'] .phosphor-glow {
     text-shadow:
         0 0 18px rgba(58, 255, 110, 0.45),
@@ -557,6 +561,14 @@ html.dark[data-design='lumen'] .app-logo-badge svg {
     color: #241309;
 }
 
+html[data-design='lumen'] .app-logo-wordmark {
+    color: #26201a;
+}
+
+html.dark[data-design='lumen'] .app-logo-wordmark {
+    color: #e8dfcd;
+}
+
 html[data-design='lumen'] .lumen-kicker {
     letter-spacing: 0.32em;
     text-transform: uppercase;
@@ -658,6 +670,10 @@ html[data-design='nebula'] .app-logo-badge {
     box-shadow: 0 0 22px rgba(139, 92, 246, 0.5);
 }
 
+html[data-design='nebula'] .app-logo-wordmark {
+    color: #e8eaff;
+}
+
 html[data-design='nebula'] .nebula-glass {
     background: linear-gradient(
         165deg,
@@ -683,4 +699,74 @@ html[data-design='phosphor'] footer,
 html[data-design='lumen'] footer,
 html[data-design='nebula'] footer {
     background-color: var(--background);
+}
+
+/* ------------------------------------------------------------
+   Design-mode focus rings — replace the classic blue halo with
+   each design's own ring token
+   ------------------------------------------------------------ */
+html[data-design] a:focus,
+html[data-design] button:focus,
+html[data-design] input:focus,
+html[data-design] textarea:focus,
+html[data-design] select:focus,
+html[data-design] [tabindex]:focus {
+    box-shadow: none !important;
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------
+   Design-mode guest CTAs — the classic blue Register button is
+   re-skinned per design
+   ------------------------------------------------------------ */
+html[data-design='phosphor'] #desktop-register-button,
+html[data-design='phosphor'] #mobile-register-button {
+    background: #3aff6e;
+    color: #03140a;
+    box-shadow: 0 0 16px rgba(58, 255, 110, 0.35);
+}
+
+html[data-design='phosphor'] #desktop-register-button:hover,
+html[data-design='phosphor'] #mobile-register-button:hover {
+    background: #6cff96;
+}
+
+html[data-design='lumen'] #desktop-register-button,
+html[data-design='lumen'] #mobile-register-button {
+    background: #a63f1f;
+    color: #fdf6ea;
+}
+
+html[data-design='lumen'] #desktop-register-button:hover,
+html[data-design='lumen'] #mobile-register-button:hover {
+    background: #8a3319;
+}
+
+html.dark[data-design='lumen'] #desktop-register-button,
+html.dark[data-design='lumen'] #mobile-register-button {
+    background: #d98a5f;
+    color: #241309;
+}
+
+html[data-design='nebula'] #desktop-register-button,
+html[data-design='nebula'] #mobile-register-button {
+    background: linear-gradient(120deg, #8b5cf6, #d946ef 55%, #22d3ee);
+    color: #ffffff;
+    box-shadow: 0 0 18px rgba(139, 92, 246, 0.45);
+}
+
+html[data-design='nebula'] #desktop-register-button:hover,
+html[data-design='nebula'] #mobile-register-button:hover {
+    background: linear-gradient(120deg, #7c3aed, #c026d3 55%, #06b6d4);
+}
+
+/* Phosphor's auth split poster panel — near-black "terminal screen" */
+html[data-design='phosphor'] .bg-zinc-900 {
+    background-color: #050a06;
+}
+
+/* Nebula auth logo ping — keep icon legible on the gradient tile */
+html[data-design='nebula'] .app-logo-icon {
+    color: #f8f7ff;
 }

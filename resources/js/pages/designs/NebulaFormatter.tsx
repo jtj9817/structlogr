@@ -574,32 +574,66 @@ export default function NebulaFormatter({
                                     <p className="text-[10px] font-bold tracking-[0.3em] text-cyan-300 uppercase">
                                         01 · Payload Bay
                                     </p>
-                                    <select
-                                        id="formatter-sample-logs-select"
-                                        data-testid="test-formatter-sample-logs"
-                                        aria-label="Load a sample log"
-                                        defaultValue=""
-                                        onChange={(e) => {
-                                            const sample = sampleLogs.find(
-                                                (log) =>
-                                                    log.id === e.target.value,
-                                            );
-                                            if (sample) {
-                                                setData(
-                                                    'raw_log',
-                                                    sample.content,
-                                                );
-                                            }
-                                        }}
-                                        className="rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-[11px] text-indigo-100 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:outline-none"
-                                    >
-                                        <option value="">Load specimen…</option>
-                                        {sampleLogs.map((log) => (
-                                            <option key={log.id} value={log.id}>
-                                                {log.name}
+                                    <div className="flex items-center gap-2">
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Button
+                                                    id="preferences-button"
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() =>
+                                                        setPreferencesOpen(
+                                                            true,
+                                                        )
+                                                    }
+                                                    aria-label="Open formatting preferences"
+                                                    className="size-8 text-muted-foreground hover:text-cyan-200"
+                                                >
+                                                    <SlidersHorizontal
+                                                        className="size-4"
+                                                        aria-hidden
+                                                    />
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>Preferences</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                        <select
+                                            id="formatter-sample-logs-select"
+                                            data-testid="test-formatter-sample-logs"
+                                            aria-label="Load a sample log"
+                                            defaultValue=""
+                                            onChange={(e) => {
+                                                const sample =
+                                                    sampleLogs.find(
+                                                        (log) =>
+                                                            log.id ===
+                                                            e.target.value,
+                                                    );
+                                                if (sample) {
+                                                    setData(
+                                                        'raw_log',
+                                                        sample.content,
+                                                    );
+                                                }
+                                            }}
+                                            className="rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-[11px] text-indigo-100 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:outline-none"
+                                        >
+                                            <option value="">
+                                                Load specimen…
                                             </option>
-                                        ))}
-                                    </select>
+                                            {sampleLogs.map((log) => (
+                                                <option
+                                                    key={log.id}
+                                                    value={log.id}
+                                                >
+                                                    {log.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
                                 </div>
 
                                 <label
@@ -835,18 +869,6 @@ export default function NebulaFormatter({
                     </footer>
                 </main>
             </div>
-
-            {/* Preferences — frosted pill, bottom right */}
-            <Button
-                id="preferences-button"
-                type="button"
-                onClick={() => setPreferencesOpen(true)}
-                aria-label="Open formatting preferences"
-                className="nebula-glass fixed right-5 bottom-5 z-50 h-12 gap-2 rounded-full border-white/15 px-5 text-sm font-semibold text-indigo-100 backdrop-blur-xl hover:bg-white/10"
-            >
-                <SlidersHorizontal className="size-4" aria-hidden />
-                Preferences
-            </Button>
 
             <HistorySidebar
                 open={historyOpen}

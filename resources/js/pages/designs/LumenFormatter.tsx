@@ -168,18 +168,59 @@ export default function LumenFormatter({
         [formattedOutput],
     );
 
-    // The headline is whatever the parser found at the top of the story.
-    const summary = (
-        displayLog as
-            | {
-                  summary?: {
-                      headline?: string;
-                      level?: string;
-                      timestamp?: string;
-                  };
-              }
-            | undefined
-    )?.summary;
+    // The front page headline is whatever the parser found most
+    // newsworthy — prefer an explicit summary, fall back to the
+    // first concrete error, then to the detected log signature.
+    const edition = useMemo(() => {
+        if (!displayLog) {
+            return null;
+        }
+
+        const log = displayLog as {
+            summary?: {
+                headline?: string;
+                level?: string;
+                timestamp?: string;
+            };
+            results_summary?: {
+                status?: string | null;
+                timestamp?: string | null;
+            };
+            detected_log_type?: string;
+            errors?: Array<{
+                message?: string | null;
+                error_type?: string | null;
+            } | null> | null;
+        };
+
+        const rawHeadline =
+            log.summary?.headline ??
+            log.errors?.find((entry) => entry?.message)?.message ??
+            (log.detected_log_type
+                ? `${log.detected_log_type}${
+                      log.results_summary?.status
+                          ? ` — ${log.results_summary.status}`
+                          : ''
+                  }`
+                : null);
+
+        if (!rawHeadline) {
+            return null;
+        }
+
+        const headline =
+            rawHeadline.length > 96
+                ? `${rawHeadline.slice(0, 93).trimEnd()}…`
+                : rawHeadline;
+        const level =
+            log.summary?.level ?? log.results_summary?.status ?? undefined;
+        const timestamp =
+            log.summary?.timestamp ??
+            log.results_summary?.timestamp ??
+            undefined;
+
+        return { headline, level, timestamp };
+    }, [displayLog]);
 
     const characterCount = data.raw_log.length;
     const lineCount = data.raw_log.length ? data.raw_log.split('\n').length : 0;
@@ -655,15 +696,15 @@ export default function LumenFormatter({
                                     JSON — Special Edition
                                 </p>
 
-                                {summary?.headline && !processing ? (
+                                {edition?.headline && !processing ? (
                                     <div className="mt-2 border-b-2 border-foreground pb-4">
                                         <h3 className="font-serif text-2xl leading-tight font-black tracking-tight text-balance">
-                                            {summary.headline}
+                                            {edition.headline}
                                         </h3>
                                         <p className="mt-2 text-[10px] font-semibold tracking-[0.22em] text-muted-foreground uppercase">
-                                            Byline · {summary.level ?? 'INFO'}
-                                            {summary.timestamp
-                                                ? ` · Filed ${summary.timestamp}`
+                                            Byline · {edition.level ?? 'FILED'}
+                                            {edition.timestamp
+                                                ? ` · Filed ${edition.timestamp}`
                                                 : ''}
                                         </p>
                                     </div>

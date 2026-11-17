@@ -401,7 +401,7 @@ export default function PhosphorFormatter({
         }
 
         return (
-            <pre className="m-0 text-sm leading-6 whitespace-pre-wrap text-[#2f6b41]">
+            <pre className="m-0 text-sm leading-6 whitespace-pre-wrap text-[#4a8f63]">
                 {phosphorPreview}
             </pre>
         );
@@ -557,7 +557,7 @@ export default function PhosphorFormatter({
                                     name="raw_log"
                                     placeholder="// paste raw log text here…"
                                     aria-label="Raw log input"
-                                    className="min-h-[240px] resize-none rounded-none border-0 bg-transparent font-mono text-sm leading-6 text-[#a9f5b4] caret-[#3aff6e] placeholder:text-[#2f6b41] focus-visible:ring-0"
+                                    className="min-h-[240px] resize-none rounded-none border-0 bg-transparent font-mono text-sm leading-6 text-[#a9f5b4] caret-[#3aff6e] placeholder:text-[#4a8f63] focus-visible:ring-0"
                                     value={data.raw_log}
                                     onChange={(e) =>
                                         setData('raw_log', e.target.value)
@@ -729,7 +729,7 @@ export default function PhosphorFormatter({
                             </div>
 
                             {/* Session hint row */}
-                            <div className="flex items-center gap-4 px-2 pt-2 font-mono text-[11px] text-[#2f6b41]">
+                            <div className="flex items-center gap-4 px-2 pt-2 font-mono text-[11px] text-[#4a8f63]">
                                 <button
                                     type="button"
                                     onClick={() => setHistoryOpen(true)}
