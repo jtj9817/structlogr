@@ -1,14 +1,15 @@
 import '../css/app.css';
 
 import { createInertiaApp } from '@inertiajs/react';
+import axios from 'axios';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import type { ComponentProps } from 'react';
 import { createRoot } from 'react-dom/client';
-import axios from 'axios';
 import { ErrorBoundary } from './components/error-boundary';
-import { useCSRFHandler } from './hooks/use-csrf-handler';
 import { initializeTheme } from './hooks/use-appearance';
+import { useCSRFHandler } from './hooks/use-csrf-handler';
 import { initializeDesign } from './hooks/use-design';
+import { initializeFavicon } from './hooks/use-favicon';
 import { initializeFontSize } from './hooks/use-font-size';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
@@ -24,7 +25,9 @@ createInertiaApp({
         const root = createRoot(el);
 
         // Configure CSRF token for all requests
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        const csrfToken = document
+            .querySelector('meta[name="csrf-token"]')
+            ?.getAttribute('content');
         if (csrfToken) {
             // Set default header for axios (used by Inertia)
             axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken;
@@ -46,7 +49,9 @@ createInertiaApp({
         }
 
         // Component with CSRF error handling
-        function AppWithCSRFHandler(componentProps: ComponentProps<typeof App>) {
+        function AppWithCSRFHandler(
+            componentProps: ComponentProps<typeof App>,
+        ) {
             useCSRFHandler({
                 enableAutoReload: true,
                 reloadDelay: 1000,
@@ -75,6 +80,9 @@ createInertiaApp({
 
 // This will set the design mode on load...
 initializeDesign();
+
+// This will set the favicon on load...
+initializeFavicon();
 
 // This will set light / dark mode on load...
 initializeTheme();
