@@ -33,6 +33,7 @@ import {
     History as HistoryIcon,
     Home,
     Info,
+    Palette,
     Search,
     Server,
     Settings,
@@ -71,6 +72,11 @@ const primaryNavItems: NavItem[] = [
         title: 'About',
         href: '/about',
         icon: Info,
+    },
+    {
+        title: 'Designs',
+        href: '/designs',
+        icon: Palette,
     },
 ];
 
@@ -361,7 +367,7 @@ export function AppHeader({
             <header
                 id="app-header"
                 className={cn(
-                    'sticky top-0 z-50 border-b border-[#928477]/40 bg-[#C6BFBB]/95 backdrop-blur supports-[backdrop-filter]:bg-[#C6BFBB]/95 dark:border-[#285669]/40 dark:bg-[#061417]/95',
+                    'sticky top-0 z-50 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/95',
                     isScrolled && 'shadow-md',
                 )}
             >

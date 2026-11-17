@@ -326,3 +326,361 @@ html {
         color: black;
     }
 }
+
+/* ============================================================
+   STRUCTLOGR DESIGN MODES
+   ------------------------------------------------------------
+   Alternative interface designs applied via the `data-design`
+   attribute on <html>. Classic (the default) has no attribute.
+   Each design re-themes the existing token system plus a small
+   set of scoped decorative utilities. No separate components.
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   PHOSPHOR — retro CRT terminal. Dark, phosphor-green, mono,
+   scanlines and a soft ember glow. Blocky radii.
+   ------------------------------------------------------------ */
+html[data-design='phosphor'],
+html.dark[data-design='phosphor'] {
+    --background: #060d07;
+    --foreground: #a9f5b4;
+    --card: #0b1710;
+    --card-foreground: #b9f7c6;
+    --popover: #0d1a11;
+    --popover-foreground: #b9f7c6;
+    --primary: #3aff6e;
+    --primary-foreground: #03140a;
+    --secondary: #122619;
+    --secondary-foreground: #8be0a0;
+    --muted: #122619;
+    --muted-foreground: #5fa874;
+    --accent: #ffb000;
+    --accent-foreground: #1c1000;
+    --destructive: #ff5f4d;
+    --destructive-foreground: #26060a;
+    --border: #1d3a26;
+    --input: #1d3a26;
+    --ring: #3aff6e;
+    --chart-1: #3aff6e;
+    --chart-2: #ffb000;
+    --chart-3: #1d3a26;
+    --chart-4: #8be0a0;
+    --chart-5: #060d07;
+    --sidebar: #050a06;
+    --sidebar-foreground: #a9f5b4;
+    --sidebar-primary: #3aff6e;
+    --sidebar-primary-foreground: #03140a;
+    --sidebar-accent: #ffb000;
+    --sidebar-accent-foreground: #1c1000;
+    --sidebar-border: #1d3a26;
+    --sidebar-ring: #3aff6e;
+    --radius: 0.25rem;
+}
+
+html[data-design='phosphor'] body {
+    background-image: repeating-linear-gradient(
+        to bottom,
+        rgba(74, 255, 110, 0.045) 0 1px,
+        transparent 1px 4px
+    );
+    background-attachment: fixed;
+}
+
+html[data-design='phosphor'] ::selection {
+    background: #3aff6e;
+    color: #03140a;
+}
+
+html[data-design='phosphor'] #app-header {
+    border-color: rgba(58, 255, 110, 0.18);
+    background: rgba(6, 13, 7, 0.92);
+}
+
+html[data-design='phosphor'] .app-logo-badge {
+    background: #3aff6e;
+    border-radius: 0.25rem;
+    box-shadow: 0 0 18px rgba(58, 255, 110, 0.45);
+}
+
+html[data-design='phosphor'] .app-logo-badge svg {
+    color: #03140a;
+}
+
+html[data-design='phosphor'] .phosphor-glow {
+    text-shadow:
+        0 0 18px rgba(58, 255, 110, 0.45),
+        0 0 2px rgba(58, 255, 110, 0.8);
+}
+
+html[data-design='phosphor'] .phosphor-panel {
+    box-shadow:
+        inset 0 0 32px rgba(58, 255, 110, 0.06),
+        0 0 0 1px rgba(58, 255, 110, 0.14),
+        0 24px 60px rgba(0, 0, 0, 0.55);
+}
+
+html[data-design='phosphor'] .phosphor-titlebar {
+    background: linear-gradient(
+        to bottom,
+        rgba(58, 255, 110, 0.1),
+        rgba(58, 255, 110, 0.02)
+    );
+}
+
+/* ------------------------------------------------------------
+   LUMEN — editorial broadsheet. Warm paper, ink, terracotta +
+   petrol accents, serif display type, sharp rules and radii.
+   ------------------------------------------------------------ */
+html[data-design='lumen'] {
+    --background: #f7f1e6;
+    --foreground: #26201a;
+    --card: #fffdf5;
+    --card-foreground: #26201a;
+    --popover: #fffdf5;
+    --popover-foreground: #26201a;
+    --primary: #a63f1f;
+    --primary-foreground: #fdf6ea;
+    --secondary: #ece5d4;
+    --secondary-foreground: #26201a;
+    --muted: #e9e1d0;
+    --muted-foreground: #6d6252;
+    --accent: #173f4f;
+    --accent-foreground: #f5efe2;
+    --destructive: #a33b3b;
+    --destructive-foreground: #fdf3ec;
+    --border: #ddd2bd;
+    --input: #ddd2bd;
+    --ring: #a63f1f;
+    --chart-1: #a63f1f;
+    --chart-2: #173f4f;
+    --chart-3: #26201a;
+    --chart-4: #ddd2bd;
+    --chart-5: #f7f1e6;
+    --sidebar: #efe8d8;
+    --sidebar-foreground: #26201a;
+    --sidebar-primary: #a63f1f;
+    --sidebar-primary-foreground: #fdf6ea;
+    --sidebar-accent: #173f4f;
+    --sidebar-accent-foreground: #f5efe2;
+    --sidebar-border: #ddd2bd;
+    --sidebar-ring: #a63f1f;
+    --radius: 0.125rem;
+    --font-sans:
+        'Newsreader', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+}
+
+html.dark[data-design='lumen'] {
+    --background: #1b1712;
+    --foreground: #e8dfcd;
+    --card: #242019;
+    --card-foreground: #e8dfcd;
+    --popover: #242019;
+    --popover-foreground: #e8dfcd;
+    --primary: #d98a5f;
+    --primary-foreground: #241309;
+    --secondary: #2e2820;
+    --secondary-foreground: #e8dfcd;
+    --muted: #2e2820;
+    --muted-foreground: #a89a83;
+    --accent: #7fb3c8;
+    --accent-foreground: #0d2027;
+    --destructive: #d97b6c;
+    --destructive-foreground: #2b0d08;
+    --border: #3a332a;
+    --input: #3a332a;
+    --ring: #d98a5f;
+    --chart-1: #d98a5f;
+    --chart-2: #7fb3c8;
+    --chart-3: #e8dfcd;
+    --chart-4: #3a332a;
+    --chart-5: #1b1712;
+    --sidebar: #211d16;
+    --sidebar-foreground: #e8dfcd;
+    --sidebar-primary: #d98a5f;
+    --sidebar-primary-foreground: #241309;
+    --sidebar-accent: #7fb3c8;
+    --sidebar-accent-foreground: #0d2027;
+    --sidebar-border: #3a332a;
+    --sidebar-ring: #d98a5f;
+}
+
+html[data-design='lumen'] body {
+    font-family:
+        'Newsreader', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+    background-image: radial-gradient(
+        circle at 50% -20%,
+        rgba(38, 32, 26, 0.06),
+        transparent 60%
+    );
+}
+
+html.dark[data-design='lumen'] body {
+    background-image: radial-gradient(
+        circle at 50% -20%,
+        rgba(232, 223, 205, 0.05),
+        transparent 60%
+    );
+}
+
+html[data-design='lumen'] pre,
+html[data-design='lumen'] code,
+html[data-design='lumen'] kbd,
+html[data-design='lumen'] samp {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo,
+        monospace;
+}
+
+html[data-design='lumen'] ::selection {
+    background: rgba(166, 63, 31, 0.25);
+}
+
+html[data-design='lumen'] #app-header {
+    border-color: rgba(38, 32, 26, 0.16);
+    background: rgba(247, 241, 230, 0.92);
+}
+
+html.dark[data-design='lumen'] #app-header {
+    border-color: rgba(232, 223, 205, 0.14);
+    background: rgba(27, 23, 18, 0.92);
+}
+
+html[data-design='lumen'] .app-logo-badge {
+    background: #a63f1f;
+    border-radius: 0.125rem;
+}
+
+html.dark[data-design='lumen'] .app-logo-badge {
+    background: #d98a5f;
+}
+
+html.dark[data-design='lumen'] .app-logo-badge svg {
+    color: #241309;
+}
+
+html[data-design='lumen'] .lumen-kicker {
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    font-size: 0.68rem;
+    font-weight: 600;
+}
+
+html[data-design='lumen'] .lumen-rule-double {
+    border-top: 3px double var(--foreground);
+}
+
+/* ------------------------------------------------------------
+   NEBULA — deep-space aurora glass. Indigo void, violet→cyan
+   gradients, magenta glow, frosted panels, generous radii.
+   ------------------------------------------------------------ */
+html[data-design='nebula'],
+html.dark[data-design='nebula'] {
+    --background: #070a1e;
+    --foreground: #e8eaff;
+    --card: #101536;
+    --card-foreground: #e8eaff;
+    --popover: #141a42;
+    --popover-foreground: #e8eaff;
+    --primary: #8b5cf6;
+    --primary-foreground: #f5f3ff;
+    --secondary: #171d49;
+    --secondary-foreground: #c4c9ff;
+    --muted: #171d49;
+    --muted-foreground: #8f97d8;
+    --accent: #22d3ee;
+    --accent-foreground: #032430;
+    --destructive: #fb7185;
+    --destructive-foreground: #2b050d;
+    --border: #252c5e;
+    --input: #252c5e;
+    --ring: #22d3ee;
+    --chart-1: #8b5cf6;
+    --chart-2: #22d3ee;
+    --chart-3: #f472b6;
+    --chart-4: #252c5e;
+    --chart-5: #070a1e;
+    --sidebar: #090d26;
+    --sidebar-foreground: #e8eaff;
+    --sidebar-primary: #8b5cf6;
+    --sidebar-primary-foreground: #f5f3ff;
+    --sidebar-accent: #22d3ee;
+    --sidebar-accent-foreground: #032430;
+    --sidebar-border: #252c5e;
+    --sidebar-ring: #22d3ee;
+    --radius: 1rem;
+    --font-sans:
+        'Space Grotesk', 'Avenir Next', 'Segoe UI', system-ui, sans-serif;
+}
+
+html[data-design='nebula'] body {
+    font-family:
+        'Space Grotesk', 'Avenir Next', 'Segoe UI', system-ui, sans-serif;
+    background:
+        radial-gradient(
+            1100px 520px at 12% -8%,
+            rgba(139, 92, 246, 0.34),
+            transparent 60%
+        ),
+        radial-gradient(
+            900px 500px at 88% -6%,
+            rgba(34, 211, 238, 0.28),
+            transparent 55%
+        ),
+        radial-gradient(
+            1000px 700px at 50% 118%,
+            rgba(244, 114, 182, 0.22),
+            transparent 60%
+        ),
+        var(--background);
+    background-attachment: fixed;
+}
+
+html[data-design='nebula'] pre,
+html[data-design='nebula'] code,
+html[data-design='nebula'] kbd,
+html[data-design='nebula'] samp {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo,
+        monospace;
+}
+
+html[data-design='nebula'] ::selection {
+    background: rgba(139, 92, 246, 0.45);
+}
+
+html[data-design='nebula'] #app-header {
+    border-color: rgba(139, 92, 246, 0.32);
+    background: rgba(9, 13, 38, 0.72);
+    backdrop-filter: blur(14px);
+}
+
+html[data-design='nebula'] .app-logo-badge {
+    background: linear-gradient(135deg, #8b5cf6, #22d3ee);
+    border-radius: 0.9rem;
+    box-shadow: 0 0 22px rgba(139, 92, 246, 0.5);
+}
+
+html[data-design='nebula'] .nebula-glass {
+    background: linear-gradient(
+        165deg,
+        rgba(255, 255, 255, 0.07),
+        rgba(255, 255, 255, 0.02)
+    );
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    backdrop-filter: blur(14px);
+}
+
+html[data-design='nebula'] .nebula-glow {
+    box-shadow:
+        0 0 32px rgba(139, 92, 246, 0.38),
+        0 0 72px rgba(34, 211, 238, 0.16);
+}
+
+/* ------------------------------------------------------------
+   Design-mode overrides for hardcoded classic chrome
+   (header/footer/logo use literal colors in Classic;
+   re-theme them per design)
+   ------------------------------------------------------------ */
+html[data-design='phosphor'] footer,
+html[data-design='lumen'] footer,
+html[data-design='nebula'] footer {
+    background-color: var(--background);
+}

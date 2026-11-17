@@ -125,7 +125,7 @@ export function AppFooter({ className }: { className?: string }) {
     return (
         <footer
             className={cn(
-                'border-t border-border/60 bg-gray-50 text-sm text-muted-foreground dark:border-gray-800 dark:bg-gray-900',
+                'border-t border-border/60 bg-background text-sm text-muted-foreground',
                 className,
             )}
         >

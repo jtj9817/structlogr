@@ -23,7 +23,7 @@ export default function AppLogo({
             )}
             {...props}
         >
-            <span className="flex size-9 items-center justify-center rounded-md bg-gradient-to-br from-blue-600 via-indigo-500 to-purple-500 text-white shadow-sm dark:from-blue-500 dark:via-indigo-400 dark:to-purple-400">
+            <span className="app-logo-badge flex size-9 items-center justify-center rounded-md bg-gradient-to-br from-blue-600 via-indigo-500 to-purple-500 text-white shadow-sm dark:from-blue-500 dark:via-indigo-400 dark:to-purple-400">
                 <AppLogoIcon className="size-5 fill-current text-white/90 dark:text-black" />
             </span>
             {showWordmark && (
