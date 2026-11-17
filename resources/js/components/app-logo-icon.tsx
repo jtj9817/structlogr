@@ -1,12 +1,59 @@
 import { SVGAttributes } from 'react';
 
+/**
+ * The StructLogr brand mark — the favicon glyph: three structured log
+ * lines nested inside the Prism Braces outline. Stroke-based
+ * (`currentColor`) so the badge, the auth layouts and the design-mode
+ * CSS re-tints keep working exactly as they do for a filled icon.
+ */
 export default function AppLogoIcon(props: SVGAttributes<SVGElement>) {
     return (
-        <svg {...props} viewBox="0 0 40 42" xmlns="http://www.w3.org/2000/svg">
+        <svg
+            {...props}
+            viewBox="0 0 64 64"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+        >
             <path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M17.2 5.63325L8.6 0.855469L0 5.63325V32.1434L16.2 41.1434L32.4 32.1434V23.699L40 19.4767V9.85547L31.4 5.07769L22.8 9.85547V18.2999L17.2 21.411V5.63325ZM38 18.2999L32.4 21.411V15.2545L38 12.1434V18.2999ZM36.9409 10.4439L31.4 13.5221L25.8591 10.4439L31.4 7.36561L36.9409 10.4439ZM24.8 18.2999V12.1434L30.4 15.2545V21.411L24.8 18.2999ZM23.8 20.0323L29.3409 23.1105L16.2 30.411L10.6591 27.3328L23.8 20.0323ZM7.6 27.9212L15.2 32.1434V38.2999L2 30.9666V7.92116L7.6 11.0323V27.9212ZM8.6 9.29991L3.05913 6.22165L8.6 3.14339L14.1409 6.22165L8.6 9.29991ZM30.4 24.8101L17.2 32.1434V38.2999L30.4 30.9666V24.8101ZM9.6 11.0323L15.2 7.92117V22.5221L9.6 25.6333V11.0323Z"
+                d="M22 9 C17.5 9 15 12 15 16.5 L15 24 C15 28.5 13 30.4 9.5 32 C13 33.6 15 35.5 15 40 L15 47.5 C15 52 17.5 55 22 55"
+                stroke="currentColor"
+                strokeWidth={6}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+            <path
+                d="M42 9 C46.5 9 49 12 49 16.5 L49 24 C49 28.5 51 30.4 54.5 32 C51 33.6 49 35.5 49 40 L49 47.5 C49 52 46.5 55 42 55"
+                stroke="currentColor"
+                strokeWidth={6}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+            <line
+                x1="23"
+                y1="22"
+                x2="42"
+                y2="22"
+                stroke="currentColor"
+                strokeWidth={6.4}
+                strokeLinecap="round"
+            />
+            <line
+                x1="23"
+                y1="32"
+                x2="36.5"
+                y2="32"
+                stroke="currentColor"
+                strokeWidth={6.4}
+                strokeLinecap="round"
+            />
+            <line
+                x1="23"
+                y1="42"
+                x2="39.5"
+                y2="42"
+                stroke="currentColor"
+                strokeWidth={6.4}
+                strokeLinecap="round"
             />
         </svg>
     );
