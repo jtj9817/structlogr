@@ -84,7 +84,6 @@ class HandleInertiaRequests extends Middleware
                     'preferences' => $request->user()->preferences,
                 ] : null,
             ],
-            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'csrf_debug' => $csrfDebug, // For frontend debugging
         ];
     }

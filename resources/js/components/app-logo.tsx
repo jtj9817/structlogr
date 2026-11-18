@@ -5,7 +5,7 @@ import AppLogoIcon from './app-logo-icon';
 interface AppLogoProps extends HTMLAttributes<HTMLDivElement> {
     /**
      * Controls whether the StructLogr wordmark is visible.
-     * Useful for compact layouts like the collapsed sidebar.
+     * Useful for compact layouts.
      */
     showWordmark?: boolean;
 }

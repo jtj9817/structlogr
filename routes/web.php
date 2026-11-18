@@ -54,7 +54,6 @@ Route::prefix('debug')->middleware('web')->group(function () {
             'session_same_site' => config('session.same_site'),
             'cookies' => [
                 'appearance' => request()->cookie('appearance'),
-                'sidebar_state' => request()->cookie('sidebar_state'),
             ],
         ]);
     })->name('debug.session-info');
