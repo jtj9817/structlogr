@@ -5,6 +5,30 @@ All notable changes to StructLogr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [November 18, 2026] - Phosphor Is the Only Interface Design
+
+### Removed
+
+#### Classic, Lumen and Nebula designs
+- Deleted `ClassicFormatter`, `LumenFormatter` and `NebulaFormatter`;
+  `FormatterPage.tsx` is now the Phosphor (CRT terminal) formatter,
+  promoted from `pages/designs/`
+- Removed the `/designs` gallery page, route and wayfinder helpers
+- Removed the design-switching plumbing: `use-design` hook,
+  `DESIGN_META` data, the header "Designs" nav item, the
+  design-dropdown component and the Settings → Appearance
+  "Interface design" section; the `?design=` URL parameter is gone
+- Authenticated pages always use the header layout; auth pages always
+  use the split-screen layout; the classic sidebar layout, sidebar
+  components and `sidebar_state` cookie plumbing were removed
+- CSS: the classic light/dark palettes, the Lumen and Nebula theme
+  blocks, all `data-design` selectors and the classic appearance-matched
+  logo badge gradients were removed; Phosphor is now the unscoped
+  `:root` theme and focus rings use the Phosphor ring color
+
+### Changed
+- StructLogr ships a single interface design: **Phosphor**
+
 ## [October 27, 2025] - History Search Feature & Testing Infrastructure
 
 ### Added
