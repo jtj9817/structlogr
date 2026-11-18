@@ -3,7 +3,7 @@ import { SVGAttributes } from 'react';
 /**
  * The StructLogr brand mark — the favicon glyph: three structured log
  * lines nested inside the Prism Braces outline. Stroke-based
- * (`currentColor`) so the badge, the auth layouts and the design-mode
+ * (`currentColor`) so the badge, the auth layouts and the phosphor
  * CSS re-tints keep working exactly as they do for a filled icon.
  */
 export default function AppLogoIcon(props: SVGAttributes<SVGElement>) {
