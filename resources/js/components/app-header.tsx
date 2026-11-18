@@ -1,7 +1,6 @@
 import AppLogo from '@/components/app-logo';
 import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import DesignDropdown from '@/components/design-dropdown';
 import { MobileNavigation } from '@/components/mobile-navigation';
 import { SearchDialog } from '@/components/search/search-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -34,7 +33,6 @@ import {
     History as HistoryIcon,
     Home,
     Info,
-    Palette,
     Search,
     Server,
     Settings,
@@ -73,11 +71,6 @@ const primaryNavItems: NavItem[] = [
         title: 'About',
         href: '/about',
         icon: Info,
-    },
-    {
-        title: 'Designs',
-        href: '/designs',
-        icon: Palette,
     },
 ];
 
@@ -336,10 +329,6 @@ export function AppHeader({
                     id="mobile-appearance-toggle-auth"
                     className="flex justify-start rounded-md border border-border/80 px-3"
                 />
-                <DesignDropdown
-                    id="mobile-design-toggle-auth"
-                    className="flex justify-start rounded-md border border-border/80 px-3"
-                />
             </div>
         </div>
     ) : (
@@ -365,10 +354,6 @@ export function AppHeader({
             <div className="flex gap-2">
                 <AppearanceToggleDropdown
                     id="mobile-appearance-toggle-guest"
-                    className="flex justify-start rounded-md border border-border/80 px-3"
-                />
-                <DesignDropdown
-                    id="mobile-design-toggle-guest"
                     className="flex justify-start rounded-md border border-border/80 px-3"
                 />
             </div>
@@ -414,19 +399,6 @@ export function AppHeader({
                         className="ml-auto flex items-center gap-2"
                     >
                         {desktopCreditsBadge}
-                        <TooltipProvider delayDuration={0}>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <DesignDropdown
-                                        id="desktop-design-toggle"
-                                        className="hidden sm:block"
-                                    />
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>Switch design</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
                         <TooltipProvider delayDuration={0}>
                             <Tooltip>
                                 <TooltipTrigger asChild>

@@ -8,7 +8,6 @@ import { createRoot } from 'react-dom/client';
 import { ErrorBoundary } from './components/error-boundary';
 import { initializeTheme } from './hooks/use-appearance';
 import { useCSRFHandler } from './hooks/use-csrf-handler';
-import { initializeDesign } from './hooks/use-design';
 import { initializeFontSize } from './hooks/use-font-size';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
@@ -76,9 +75,6 @@ createInertiaApp({
         color: '#4B5563',
     },
 });
-
-// This will set the design mode on load...
-initializeDesign();
 
 // This will set light / dark mode on load...
 initializeTheme();

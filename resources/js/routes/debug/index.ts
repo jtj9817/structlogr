@@ -1,6 +1,6 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../wayfinder'
 /**
-* @see routes/web.php:13
+* @see routes/web.php:12
 * @route '/debug/csrf-status'
 */
 export const csrfStatus = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -14,7 +14,7 @@ csrfStatus.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
-* @see routes/web.php:13
+* @see routes/web.php:12
 * @route '/debug/csrf-status'
 */
 csrfStatus.url = (options?: RouteQueryOptions) => {
@@ -22,7 +22,7 @@ csrfStatus.url = (options?: RouteQueryOptions) => {
 }
 
 /**
-* @see routes/web.php:13
+* @see routes/web.php:12
 * @route '/debug/csrf-status'
 */
 csrfStatus.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -31,7 +31,7 @@ csrfStatus.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 
 /**
-* @see routes/web.php:13
+* @see routes/web.php:12
 * @route '/debug/csrf-status'
 */
 csrfStatus.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -40,7 +40,7 @@ csrfStatus.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 })
 
 /**
-* @see routes/web.php:13
+* @see routes/web.php:12
 * @route '/debug/csrf-status'
 */
 const csrfStatusForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -49,7 +49,7 @@ const csrfStatusForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'>
 })
 
 /**
-* @see routes/web.php:13
+* @see routes/web.php:12
 * @route '/debug/csrf-status'
 */
 csrfStatusForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -58,7 +58,7 @@ csrfStatusForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> =
 })
 
 /**
-* @see routes/web.php:13
+* @see routes/web.php:12
 * @route '/debug/csrf-status'
 */
 csrfStatusForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -74,7 +74,7 @@ csrfStatusForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> 
 csrfStatus.form = csrfStatusForm
 
 /**
-* @see routes/web.php:25
+* @see routes/web.php:24
 * @route '/debug/csrf-test'
 */
 export const csrfTest = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -88,7 +88,7 @@ csrfTest.definition = {
 } satisfies RouteDefinition<["post"]>
 
 /**
-* @see routes/web.php:25
+* @see routes/web.php:24
 * @route '/debug/csrf-test'
 */
 csrfTest.url = (options?: RouteQueryOptions) => {
@@ -96,7 +96,7 @@ csrfTest.url = (options?: RouteQueryOptions) => {
 }
 
 /**
-* @see routes/web.php:25
+* @see routes/web.php:24
 * @route '/debug/csrf-test'
 */
 csrfTest.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -105,7 +105,7 @@ csrfTest.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 })
 
 /**
-* @see routes/web.php:25
+* @see routes/web.php:24
 * @route '/debug/csrf-test'
 */
 const csrfTestForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -114,7 +114,7 @@ const csrfTestForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> 
 })
 
 /**
-* @see routes/web.php:25
+* @see routes/web.php:24
 * @route '/debug/csrf-test'
 */
 csrfTestForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -125,7 +125,7 @@ csrfTestForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> =
 csrfTest.form = csrfTestForm
 
 /**
-* @see routes/web.php:46
+* @see routes/web.php:45
 * @route '/debug/session-info'
 */
 export const sessionInfo = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -139,7 +139,7 @@ sessionInfo.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
-* @see routes/web.php:46
+* @see routes/web.php:45
 * @route '/debug/session-info'
 */
 sessionInfo.url = (options?: RouteQueryOptions) => {
@@ -147,7 +147,7 @@ sessionInfo.url = (options?: RouteQueryOptions) => {
 }
 
 /**
-* @see routes/web.php:46
+* @see routes/web.php:45
 * @route '/debug/session-info'
 */
 sessionInfo.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -156,7 +156,7 @@ sessionInfo.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 
 /**
-* @see routes/web.php:46
+* @see routes/web.php:45
 * @route '/debug/session-info'
 */
 sessionInfo.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -165,7 +165,7 @@ sessionInfo.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 })
 
 /**
-* @see routes/web.php:46
+* @see routes/web.php:45
 * @route '/debug/session-info'
 */
 const sessionInfoForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -174,7 +174,7 @@ const sessionInfoForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'
 })
 
 /**
-* @see routes/web.php:46
+* @see routes/web.php:45
 * @route '/debug/session-info'
 */
 sessionInfoForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -183,7 +183,7 @@ sessionInfoForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> 
 })
 
 /**
-* @see routes/web.php:46
+* @see routes/web.php:45
 * @route '/debug/session-info'
 */
 sessionInfoForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
